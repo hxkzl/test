@@ -748,6 +748,15 @@
             });
         }
 
+        // 將函式掛載到 window 物件，讓 HTML 中的 onclick 可以呼叫
+        window.navigate = navigate;
+        window.showComplaintSection = showComplaintSection;
+        window.handleComplaintSubmit = handleComplaintSubmit;
+        window.handleTrackingSubmit = handleTrackingSubmit;
+        window.filterClubs = filterClubs;
+        window.handleAdminLogin = handleAdminLogin;
+        window.handleAdminLogout = handleAdminLogout;
+
         // Mobile Menu Toggler
         document.addEventListener('DOMContentLoaded', () => {
             const menuButton = document.getElementById('menu-button');
