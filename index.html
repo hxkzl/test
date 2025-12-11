@@ -151,7 +151,10 @@
         let app;
         let db;
         let auth;
-        const ADMIN_EMAIL = 'admin@pksh.edu.tw'; // 管理員專用 Email
+        
+        // --- 🔴 關鍵修改：將這裡改成你的 Email ---
+        const ADMIN_EMAIL = 'shaken42069@gmail.com'; 
+        // ----------------------------------------
 
         // --- Firebase 初始化與認證 ---
         function initFirebaseAndAuth() {
@@ -172,7 +175,6 @@
                 db = getFirestore(app);
                 
                 // 嘗試匿名登入 (確保一般訪客也能連線)
-                // 請確保在 Firebase Console 開啟「匿名 (Anonymous)」登入
                 signInAnonymously(auth).catch(error => {
                     console.warn("Anonymous sign-in failed. Guests might not see real-time data.", error);
                 });
@@ -191,7 +193,6 @@
                     
                     if (!APP_STATE.authReady) {
                         APP_STATE.authReady = true;
-                        // 首次載入完成，移除載入動畫並導航到首頁
                         const loadingSpinner = document.getElementById('loading-spinner');
                         if (loadingSpinner) loadingSpinner.remove();
                         navigate('home');
@@ -200,7 +201,6 @@
                 });
             } catch (e) {
                 console.error("Failed to initialize Firebase:", e);
-                // 即使失敗，也嘗試導航，但功能會受限
                 APP_STATE.authReady = true;
                 const loadingSpinner = document.getElementById('loading-spinner');
                 if (loadingSpinner) loadingSpinner.remove();
@@ -232,7 +232,6 @@
                     <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ${item.tag === '活動' ? 'bg-phsa-red text-white' : item.tag === '權益' ? 'bg-phsa-blue text-white' : 'bg-gray-200 text-gray-700'}">${item.tag}</span>
                     <h3 class="text-xl font-bold mt-2 text-gray-900">${item.title}</h3>
                     <p class="text-sm text-gray-500 mt-1">${item.date}</p>
-                    <!-- TODO: API 替換點 - 公告詳細內容連結 -->
                     <a href="#" class="mt-3 text-phsa-red font-semibold flex items-center hover:underline" onclick="event.preventDefault(); alert('點擊查看詳細內容 (模擬)');">
                         閱讀詳情 <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
                     </a>
@@ -281,7 +280,6 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             ${newsHtml}
                         </div>
-                        <!-- TODO: API 替換點 - 更多公告連結 -->
                         <div class="text-center mt-6">
                              <a href="#" class="text-phsa-red font-semibold hover:underline">查看更多公告...</a>
                         </div>
@@ -302,7 +300,7 @@
                     </div>
                 </section>
             `;
-            lucide.createIcons(); // 重新渲染 Lucide 圖標
+            lucide.createIcons();
         }
 
         // 2. 申訴信箱頁面渲染
@@ -311,13 +309,11 @@
                 <div class="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl card-shadow">
                     <h1 class="text-3xl font-bold mb-6 text-phsa-red">權益申訴/建議信箱</h1>
 
-                    <!-- 導航 Tab: 申訴提交 / 狀態追蹤 -->
                     <div class="flex border-b mb-6">
                         <button id="tab-submit" class="tab-button py-2 px-4 text-lg font-medium border-b-2 border-phsa-red text-phsa-red transition-colors" onclick="showComplaintSection('submit')">提交申訴</button>
                         <button id="tab-track" class="tab-button py-2 px-4 text-lg font-medium border-b-2 border-transparent text-gray-500 hover:text-phsa-red transition-colors" onclick="showComplaintSection('track')">進度追蹤</button>
                     </div>
 
-                    <!-- 申訴提交區塊 -->
                     <div id="complaint-submit-section">
                         <form id="complaint-form" onsubmit="handleComplaintSubmit(event)">
                             <p class="mb-4 text-gray-600 flex items-center">
@@ -328,10 +324,10 @@
                                 <label for="category" class="block text-sm font-medium text-gray-700 mb-1">申訴類別 (必選)</label>
                                 <select id="category" name="category" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-phsa-red focus:border-phsa-red">
                                     <option value="">請選擇...</option>
-                                    <option value="equipment">設備設施 (如飲水機、廁所)</option>
-                                    <option value="curriculum">教務相關 (如課表、考試)</option>
-                                    <option value="rights">學生權益 (如校規、服儀)</option>
-                                    <option value="life">生活相關 (如午餐、合作社)</option>
+                                    <option value="equipment">設備設施</option>
+                                    <option value="curriculum">教務相關</option>
+                                    <option value="rights">學生權益</option>
+                                    <option value="life">生活相關</option>
                                     <option value="other">其他</option>
                                 </select>
                             </div>
@@ -346,10 +342,9 @@
                         </form>
                     </div>
 
-                    <!-- 狀態追蹤區塊 -->
                     <div id="complaint-track-section" class="hidden">
                         <div id="tracking-info" class="mb-6 bg-gray-50 p-4 rounded-lg text-gray-700">
-                             請輸入您的追蹤 ID 查詢申訴進度，**本系統無需 PIN 碼，僅需 ID** (模擬簡化)。
+                             請輸入您的追蹤 ID 查詢申訴進度，**本系統無需 PIN 碼，僅需 ID**。
                         </div>
                         <form id="tracking-form" onsubmit="handleTrackingSubmit(event)">
                             <div class="flex space-x-2">
@@ -359,14 +354,11 @@
                                 </button>
                             </div>
                         </form>
-                        <div id="tracking-result" class="mt-8">
-                            <!-- 查詢結果將顯示在這裡 -->
-                        </div>
+                        <div id="tracking-result" class="mt-8"></div>
                     </div>
                 </div>
             `;
             lucide.createIcons();
-            // 根據狀態條重設 active 狀態
             if (APP_STATE.trackingId) {
                 showComplaintSection('track');
                 document.getElementById('track-id').value = APP_STATE.trackingId;
@@ -405,7 +397,6 @@
             appContainer.innerHTML = `
                 <h1 class="text-3xl font-bold mb-6 text-phsa-red">社團專區 (Club Directory)</h1>
 
-                <!-- 搜尋與篩選 -->
                 <div class="mb-8 p-6 bg-white rounded-xl card-shadow">
                     <input type="text" placeholder="輸入社團名稱或關鍵字搜尋..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-phsa-red focus:border-phsa-red mb-4">
                     <div class="flex flex-wrap gap-2" id="club-category-filters">
@@ -413,11 +404,9 @@
                     </div>
                 </div>
 
-                <!-- 社團列表 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="club-list">
                     ${clubHtml}
                 </div>
-                <!-- TODO: API 替換點 - 社團列表 API -->
             `;
             lucide.createIcons();
         }
@@ -428,7 +417,7 @@
                 renderAdminDashboard();
                 return;
             }
-            renderAdminLogin(); // 如果不是 Admin 則顯示登入頁面
+            renderAdminLogin();
         }
 
         function renderAdminLogin() {
@@ -454,8 +443,6 @@
             `;
         }
 
-
-        // 4.1 Admin Dashboard 模擬
         function renderAdminDashboard() {
              const complaintsPending = Object.values(APP_STATE.mockData.complaints).filter(c => c.status === '已收到').length;
              const applicationsPending = APP_STATE.mockData.clubApplications.filter(a => a.status === '已收件').length;
@@ -464,19 +451,16 @@
                 <h1 class="text-3xl font-bold mb-6 text-phsa-red">儀表板 (Admin)</h1>
                 <p class="mb-6 text-green-600 font-semibold">您已以管理員身份 ${auth.currentUser.email} 登入。</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <!-- 卡片 1: 待處理申訴 -->
                     <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-phsa-red">
                         <p class="text-sm font-medium text-phsa-red">待處理申訴</p>
                         <p class="text-3xl font-bold mt-1">${complaintsPending}</p>
                         <a href="#" class="text-sm text-gray-500 hover:text-phsa-red">查看所有案件</a>
                     </div>
-                    <!-- 卡片 2: 社團申請 -->
                     <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-phsa-blue">
                         <p class="text-sm font-medium text-phsa-blue">待審核申請</p>
                         <p class="text-3xl font-bold mt-1">${applicationsPending}</p>
                         <a href="#" class="text-sm text-gray-500 hover:text-phsa-blue">審核社團活動</a>
                     </div>
-                    <!-- 卡片 3: 公告發布 -->
                     <div class="bg-white p-6 rounded-xl card-shadow border-l-4 border-gray-500">
                         <p class="text-sm font-medium text-gray-500">發布新公告</p>
                         <p class="text-3xl font-bold mt-1">📝</p>
@@ -484,7 +468,6 @@
                     </div>
                 </div>
 
-                <!-- 模擬申訴案件列表 -->
                 <div class="bg-white p-6 rounded-xl card-shadow mb-8">
                     <h2 class="text-xl font-bold mb-4 text-gray-900">申訴案件追蹤 (權益組)</h2>
                     <table class="min-w-full divide-y divide-gray-200">
@@ -527,20 +510,15 @@
 
         // --- 互動邏輯函數 ---
 
-        // 頁面導航
         function navigate(view) {
             APP_STATE.view = view;
-            APP_STATE.trackingId = null; // 清除追蹤 ID 狀態
+            APP_STATE.trackingId = null;
             const mobileMenu = document.getElementById('mobile-menu');
             if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.add('hidden');
             }
 
-            // 確保認證完成後才開始渲染
-            if (!APP_STATE.authReady) {
-                // 如果認證未完成，則不做任何事，等待 onAuthStateChanged 觸發
-                return;
-            }
+            if (!APP_STATE.authReady) return;
 
             switch (view) {
                 case 'complaint':
@@ -550,16 +528,15 @@
                     checkAuthAndRender(renderClubs);
                     break;
                 case 'admin':
-                    checkAuthAndRender(renderAdmin); // 這裡會檢查是否為 admin，不是則導向登入頁
+                    checkAuthAndRender(renderAdmin);
                     break;
                 default:
                     checkAuthAndRender(renderHome);
                     break;
             }
-            window.scrollTo(0, 0); // 回到頂部
+            window.scrollTo(0, 0);
         }
         
-        // 申訴頁面 Tab 切換
         function showComplaintSection(section) {
             const submit = document.getElementById('complaint-submit-section');
             const track = document.getElementById('complaint-track-section');
@@ -583,57 +560,43 @@
             }
         }
 
-        // 申訴提交處理
         function handleComplaintSubmit(event) {
             event.preventDefault();
             const category = document.getElementById('category').value;
             const content = document.getElementById('content').value.trim();
 
             if (content.length < 20) {
-                 // 使用 custom modal 而非 alert
                  console.log('請提供更詳細的申訴內容 (至少 20 個字)。');
                  return;
             }
 
-            // --- API 替換點: POST /api/complaints (未來使用 Firestore) ---
-            // 模擬後端回傳 Tracking ID
             const newId = 'C' + Math.floor(Math.random() * 900 + 100); 
 
-            // 模擬成功回饋
             document.getElementById('complaint-form').reset();
             APP_STATE.trackingId = newId;
 
-            // 這裡應該替換成自訂的成功訊息 Modal
-            console.log(`申訴成功！您的追蹤 ID 是：${newId}。請妥善保存！`);
-            
-            // 由於不能使用 alert()，這裡將成功訊息直接顯示在畫面頂部
             const successMessage = document.createElement('div');
             successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-xl z-50';
             successMessage.textContent = `✅ 申訴成功！追蹤 ID：${newId}`;
             document.body.appendChild(successMessage);
             setTimeout(() => successMessage.remove(), 5000);
 
-
             showComplaintSection('track');
             document.getElementById('track-id').value = newId;
-            handleTrackingSubmit({ preventDefault: () => {} }); // 自動追蹤
-            // ----------------------------------------
+            handleTrackingSubmit({ preventDefault: () => {} });
         }
 
-        // 申訴追蹤查詢處理
         function handleTrackingSubmit(event) {
             event.preventDefault();
             const trackId = document.getElementById('track-id').value.toUpperCase();
             const resultDiv = document.getElementById('tracking-result');
             
-            // --- API 替換點: GET /api/complaints/:id ---
             const caseData = APP_STATE.mockData.complaints[trackId];
 
             if (!caseData) {
                 resultDiv.innerHTML = `<p class="text-red-600 font-semibold mt-4">查無此案件 ID 或案件已過期。</p>`;
                 return;
             }
-            // ----------------------------------------
 
             const steps = ['已收到', '處理中', '已回覆', '已結案'];
             const currentStatusIndex = steps.indexOf(caseData.status);
@@ -660,12 +623,10 @@
                     </p>
                 </div>
 
-                <!-- 狀態進度條 -->
                 <div class="flex items-start justify-between mb-8">
                     ${stepsHtml}
                 </div>
                 
-                <!-- 申訴內容與回覆 -->
                 <div class="bg-gray-100 p-4 rounded-lg">
                     <p class="font-semibold mb-2">您提交的內容：</p>
                     <p class="text-gray-700 italic">${caseData.content}</p>
@@ -680,13 +641,10 @@
             lucide.createIcons();
         }
 
-        // 社團篩選
         function filterClubs(category) {
-            // 這裡可以實現前端篩選邏輯，或觸發 API 請求
             console.log(`模擬篩選社團，篩選類別: ${category}`);
         }
 
-        // 幹部登入（使用 Firebase Email/Password 驗證）
         async function handleAdminLogin(event) {
             event.preventDefault();
             const email = document.getElementById('admin-email').value;
@@ -697,25 +655,19 @@
             messageEl.classList.remove('text-red-500', 'text-green-500');
 
             try {
-                // 1. 嘗試使用 Email/Password 登入 Firebase
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 
-                // 2. 確認登入的用戶是否為管理員 Email
                 if (userCredential.user.email === ADMIN_EMAIL) {
-                    // 登入成功且是管理員
                     APP_STATE.isAdmin = true;
                     messageEl.textContent = '登入成功！';
                     messageEl.classList.remove('text-red-500');
                     messageEl.classList.add('text-green-500');
-                    // navigate 會由 onAuthStateChanged 監聽器間接觸發，但這裡直接導航更快
                     setTimeout(() => navigate('admin'), 500);
                 } else {
-                    // 登入成功但不是預期的管理員帳號 (例如：普通學生帳號)
-                    await signOut(auth); // 登出這個非管理員帳號
+                    await signOut(auth);
                     messageEl.textContent = '帳號權限不足。';
                 }
             } catch (error) {
-                // 登入失敗
                 console.error("Login failed:", error);
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     messageEl.textContent = '帳號或密碼錯誤。';
@@ -729,12 +681,10 @@
             }
         }
 
-        // 幹部登出
         function handleAdminLogout() {
             signOut(auth).then(() => {
                 APP_STATE.isAdmin = false;
                 navigate('home');
-                // 這裡應該替換成自訂的成功訊息 Modal
                 console.log('您已安全登出。');
                 
                 const successMessage = document.createElement('div');
@@ -748,7 +698,6 @@
             });
         }
 
-        // 將函式掛載到 window 物件，讓 HTML 中的 onclick 可以呼叫
         window.navigate = navigate;
         window.showComplaintSection = showComplaintSection;
         window.handleComplaintSubmit = handleComplaintSubmit;
@@ -757,7 +706,6 @@
         window.handleAdminLogin = handleAdminLogin;
         window.handleAdminLogout = handleAdminLogout;
 
-        // Mobile Menu Toggler
         document.addEventListener('DOMContentLoaded', () => {
             const menuButton = document.getElementById('menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -767,12 +715,9 @@
                     mobileMenu.classList.toggle('hidden');
                 });
             }
-
-            // 初始啟動 Firebase 和身份驗證流程
             initFirebaseAndAuth();
         });
 
-        // PWA 建議：Service Worker 註冊 (此處為模擬提示)
         if ('serviceWorker' in navigator) {
             setTimeout(() => {
                 console.log('TODO: 註冊 Service Worker 實現 PWA 快取。');
