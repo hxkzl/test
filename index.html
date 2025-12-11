@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>北港高中學生會 | PKSH 數位平台</title>
+    <!-- v2.0 標題，用來確認是否有更新成功 -->
+    <title>北港高中學生會 | PKSH 數位平台 (v2.0)</title>
     <!-- 載入 Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 載入 Lucide Icons CDN -->
@@ -62,7 +63,6 @@
                     <button class="text-gray-600 hover:text-phsa-red transition-colors" onclick="navigate('complaint')">申訴信箱</button>
                     <button class="text-gray-600 hover:text-phsa-red transition-colors" onclick="navigate('clubs')">社團專區</button>
                     <a href="#admin" class="text-gray-600 hover:text-phsa-red transition-colors" onclick="navigate('admin')">幹部登入</a>
-                    <!-- TODO: API 替換點 - 社群連結 -->
                     <a href="https://www.instagram.com/pksh" target="_blank" class="text-gray-600 hover:text-phsa-red transition-colors">
                         <i data-lucide="instagram" class="w-5 h-5"></i>
                     </a>
@@ -92,7 +92,7 @@
         <!-- 載入中的提示 -->
         <div id="loading-spinner" class="flex justify-center items-center h-64">
             <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-phsa-red"></div>
-            <p class="ml-4 text-gray-500">系統載入中...</p>
+            <p class="ml-4 text-gray-500">系統載入中... (若過久請重新整理)</p>
         </div>
     </main>
 
@@ -108,18 +108,16 @@
         // 引入 Firebase 必要的模組
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- 核心資料與狀態 ---
 
         const APP_STATE = {
             view: 'home',
             trackingId: null,
-            // Firebase 狀態
             authReady: false,
-            isAdmin: false, // 追蹤是否為管理員
+            isAdmin: false,
             userId: null,
-            // 模擬資料 (將逐步被 Firestore 取代)
             mockData: {
                 announcements: [
                     { id: 1, title: '校慶園遊會攤位招募！', tag: '活動', date: '2025-11-20', content: '一年一度的校慶園遊會即將登場，快來申請攤位！' },
@@ -152,14 +150,12 @@
         let db;
         let auth;
         
-        // --- 🔴 關鍵修改：將這裡改成你的 Email ---
+        // 管理員 Email
         const ADMIN_EMAIL = 'shaken42069@gmail.com'; 
-        // ----------------------------------------
 
         // --- Firebase 初始化與認證 ---
         function initFirebaseAndAuth() {
             try {
-                // 使用者提供的真實 Firebase 設定
                 const firebaseConfig = {
                   apiKey: "AIzaSyDWmy__e9_7YbhBTJNvLvGVglj-fOTFWMg",
                   authDomain: "pksh-student-council.firebaseapp.com",
@@ -169,22 +165,17 @@
                   appId: "1:142500679754:web:a758dc9a8b5ae34f9296b3"
                 };
 
-                // 1. 初始化 Firebase App
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // 嘗試匿名登入 (確保一般訪客也能連線)
                 signInAnonymously(auth).catch(error => {
-                    console.warn("Anonymous sign-in failed. Guests might not see real-time data.", error);
+                    console.warn("Anonymous sign-in failed.", error);
                 });
 
-                // 2. 監聽身份驗證狀態變化
                 onAuthStateChanged(auth, (user) => {
-                    // 檢查用戶是否已登入 (無論是匿名或 Email/Password)
                     if (user) {
                         APP_STATE.userId = user.uid;
-                        // 檢查是否為管理員 (這裡我們將 admin 登入視為特殊權限)
                         APP_STATE.isAdmin = (user.email === ADMIN_EMAIL && !user.isAnonymous); 
                     } else {
                         APP_STATE.userId = null;
@@ -197,14 +188,15 @@
                         if (loadingSpinner) loadingSpinner.remove();
                         navigate('home');
                     }
-                    console.log("Auth State Changed. User ID:", APP_STATE.userId, "Is Admin:", APP_STATE.isAdmin);
+                    console.log("Auth State:", APP_STATE.isAdmin ? "Admin" : "User");
                 });
             } catch (e) {
-                console.error("Failed to initialize Firebase:", e);
-                APP_STATE.authReady = true;
+                console.error("Firebase init error:", e);
+                APP_STATE.authReady = true; // 允許在錯誤狀態下顯示介面
                 const loadingSpinner = document.getElementById('loading-spinner');
                 if (loadingSpinner) loadingSpinner.remove();
                 navigate('home');
+                alert("系統初始化失敗，部分功能可能無法使用。請檢查網路連線。");
             }
         }
         
@@ -212,16 +204,12 @@
 
         const appContainer = document.getElementById('app-container');
 
-        // 輔助函數: 檢查認證狀態
         function checkAuthAndRender(renderFunction) {
-             if (!APP_STATE.authReady) return; // 避免在認證完成前渲染
-
-             // 確保在導航到 admin 頁面時，用戶確實是 admin
+             if (!APP_STATE.authReady) return; 
              if (APP_STATE.view === 'admin' && !APP_STATE.isAdmin) {
-                 renderAdminLogin(); // 未登入或不是 admin 則顯示登入介面
+                 renderAdminLogin(); 
                  return;
              }
-             
              renderFunction();
         }
 
@@ -250,7 +238,7 @@
                     </button>
                 </div>
 
-                <!-- 快速連結 (Quick Links) -->
+                <!-- 快速連結 -->
                 <section class="mb-12">
                     <h2 class="text-2xl font-bold mb-4 text-gray-900">快速行動</h2>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -285,7 +273,6 @@
                         </div>
                     </div>
 
-                    <!-- 匿名告白牆 (側邊欄/卡片) -->
                     <div class="bg-white p-6 rounded-xl card-shadow h-fit">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-xl font-bold text-phsa-red flex items-center">
@@ -318,7 +305,7 @@
                         <form id="complaint-form" onsubmit="handleComplaintSubmit(event)">
                             <p class="mb-4 text-gray-600 flex items-center">
                                 <i data-lucide="alert-triangle" class="w-5 h-5 mr-2 text-yellow-500"></i>
-                                本系統完全匿名，請勿在內容中填寫個人資料。系統將提供追蹤碼供您查詢進度。
+                                本系統完全匿名，請勿在內容中填寫個人資料。
                             </p>
                             <div class="mb-4">
                                 <label for="category" class="block text-sm font-medium text-gray-700 mb-1">申訴類別 (必選)</label>
@@ -333,8 +320,7 @@
                             </div>
                             <div class="mb-6">
                                 <label for="content" class="block text-sm font-medium text-gray-700 mb-1">申訴內容 (必填)</label>
-                                <textarea id="content" name="content" rows="6" required placeholder="請詳細描述問題發生的時間、地點及影響..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-phsa-red focus:border-phsa-red"></textarea>
-                                <p class="text-xs text-gray-500 mt-1">內容需大於 20 字，小於 1000 字。</p>
+                                <textarea id="content" name="content" rows="6" required placeholder="請詳細描述..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-phsa-red focus:border-phsa-red"></textarea>
                             </div>
                             <button type="submit" class="w-full bg-phsa-red text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-colors">
                                 提交申訴
@@ -344,7 +330,7 @@
 
                     <div id="complaint-track-section" class="hidden">
                         <div id="tracking-info" class="mb-6 bg-gray-50 p-4 rounded-lg text-gray-700">
-                             請輸入您的追蹤 ID 查詢申訴進度，**本系統無需 PIN 碼，僅需 ID**。
+                             請輸入您的追蹤 ID 查詢申訴進度。
                         </div>
                         <form id="tracking-form" onsubmit="handleTrackingSubmit(event)">
                             <div class="flex space-x-2">
@@ -396,14 +382,12 @@
 
             appContainer.innerHTML = `
                 <h1 class="text-3xl font-bold mb-6 text-phsa-red">社團專區 (Club Directory)</h1>
-
                 <div class="mb-8 p-6 bg-white rounded-xl card-shadow">
                     <input type="text" placeholder="輸入社團名稱或關鍵字搜尋..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-phsa-red focus:border-phsa-red mb-4">
                     <div class="flex flex-wrap gap-2" id="club-category-filters">
                         ${categoryHtml}
                     </div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="club-list">
                     ${clubHtml}
                 </div>
@@ -698,6 +682,7 @@
             });
         }
 
+        // 將函式掛載到 window 物件，讓 HTML 中的 onclick 可以呼叫
         window.navigate = navigate;
         window.showComplaintSection = showComplaintSection;
         window.handleComplaintSubmit = handleComplaintSubmit;
