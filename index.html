@@ -1,47 +1,47 @@
 <!DOCTYPE html>
-< = =>
-<>
-    < =>
-    < = =>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>北港高中學生會 | PKSH Student Council</title>
-    < =></>
-    <>
-        . = {
-            : ,
-            : {
-                : {
-                    : {
-                        : {
-                            : ,
-                            : ,
-                            : 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        theme: {
+                            DEFAULT: '#00c8b7',
+                            dark: '#00a092',
+                            light: '#e0fbf9'
                         }
                     }
                 }
             }
         }
-    </>
-    < =></>
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     
-    <>
-        : {
-            : #c8b7;
-            : , , , ;
+    <style>
+        :root {
+            --primary-color: #00c8b7;
+            font-family: 'Noto Sans TC', 'Inter', system-ui, sans-serif;
         }
         
         /* 自定義樣式類別 */
-        . { : (); }
-        . { : (); }
-        . { : (); }
-        .: { : (); }
+        .text-theme { color: var(--primary-color); }
+        .bg-theme { background-color: var(--primary-color); }
+        .border-theme { border-color: var(--primary-color); }
+        .hover-text-theme:hover { color: var(--primary-color); }
         
+        /* 跑馬燈：速度放慢至 30s */
+        .marquee-container { overflow: hidden; white-space: nowrap; position: relative; }
+        .marquee-content { display: inline-block; animation: marquee 30s linear infinite; }
+        .marquee-content:hover { animation-play-state: paused; }
         
-        . { : ; : ; : ; }
-        . { : ; :    ; }
-        .: { : ; }
-        
-          {
-            % { : (%); }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
 
@@ -50,9 +50,9 @@
         
         /* 過渡效果 */
         body, div, nav, header { transition: background-color 0.3s, color 0.3s; }
-    </>
+    </style>
 </head>
-< =>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 flex flex-col min-h-screen">
 
     <div class="bg-gray-800 text-white dark:bg-black text-sm py-2 px-4 marquee-container">
         <div class="marquee-content" id="marquee-text">
@@ -63,46 +63,44 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="#" class="flex-shrink-0 flex items-center gap-2" onclick="navigate('home')">
-                    <img src="image_0.png" alt="PKSH Student Council Logo" class="w-10 h-10 rounded-full bg-white dark:bg-gray-700 p-0.5 shadow-sm">
+                    <img src="大頭貼.jpg" alt="PKSH Logo" class="w-10 h-10 rounded-full bg-white dark:bg-gray-700 p-0.5 shadow-sm object-cover">
                     <span class="text-xl font-bold text-gray-900 dark:text-white hidden sm:block">北港高中<span class="text-theme">學生會</span></span>
                 </a>
 
-                <nav class="hidden lg:flex space-x-4 items-center">
-                    <button class="nav-btn hover:text-theme" onclick="navigate('home')" data-key="home">首頁</button>
-                    <button class="nav-btn hover:text-theme" onclick="navigate('events')" data-key="events">近期活動</button>
-                    <button class="nav-btn hover:text-theme" onclick="navigate('complaint')" data-key="complaint">申訴</button>
-                    <button class="nav-btn hover:text-theme" onclick="navigate('clubs')" data-key="clubs">社團</button>
-                    <button class="nav-btn hover:text-theme" onclick="navigate('org')" data-key="org">組織架構</button>
-                    < = ="()" =>財務公開</>
-                    < = ="()" =>
-                        聯絡我們
-                    </>
-                </>
+                <nav class="hidden lg:flex space-x-1 items-center">
+                    <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="navigate('home')" data-key="home">首頁</button>
+                    <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="navigate('events')" data-key="events">近期活動</button>
+                    <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="navigate('complaint')" data-key="complaint">申訴</button>
+                    <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="navigate('clubs')" data-key="clubs">社團</button>
+                    <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="navigate('org')" data-key="org">組織架構</button>
+                    <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="navigate('finance')" data-key="finance">財務公開</button>
+                    <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition text-theme font-semibold" onclick="navigate('contact')" data-key="contact">聯絡我們</button>
+                </nav>
 
-                < =>
-                    < ="()" =>
-                        < =>EN</>
-                    </>
-                    < ="()" =>
-                        < = = =></>
-                        < = = =></>
-                    </>
-                    < = =>
-                        < = =></>
-                    </>
-                </>
-            </>
-        </>
+                <div class="flex items-center space-x-3">
+                    <button onclick="toggleLang()" class="px-2 py-1 text-xs font-bold border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <span id="lang-display">EN</span>
+                    </button>
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-yellow-400 transition">
+                        <i data-lucide="moon" id="dark-icon" class="w-5 h-5"></i>
+                        <i data-lucide="sun" id="light-icon" class="w-5 h-5 hidden"></i>
+                    </button>
+                    <button id="menu-button" class="lg:hidden text-gray-600 dark:text-gray-200 p-2">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
         
-        < = =>
-            < =>
-                < = ="()" =>首頁</button>
-                < = ="()" =>近期活動</button>
-                < = ="()" ="complaint">申訴信箱</button>
-                < = ="()" =>社團專區</button>
-                < = ="()" =>組織架構</button>
-                < = ="()" =>財務公開</button>
-                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('contact')" data-key="contact">聯絡我們</button>
+        <div id="mobile-menu" class="lg:hidden hidden bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 absolute w-full z-40 shadow-xl">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('home')" data-key="home">首頁</button>
+                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('events')" data-key="events">近期活動</button>
+                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('complaint')" data-key="complaint">申訴信箱</button>
+                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('clubs')" data-key="clubs">社團專區</button>
+                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('org')" data-key="org">組織架構</button>
+                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('finance')" data-key="finance">財務公開</button>
+                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700 text-theme" onclick="navigate('contact')" data-key="contact">聯絡我們</button>
             </div>
         </div>
     </header>
@@ -122,74 +120,59 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // --- 翻譯字典 ---
+        // --- 多語系字典 ---
         const I18N = {
             zh: {
-                // 修改處：about 改為 contact
                 home: '首頁', events: '近期活動', complaint: '申訴信箱', clubs: '社團專區', 
                 contact: '聯絡我們', org: '組織架構', finance: '財務公開', admin: '幹部登入',
                 marquee: '歡迎來到北港高中學生會！ 12/24(三) 金勾盃活動 • 1/16-20 第三次段考 • 傳情活動熱烈進行中！',
-                // 修改處：首頁標題更改
                 heroTitle: '北港高中學生會互動網站',
                 heroSubtitle: '你的聲音，我們的行動。共創更美好的校園生活。',
                 btnComplaint: '立即申訴/建議',
-                quickActions: '快速行動',
                 news: '最新公告',
                 confession: '匿名告白牆',
                 financeTitle: '財務公開透明',
                 orgTitle: '學生會組織架構',
                 eventTitle: '近期活動一覽',
-                loading: '載入中...',
-                readMore: '閱讀詳情',
                 submit: '提交',
-                track: '查詢',
-                status: '狀態',
                 category: '類別',
                 content: '內容'
             },
             en: {
-                // 修改處：about 改為 contact
                 home: 'Home', events: 'Events', complaint: 'Complaints', clubs: 'Clubs',
                 contact: 'Contact Us', org: 'Organization', finance: 'Finance', admin: 'Staff Login',
                 marquee: 'Welcome to PKSH Student Council! 12/24 Xmas Event • 1/16-20 3rd Midterm Exam • Message Delivery Event Ongoing!',
                 heroTitle: 'PKSH Student Council Interactive Site',
                 heroSubtitle: 'Your Voice, Our Action. Creating a better campus life together.',
                 btnComplaint: 'Submit Complaint',
-                quickActions: 'Quick Actions',
                 news: 'Latest News',
                 confession: 'Confession Wall',
                 financeTitle: 'Financial Transparency',
                 orgTitle: 'Organizational Chart',
                 eventTitle: 'Upcoming Events',
-                loading: 'Loading...',
-                readMore: 'Read More',
                 submit: 'Submit',
-                track: 'Track',
-                status: 'Status',
                 category: 'Category',
                 content: 'Content'
             }
         };
 
-        // --- 核心狀態 ---
+        // --- 應用程式狀態 ---
         const APP_STATE = {
             view: 'home',
-            lang: 'zh', // 預設中文
+            lang: 'zh',
             darkMode: false,
-            isAdmin: false,
             userId: null,
             mockData: {
                 announcements: [
-                    { id: 1, title: '傳情活動倒數中！', tag: '活動', date: '2025-12-20', content: '還沒寫卡片嗎？快來學務處前攤位！' },
-                    { id: 2, title: '金勾盃歌唱大賽賽程表', tag: '活動', date: '2025-12-18', content: '決賽名單已出爐，請參賽者準時報到。' },
-                    { id: 3, title: '第三次段考考程表公告', tag: '教務', date: '2026-01-10', content: '請同學提早準備，考程表詳見附件。' },
+                    { id: 1, title: '傳情活動倒數中！', tag: '活動', date: '2025-12-20' },
+                    { id: 2, title: '金勾盃歌唱大賽賽程表', tag: '活動', date: '2025-12-18' },
+                    { id: 3, title: '第三次段考考程表公告', tag: '教務', date: '2026-01-10' },
                 ],
                 events: [
-                    { date: '12/24', title: '金勾盃歌唱大賽', location: '活動中心', time: '13:00-16:00', type: '娛樂' },
-                    { date: '01/16', title: '第三次段考 Day1', location: '各班教室', time: '08:00-16:00', type: '學術' },
+                    { date: '12/24', title: '金勾盃歌唱大賽', location: '活動中心', time: '13:00', type: '娛樂' },
+                    { date: '01/16', title: '第三次段考 Day1', location: '各班教室', time: '08:00', type: '學術' },
                     { date: '01/20', title: '休業式', location: '操場', time: '10:00', type: '校務' }
                 ],
                 finance: [
@@ -208,17 +191,15 @@
                 clubs: [
                     { name: '熱舞社', category: '藝文', img: 'https://placehold.co/400x250/00c8b7/FFFFFF?text=Dance' },
                     { name: '籃球社', category: '運動', img: 'https://placehold.co/400x250/333333/FFFFFF?text=Basketball' },
-                ],
-                complaints: {}
+                ]
             }
         };
 
-        // --- Firebase (Mock) ---
-        const firebaseConfig = { apiKey: "AIzaSyDWmy__mock", authDomain: "mock.firebaseapp.com" }; // 請替換真實 Config
+        // --- Firebase 初始化 (Mock) ---
+        const firebaseConfig = { apiKey: "AIzaSyDWmy__mock", authDomain: "mock.firebaseapp.com" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // 模擬登入流程
         signInAnonymously(auth).catch(e => console.log("Auth placeholder"));
         onAuthStateChanged(auth, (user) => {
             APP_STATE.userId = user ? user.uid : null;
@@ -226,17 +207,14 @@
             render();
         });
 
-        // --- 輔助函式 ---
         const t = (key) => I18N[APP_STATE.lang][key] || key;
-
         function updateMarquee() {
-            const marqueeText = document.getElementById('marquee-text');
-            if(marqueeText) marqueeText.innerText = t('marquee');
+            const el = document.getElementById('marquee-text');
+            if(el) el.innerText = t('marquee');
         }
 
         // --- 頁面渲染函式 ---
-        
-        // 1. 首頁
+
         function renderHome() {
             const newsHtml = APP_STATE.mockData.announcements.map(item => `
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md hover:shadow-lg transition border-l-4 border-theme">
@@ -281,7 +259,6 @@
             `;
         }
 
-        // 2. 近期活動
         function renderEvents() {
             const eventsHtml = APP_STATE.mockData.events.map(ev => `
                 <div class="flex items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4 border-l-4 ${ev.type === '娛樂' ? 'border-pink-500' : ev.type === '學術' ? 'border-blue-500' : 'border-gray-500'}">
@@ -299,16 +276,9 @@
                     <span class="px-3 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">${ev.type}</span>
                 </div>
             `).join('');
-
-            return `
-                <h1 class="text-3xl font-bold mb-6 text-theme">${t('eventTitle')}</h1>
-                <div class="max-w-3xl mx-auto">
-                    ${eventsHtml}
-                </div>
-            `;
+            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('eventTitle')}</h1><div class="max-w-3xl mx-auto">${eventsHtml}</div>`;
         }
 
-        // 3. 組織架構
         function renderOrg() {
             const orgHtml = APP_STATE.mockData.org.map(member => `
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md text-center hover:-translate-y-1 transition duration-300">
@@ -318,63 +288,36 @@
                     <p class="text-sm text-gray-500 mt-2">${member.role}</p>
                 </div>
             `).join('');
-
-            return `
-                <h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('orgTitle')}</h1>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    ${orgHtml}
-                </div>
-            `;
+            return `<h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('orgTitle')}</h1><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${orgHtml}</div>`;
         }
 
-        // 4. 財務公開
         function renderFinance() {
             const rows = APP_STATE.mockData.finance.map(f => `
                 <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                     <td class="py-3 px-4 dark:text-gray-300">${f.date}</td>
                     <td class="py-3 px-4 font-medium dark:text-white">${f.item}</td>
-                    <td class="py-3 px-4">
-                        <span class="${f.type === '收入' ? 'text-green-500' : 'text-red-500'} font-bold">
-                            ${f.amount > 0 ? '+' : ''}${f.amount}
-                        </span>
-                    </td>
+                    <td class="py-3 px-4"><span class="${f.type === '收入' ? 'text-green-500' : 'text-red-500'} font-bold">${f.amount > 0 ? '+' : ''}${f.amount}</span></td>
                 </tr>
             `).join('');
-
             return `
                 <h1 class="text-3xl font-bold mb-6 text-theme">${t('financeTitle')}</h1>
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                    <div class="p-6 bg-theme/10 border-b border-theme/20">
-                        <p class="text-sm text-gray-600 dark:text-gray-300">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p>
-                    </div>
+                    <div class="p-6 bg-theme/10 border-b border-theme/20"><p class="text-sm text-gray-600 dark:text-gray-300">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p></div>
                     <table class="w-full text-left border-collapse">
-                        <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 uppercase text-xs">
-                            <tr>
-                                <th class="py-3 px-4">日期</th>
-                                <th class="py-3 px-4">項目</th>
-                                <th class="py-3 px-4">金額 (TWD)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${rows}
-                        </tbody>
+                        <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 uppercase text-xs"><tr><th class="py-3 px-4">日期</th><th class="py-3 px-4">項目</th><th class="py-3 px-4">金額 (TWD)</th></tr></thead>
+                        <tbody>${rows}</tbody>
                     </table>
                 </div>
             `;
         }
 
-        // 5. 申訴
         function renderComplaint() {
             return `
                 <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
                     <h1 class="text-3xl font-bold mb-6 text-theme">${t('btnComplaint')}</h1>
                     <form onsubmit="event.preventDefault(); alert('功能展示：申訴已送出！');">
                         <label class="block mb-2 text-sm font-bold dark:text-gray-300">${t('category')}</label>
-                        <select class="w-full p-3 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4">
-                            <option>設備設施</option>
-                            <option>活動建議</option>
-                            <option>學生權益</option>
-                        </select>
+                        <select class="w-full p-3 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4"><option>設備設施</option><option>活動建議</option><option>學生權益</option></select>
                         <label class="block mb-2 text-sm font-bold dark:text-gray-300">${t('content')}</label>
                         <textarea class="w-full p-3 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-6" rows="4"></textarea>
                         <button class="w-full bg-theme text-white font-bold py-3 rounded hover:bg-teal-600 transition">${t('submit')}</button>
@@ -383,47 +326,34 @@
             `;
         }
         
-        // 6. 社團
         function renderClubs() {
             const clubList = APP_STATE.mockData.clubs.map(c => `
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
                     <img src="${c.img}" class="w-full h-32 object-cover">
-                    <div class="p-4">
-                        <span class="text-xs bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-200">${c.category}</span>
-                        <h3 class="font-bold mt-2 dark:text-white">${c.name}</h3>
-                    </div>
+                    <div class="p-4"><span class="text-xs bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-200">${c.category}</span><h3 class="font-bold mt-2 dark:text-white">${c.name}</h3></div>
                 </div>
             `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('clubs')}</h1><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${clubList}</div>`;
+            return `<h1 class="text-3xl font-bold mb-6 text-theme">社團專區</h1><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${clubList}</div>`;
         }
 
-        
-         () {
-             `
-
-${()}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        function renderContact() {
+            return `
+                <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+                    <h1 class="text-3xl font-bold mb-6 text-theme">${t('contact')}</h1>
+                    <div class="space-y-6">
+                        <a href="https://www.instagram.com/pksh.su/" target="_blank" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition group">
+                            <i data-lucide="instagram" class="w-8 h-8 text-pink-600 mr-4 group-hover:scale-110 transition-transform"></i>
+                            <div><h3 class="font-bold text-lg dark:text-white">官方 Instagram</h3><p class="text-sm text-gray-600 dark:text-gray-300">@pksh.su</p></div>
+                        </a>
+                        <a href="mailto:pkshsu@pksh.ylc.edu.tw" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition group">
+                            <i data-lucide="mail" class="w-8 h-8 text-theme mr-4 group-hover:scale-110 transition-transform"></i>
+                            <div><h3 class="font-bold text-lg dark:text-white">電子信箱</h3><p class="text-sm text-gray-600 dark:text-gray-300">pkshsu@pksh.ylc.edu.tw</p></div>
+                        </a>
+                        <div class="pt-6 mt-6 border-t dark:border-gray-700">
+                            <button onclick="navigate('admin')" class="text-sm text-gray-500 hover:text-theme flex items-center transition"><i data-lucide="shield" class="w-4 h-4 mr-1"></i> 幹部後台登入</button>
+                        </div>
+                    </div>
+                </div>
             `;
         }
 
@@ -431,78 +361,60 @@ ${()}
              return `<div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow text-center"><h1 class="text-2xl font-bold mb-4 dark:text-white">幹部後台</h1><input type="password" placeholder="Password" class="w-full p-2 border mb-4 rounded dark:bg-gray-700"><button class="w-full bg-theme text-white py-2 rounded">Login</button></div>`;
         }
 
-        // --- 主渲染邏輯 ---
+        // --- 主渲染與路由 ---
         function render() {
             const container = document.getElementById('app-container');
             const view = APP_STATE.view;
             
-            // 更新導覽列狀態
-            .().( => {
-                (.. === ) ..(, );
-                 ..(, );
+            // 更新按鈕狀態
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const isActive = btn.dataset.key === view;
+                if(isActive) btn.classList.add('text-theme', 'bg-gray-50', 'dark:bg-gray-700', 'font-bold');
+                else btn.classList.remove('text-theme', 'bg-gray-50', 'dark:bg-gray-700', 'font-bold');
             });
             
-            // 更新文字翻譯
-            .().( => {
-                  = ..;
-                ([.][]) . = [.][];
+            updateMarquee();
+            document.querySelectorAll('[data-key]').forEach(el => {
+                if(I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
             });
 
-            ();
-
-            // 路由切換
-             ( === ) . = ();
-              ( === ) . = ();
-              ( === ) . = ();
-              ( === ) . = ();
-              ( === ) . = ();
-              ( === ) . = ();
-              ( === ) . = (); // 新增路由
-              ( === ) . = ();
+            // 路由表
+            const routes = {
+                'home': renderHome, 'events': renderEvents, 'complaint': renderComplaint,
+                'org': renderOrg, 'finance': renderFinance, 'clubs': renderClubs,
+                'contact': renderContact, 'admin': renderAdmin
+            };
+            container.innerHTML = routes[view] ? routes[view]() : renderHome();
             
-            .();
-            .(,);
+            lucide.createIcons();
+            window.scrollTo(0,0);
         }
 
-        // --- 全域功能 ---
-        . = () => {
-            . = ;
-              = .();
-             (!..()) ..();
-            ();
+        // --- 全域函式 ---
+        window.navigate = (view) => {
+            APP_STATE.view = view;
+            document.getElementById('mobile-menu').classList.add('hidden');
+            render();
         };
 
-        . = () => {
-            . = . ===  ?  : ;
-            .(). = ..();
-            ();
+        window.toggleLang = () => {
+            APP_STATE.lang = APP_STATE.lang === 'zh' ? 'en' : 'zh';
+            document.getElementById('lang-display').innerText = APP_STATE.lang.toUpperCase();
+            render();
         };
 
-        . = () => {
-            . = !.;
-              = .;
-              = .();
-              = .();
-            
-             (.) {
-                ..();
-                ..();
-                ..();
-            }  {
-                ..();
-                ..();
-                ..();
-            }
+        window.toggleDarkMode = () => {
+            APP_STATE.darkMode = !APP_STATE.darkMode;
+            document.documentElement.classList.toggle('dark');
+            document.getElementById('dark-icon').classList.toggle('hidden');
+            document.getElementById('light-icon').classList.toggle('hidden');
         };
 
-        
-        .().(, () => {
-            .()..();
+        document.getElementById('menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        
-        ();
-
-    </>
-</>
-</>
+        render();
+    </script>
+</body>
+</html>
