@@ -15,13 +15,21 @@
                             DEFAULT: '#00c8b7',
                             dark: '#00a092',
                             light: '#e0fbf9'
+                        },
+                        gemini: {
+                            start: '#4E8cff',
+                            end: '#E04f5f'
                         }
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
                     }
                 }
             }
         }
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <style>
         :root {
@@ -45,6 +53,23 @@
         /* 搜尋視窗過渡 */
         #search-modal { transition: opacity 0.3s ease-in-out; }
         
+        /* Gemini 漸層文字與按鈕 */
+        .text-gradient-gemini {
+            background: linear-gradient(to right, #4E8cff, #E04f5f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .bg-gradient-gemini {
+            background: linear-gradient(135deg, #4E8cff, #E04f5f);
+        }
+
+        /* 聊天視窗動畫 */
+        #gemini-chat-window { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+        .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; }
+        .chat-user { background-color: #00c8b7; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-ai { background-color: #f3f4f6; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .dark .chat-ai { background-color: #374151; color: #e5e7eb; }
+
         body, div, nav, header { transition: background-color 0.3s, color 0.3s; }
     </style>
 </head>
@@ -114,6 +139,35 @@
         </div>
         <div id="search-results" class="w-full max-w-2xl mt-4 space-y-2 overflow-y-auto max-h-[70vh] pb-10">
             </div>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
+        <div id="gemini-chat-window" class="w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 hidden transform origin-bottom-right scale-90 opacity-0 flex flex-col max-h-[500px]">
+            <div class="bg-gradient-gemini p-4 rounded-t-2xl flex justify-between items-center text-white">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <span class="font-bold">Gemini 智慧助手</span>
+                </div>
+                <button onclick="toggleGemini()" class="hover:text-gray-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="gemini-messages" class="flex-grow p-4 overflow-y-auto space-y-3 bg-gray-50 dark:bg-gray-900 h-80">
+                <div class="chat-bubble chat-ai">
+                    嗨！我是北港高中的 AI 助手。請問今天有什麼我可以幫您的嗎？您可以問我關於活動、社團或學生會的問題喔！✨
+                </div>
+            </div>
+            <div class="p-3 border-t dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-2xl flex gap-2">
+                <input type="text" id="gemini-input" placeholder="輸入訊息..." class="flex-grow p-2 rounded-lg border dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" onkeypress="handleGeminiEnter(event)">
+                <button onclick="sendGeminiMessage()" class="bg-gradient-gemini p-2 rounded-lg text-white hover:opacity-90 transition transform active:scale-95">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <button onclick="toggleGemini()" class="bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl border border-gray-100 dark:border-gray-600 group hover:scale-110 transition duration-300">
+            <div class="bg-gradient-gemini p-3 rounded-full text-white shadow-lg animate-bounce-slow">
+                <i data-lucide="bot" class="w-8 h-8"></i>
+            </div>
+        </button>
     </div>
 
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-grow w-full" id="app-container">
@@ -228,11 +282,11 @@
                     { roleKey: 'role_pr', chief: '許雅琳', chief_en: 'Xu Ya-Lin', deputy: '', deputy_en: '', desc_zh: '負責本會會議之聯絡及舉辦活動之聯繫，對外負責公共關係之職務。', desc_en: 'Responsible for liaison of meetings and activities, and external public relations duties.' },
                     { roleKey: 'role_mobile', chief: '劉乙葭', chief_en: 'Liu Yi-Jia', deputy: '', deputy_en: '', desc_zh: '負責本會舉辦之場地佈置，及其他服務事項。', desc_en: 'Responsible for venue decoration for council events and other service matters.' }
                 ],
+                // 社團順序：熱音 -> 童軍 -> 熱舞
                 clubs: [
-                    // 圖片改為圓形大頭貼風格
-                    { name_zh: '熱舞社', name_en: 'Pop Dance Club', category: 'Dance', img: 'https://placehold.co/200x200/00c8b7/FFFFFF?text=Dance', ig: 'https://www.instagram.com/pkdc.20_flaming/' },
-                    { name_zh: '熱音社', name_en: 'Pop Music Club', category: 'Music', img: 'https://placehold.co/200x200/333333/FFFFFF?text=Music', ig: 'https://www.instagram.com/pkhmc_/' },
-                    { name_zh: '童軍社', name_en: 'Scout Club', category: 'Service', img: 'https://placehold.co/200x200/orange/FFFFFF?text=Scout', ig: 'https://www.instagram.com/pksh_circus_scout/' },
+                    { name_zh: '熱音社', name_en: 'Pop Music Club', category: 'Music', img: 'music.jpg', ig: 'https://www.instagram.com/pkhmc_/' },
+                    { name_zh: '童軍社', name_en: 'Scout Club', category: 'Service', img: 'scout.jpg', ig: 'https://www.instagram.com/pksh_circus_scout/' },
+                    { name_zh: '熱舞社', name_en: 'Pop Dance Club', category: 'Dance', img: 'dance.jpg', ig: 'https://www.instagram.com/pkdc.20_flaming/' },
                 ],
                 meetings: [
                     { date: '2025-11-05', title_zh: '期中社團長大會會議記錄', title_en: 'Mid-term Club Leaders Meeting Minutes' },
@@ -312,6 +366,57 @@
                 lucide.createIcons();
             }
         };
+
+        // --- Gemini 智慧助手邏輯 (模擬) ---
+        window.toggleGemini = () => {
+            const window = document.getElementById('gemini-chat-window');
+            if (window.classList.contains('hidden')) {
+                window.classList.remove('hidden');
+                setTimeout(() => {
+                    window.classList.remove('scale-90', 'opacity-0');
+                    window.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                window.classList.remove('scale-100', 'opacity-100');
+                window.classList.add('scale-90', 'opacity-0');
+                setTimeout(() => window.classList.add('hidden'), 300);
+            }
+        };
+
+        window.handleGeminiEnter = (e) => {
+            if (e.key === 'Enter') sendGeminiMessage();
+        };
+
+        window.sendGeminiMessage = () => {
+            const input = document.getElementById('gemini-input');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            // 1. 顯示使用者訊息
+            const container = document.getElementById('gemini-messages');
+            container.innerHTML += `<div class="chat-bubble chat-user w-fit ml-auto mb-2">${msg}</div>`;
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            // 2. 模擬 AI 思考與回應
+            const loadingId = 'loading-' + Date.now();
+            container.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-ai w-fit mr-auto mb-2 italic text-gray-400">思考中...</div>`;
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                document.getElementById(loadingId).remove();
+                let reply = "";
+                // 簡單的關鍵字回應模擬
+                if(msg.includes('活動') || msg.includes('event')) reply = "近期有 **金勾盃歌唱大賽 (12/24)** 和 **第三次段考 (1/16)** 喔！詳細可以看近期活動頁面。";
+                else if(msg.includes('社團') || msg.includes('club')) reply = "我們有熱音社、熱舞社和童軍社等等！想加入哪個呢？";
+                else if(msg.includes('會長')) reply = "本屆會長是 **張佾傑** 同學，副會長是 **王雅琝** 同學。";
+                else reply = "我是北港高中學生會的 AI 助手 (Demo 版)。目前僅提供基本資訊查詢，若有複雜問題請利用信箱專區喔！😊";
+
+                container.innerHTML += `<div class="chat-bubble chat-ai w-fit mr-auto mb-2">${marked.parse(reply)}</div>`;
+                container.scrollTop = container.scrollHeight;
+            }, 1000);
+        };
+
 
         // --- 頁面渲染 ---
 
