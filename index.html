@@ -16,7 +16,10 @@
                             dark: '#00a092',
                             light: '#e0fbf9'
                         },
-                        // 已移除 gemini 顏色配置
+                        gemini: {
+                            start: '#4E8cff',
+                            end: '#E04f5f'
+                        }
                     },
                     animation: {
                         'bounce-slow': 'bounce 3s infinite',
@@ -57,7 +60,17 @@
         /* 搜尋視窗過渡 */
         #search-modal { transition: opacity 0.3s ease-in-out; }
         
-        /* 已移除 Gemini 相關 CSS */
+        /* Gemini 漸層 */
+        .bg-gradient-gemini {
+            background: linear-gradient(135deg, #4E8cff, #E04f5f);
+        }
+
+        /* 聊天視窗動畫 */
+        #gemini-chat-window { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
+        .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; }
+        .chat-user { background-color: #00c8b7; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-ai { background-color: #f3f4f6; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .dark .chat-ai { background-color: #374151; color: #e5e7eb; }
 
         body, div, nav, header { transition: background-color 0.3s, color 0.3s; }
     </style>
@@ -127,6 +140,25 @@
             </button>
         </div>
         <div id="search-results" class="w-full max-w-2xl mt-4 space-y-2 overflow-y-auto max-h-[70vh] pb-10"></div>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
+        <div id="gemini-chat-window" class="w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 hidden transform origin-bottom-right scale-90 opacity-0 flex flex-col max-h-[500px]">
+            <div class="bg-gradient-gemini p-4 rounded-t-2xl flex justify-between items-center text-white">
+                <div class="flex items-center gap-2"><i data-lucide="sparkles" class="w-5 h-5"></i><span class="font-bold">Gemini 智慧助手</span></div>
+                <button onclick="toggleGemini()" class="hover:text-gray-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="gemini-messages" class="flex-grow p-4 overflow-y-auto space-y-3 bg-gray-50 dark:bg-gray-900 h-80">
+                <div class="chat-bubble chat-ai">嗨！我是北港高中的 AI 助手。請問今天有什麼我可以幫您的嗎？✨</div>
+            </div>
+            <div class="p-3 border-t dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-2xl flex gap-2">
+                <input type="text" id="gemini-input" placeholder="輸入訊息..." class="flex-grow p-2 rounded-lg border dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" onkeypress="handleGeminiEnter(event)">
+                <button onclick="sendGeminiMessage()" class="bg-gradient-gemini p-2 rounded-lg text-white hover:opacity-90 transition transform active:scale-95"><i data-lucide="send" class="w-5 h-5"></i></button>
+            </div>
+        </div>
+        <button onclick="toggleGemini()" class="bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl border border-gray-100 dark:border-gray-600 group hover:scale-110 transition duration-300">
+            <div class="bg-gradient-gemini p-3 rounded-full text-white shadow-lg animate-bounce-slow"><i data-lucide="bot" class="w-8 h-8"></i></div>
+        </button>
     </div>
 
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-grow w-full" id="app-container">
@@ -206,6 +238,7 @@
                 role_pr: 'Public Relations', role_ga: 'General Affairs', role_art: 'Art & Design', role_chief: 'Chief', role_deputy: 'Deputy'
             }
         };
+
         const APP_STATE = {
             view: 'home',
             lang: 'zh',
@@ -256,8 +289,7 @@
                     { content: "希望能多辦一點校際交流活動！", author: "想交朋友的人" }
                 ],
                 events: [
-                    // 金勾盃地點已修改為志清堂
-                    { date: '12/24', title_zh: '金勾盃歌唱大賽', title_en: 'Jingle Bell Singing Contest', location_zh: '志清堂', location_en: 'Zhiqing Hall', time: '13:00', type: 'Entertainment' },
+                    { date: '12/24', title_zh: '金勾盃歌唱大賽', title_en: 'Jingle Bell Singing Contest', location_zh: '活動中心', location_en: 'Activity Center', time: '13:00', type: 'Entertainment' },
                     { date: '01/16', title_zh: '第三次段考 Day1', title_en: '3rd Midterm Exam Day 1', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' },
                 ],
                 finance: [
@@ -289,17 +321,21 @@
                 ]
             }
         };
+
         const firebaseConfig = { apiKey: "mock", authDomain: "mock" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        
         signInAnonymously(auth).catch(e => console.log("Auth placeholder"));
         onAuthStateChanged(auth, (user) => {
             APP_STATE.userId = user ? user.uid : null;
             document.getElementById('loading-spinner')?.remove();
             render();
         });
+
         const t = (key) => I18N[APP_STATE.lang][key] || key;
         const isEn = () => APP_STATE.lang === 'en';
+
         function updateMarquee() {
             const el = document.getElementById('marquee-text');
             if(el) el.innerText = t('marquee');
@@ -318,6 +354,7 @@
                 input.value = '';
             }
         };
+
         window.performSearch = () => {
             const query = document.getElementById('search-input').value.toLowerCase();
             const resultsDiv = document.getElementById('search-results');
@@ -350,23 +387,67 @@
                 lucide.createIcons();
             }
         };
-        // 已移除 window.toggleGemini, window.handleGeminiEnter, window.sendGeminiMessage 函式
-        
+
+        window.toggleGemini = () => {
+            const window = document.getElementById('gemini-chat-window');
+            if (window.classList.contains('hidden')) {
+                window.classList.remove('hidden');
+                setTimeout(() => {
+                    window.classList.remove('scale-90', 'opacity-0');
+                    window.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                window.classList.remove('scale-100', 'opacity-100');
+                window.classList.add('scale-90', 'opacity-0');
+                setTimeout(() => window.classList.add('hidden'), 300);
+            }
+        };
+
+        window.handleGeminiEnter = (e) => {
+            if (e.key === 'Enter') sendGeminiMessage();
+        };
+
+        window.sendGeminiMessage = () => {
+            const input = document.getElementById('gemini-input');
+            const msg = input.value.trim();
+            if(!msg) return;
+            const container = document.getElementById('gemini-messages');
+            container.innerHTML += `<div class="chat-bubble chat-user w-fit ml-auto mb-2">${msg}</div>`;
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+            const loadingId = 'loading-' + Date.now();
+            container.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-ai w-fit mr-auto mb-2 italic text-gray-400">思考中...</div>`;
+            container.scrollTop = container.scrollHeight;
+            setTimeout(() => {
+                document.getElementById(loadingId).remove();
+                let reply = "";
+                if(msg.includes('活動') || msg.includes('event')) reply = "近期有 **金勾盃歌唱大賽 (12/24)** 和 **第三次段考 (1/16)** 喔！";
+                else if(msg.includes('社團') || msg.includes('club')) reply = "我們有熱音社、熱舞社和童軍社等等！";
+                else reply = "我是北港高中學生會的 AI 助手。目前僅提供基本資訊查詢。😊";
+                container.innerHTML += `<div class="chat-bubble chat-ai w-fit mr-auto mb-2">${marked.parse(reply)}</div>`;
+                container.scrollTop = container.scrollHeight;
+            }, 1000);
+        };
+
         function startConfessionCarousel() {
             if (APP_STATE.confessionTimer) clearInterval(APP_STATE.confessionTimer);
             const updateConfession = () => {
                 const elContent = document.getElementById('confession-content');
                 const elAuthor = document.getElementById('confession-author');
                 if(!elContent || !elAuthor) return;
+
                 const data = APP_STATE.mockData.confessionWall[APP_STATE.confessionIndex];
+                
                 elContent.classList.remove('animate-fade-in');
                 elContent.style.opacity = 0;
+                
                 setTimeout(() => {
                     elContent.innerText = `"${data.content}"`;
                     elAuthor.innerText = `- ${data.author}`;
                     elContent.style.opacity = 1;
                     elContent.classList.add('animate-fade-in');
                 }, 300);
+
                 APP_STATE.confessionIndex = (APP_STATE.confessionIndex + 1) % APP_STATE.mockData.confessionWall.length;
             };
             updateConfession();
@@ -384,299 +465,169 @@
                 </div>
             `).join('');
 
-            const confessionHtml = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-t-4 border-yellow-400">
-                    <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><i data-lucide="heart" class="w-6 h-6 text-yellow-500 fill-yellow-500/20"></i>${t('confession')}</h2>
-                    <div class="text-center py-6">
-                        <p id="confession-content" class="text-xl italic text-gray-700 dark:text-gray-200 font-medium h-20 flex items-center justify-center animate-fade-in"></p>
-                        <p id="confession-author" class="text-sm text-gray-500 dark:text-gray-400 mt-4">- 匿名</p>
-                    </div>
-                </div>
-            `;
-
             return `
-                <div class="mb-8 p-4 bg-theme/10 dark:bg-theme/20 rounded-xl border border-theme/50 flex flex-col sm:flex-row items-center justify-between shadow-lg">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="download-cloud" class="w-8 h-8 text-theme flex-shrink-0"></i>
-                        <p class="font-semibold text-lg dark:text-white">金勾盃決賽時程表下載 (114學年度)</p>
+                <div class="bg-theme text-white rounded-2xl p-8 mb-10 shadow-lg relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h1 class="text-4xl font-extrabold mb-4">${t('heroTitle')}</h1>
+                        <p class="text-lg opacity-90">${t('heroSubtitle')}</p>
+                        <button class="mt-6 bg-white text-theme font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition" onclick="navigate('mailboxes')">
+                            ${t('btnComplaint')}
+                        </button>
                     </div>
-                    <a href="114金勾盃歌唱決賽時程表(公告版).pdf" download class="mt-3 sm:mt-0 px-4 py-2 bg-theme text-white rounded-full font-medium hover:bg-theme-dark transition transform hover:scale-105 flex items-center gap-2 flex-shrink-0">
-                        <i data-lucide="download" class="w-5 h-5"></i>
-                        立即下載
-                    </a>
+                    <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-10 translate-y-10"><i data-lucide="school" class="w-64 h-64"></i></div>
                 </div>
-                <section id="hero-section" class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-xl mb-12">
-                    <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-4">${t('heroTitle')}</h1>
-                    <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8">${t('heroSubtitle')}</p>
-                    <a href="#" onclick="navigate('mailboxes')" class="bg-theme text-white px-8 py-3 rounded-full text-lg font-bold hover:bg-theme-dark transition transform hover:scale-105 shadow-lg flex items-center justify-center mx-auto w-fit gap-2">
-                        <i data-lucide="inbox" class="w-5 h-5"></i>
-                        ${t('btnComplaint')}
-                    </a>
-                </section>
-                
-                <section id="news-section" class="mb-12">
-                    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 border-b-2 border-theme pb-2">${t('news')}</h2>
-                    <div class="space-y-6">
-                        ${newsHtml}
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <h2 class="text-2xl font-bold dark:text-white flex items-center gap-2"><i data-lucide="bell" class="text-theme"></i> ${t('news')}</h2>
+                        <div class="grid gap-4 md:grid-cols-1">${newsHtml}</div>
                     </div>
-                </section>
-
-                <section id="confession-section" class="mb-12">
-                    ${confessionHtml}
-                </section>
-
-                <section id="events-section">
-                    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 border-b-2 border-theme pb-2">${t('eventTitle')}</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        ${APP_STATE.mockData.events.map(e => `
-                            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border-l-4 border-yellow-500">
-                                <p class="text-sm font-bold text-yellow-600 dark:text-yellow-400 mb-1">${e.date} | ${e.time}</p>
-                                <h4 class="text-xl font-bold dark:text-white">${isEn() ? e.title_en : e.title_zh}</h4>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i>${isEn() ? e.location_en : e.location_zh}</p>
+                    <div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md sticky top-24">
+                            <h2 class="text-xl font-bold text-pink-500 mb-4 flex items-center gap-2"><i data-lucide="heart"></i> ${t('confession')}</h2>
+                            <div class="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg border border-pink-100 dark:border-pink-900 min-h-[120px] flex flex-col justify-center">
+                                <p id="confession-content" class="italic text-gray-700 dark:text-gray-300 text-lg font-medium transition-opacity duration-300">"載入中..."</p>
+                                <p id="confession-author" class="text-right text-xs text-gray-500 mt-2 transition-opacity duration-300"></p>
                             </div>
-                        `).join('')}
+                            <a href="https://forms.gle/6SJpkYYfd48Vj7yv7" target="_blank" class="block w-full mt-4 bg-pink-500 text-white font-bold py-2 rounded text-center hover:bg-pink-600 transition">我要告白</a>
+                        </div>
                     </div>
-                </section>
+                </div>
             `;
         }
-        
+
         function renderEvents() {
-            return `
-                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('eventTitle')}</h1>
-                <div class="space-y-6">
-                    ${APP_STATE.mockData.events.map(e => `
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center justify-between border-l-8 border-theme">
-                            <div>
-                                <p class="text-sm font-bold text-theme mb-1">${e.date} | ${e.time}</p>
-                                <h2 class="text-2xl font-bold dark:text-white">${isEn() ? e.title_en : e.title_zh}</h2>
-                                <p class="text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1"><i data-lucide="map-pin" class="w-5 h-5"></i>${isEn() ? e.location_en : e.location_zh}</p>
-                            </div>
-                            <span class="text-xs font-semibold bg-theme/20 text-theme px-3 py-1 rounded-full">${e.type}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderClubs() {
-            return `
-                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('clubTitle')}</h1>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    ${APP_STATE.mockData.clubs.map(c => `
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition group">
-                            <img src="${c.img}" alt="${isEn() ? c.name_en : c.name_zh}" class="w-full h-48 object-cover group-hover:scale-[1.03] transition duration-300">
-                            <div class="p-5">
-                                <span class="text-xs font-semibold bg-theme/20 text-theme px-3 py-1 rounded-full mb-2 inline-block">${c.category}</span>
-                                <h3 class="text-xl font-bold dark:text-white mb-2">${isEn() ? c.name_en : c.name_zh}</h3>
-                                ${c.ig ? `
-                                    <a href="${c.ig}" target="_blank" class="text-pink-600 dark:text-pink-400 flex items-center gap-1 font-medium hover:underline">
-                                        <i data-lucide="instagram" class="w-4 h-4"></i>
-                                        Instagram
-                                    </a>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderMailboxes() {
-            return `
-                <h1 class="text-4xl font-extrabold mb-10 text-gray-900 dark:text-white">信箱專區</h1>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl border-l-8 border-theme">
-                        <h2 class="text-3xl font-bold text-theme mb-3">${t('rightsMailbox')}</h2>
-                        <p class="text-gray-600 dark:text-gray-300 mb-6">${t('rightsDesc')}</p>
-                        <a href="https://forms.gle/your-rights-form-link" target="_blank" class="bg-theme text-white px-6 py-3 rounded-full font-medium hover:bg-theme-dark transition transform hover:scale-[1.01] flex items-center justify-center gap-2">
-                            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-                            ${t('goToForm')}
-                        </a>
+            const eventsHtml = APP_STATE.mockData.events.map(ev => `
+                <div class="flex items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4 border-l-4 ${ev.type === 'Entertainment' ? 'border-pink-500' : 'border-blue-500'}">
+                    <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg text-center min-w-[80px]">
+                        <span class="block text-xl font-bold text-gray-800 dark:text-white">${ev.date.split('/')[1]}</span>
+                        <span class="block text-xs text-gray-500">${ev.date.split('/')[0]}月</span>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl border-l-8 border-yellow-500">
-                        <h2 class="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-3">${t('anonMailbox')}</h2>
-                        <p class="text-gray-600 dark:text-gray-300 mb-6">${t('anonDesc')}</p>
-                        <a href="https://forms.gle/your-anon-form-link" target="_blank" class="bg-yellow-500 text-white px-6 py-3 rounded-full font-medium hover:bg-yellow-600 transition transform hover:scale-[1.01] flex items-center justify-center gap-2">
-                            <i data-lucide="feather" class="w-5 h-5"></i>
-                            ${t('goToForm')}
-                        </a>
+                    <div class="ml-4 flex-grow">
+                        <h3 class="text-lg font-bold dark:text-white">${isEn() ? ev.title_en : ev.title_zh}</h3>
+                        <p class="text-sm text-gray-500 flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3 h-3"></i> ${isEn() ? ev.location_en : ev.location_zh} | 
+                            <i data-lucide="clock" class="w-3 h-3"></i> ${ev.time}
+                        </p>
                     </div>
                 </div>
-            `;
-        }
-
-        function renderFinance() {
-            const tableHeaders = `
-                <thead class="bg-theme/20 dark:bg-gray-700 text-theme dark:text-white">
-                    <tr>
-                        <th class="p-3 text-left w-1/4">${t('col_date')}</th>
-                        <th class="p-3 text-left w-1/2">${t('col_item')}</th>
-                        <th class="p-3 text-right w-1/4">${t('col_amount')}</th>
-                    </tr>
-                </thead>
-            `;
-
-            const tableRows = APP_STATE.mockData.finance.map(f => {
-                const amountClass = f.amount > 0 ? 'text-green-600 dark:text-green-400 font-bold' : 'text-red-600 dark:text-red-400 font-bold';
-                const sign = f.amount > 0 ? '+' : '';
-                return `
-                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                        <td class="p-3 text-gray-500 dark:text-gray-400">${f.date}</td>
-                        <td class="p-3 dark:text-white">${isEn() ? f.item_en : f.item_zh}</td>
-                        <td class="p-3 text-right ${amountClass}">${sign}${f.amount.toLocaleString()}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            const total = APP_STATE.mockData.finance.reduce((sum, f) => sum + f.amount, 0);
-            const totalClass = total >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
-
-            const tableFooter = `
-                <tfoot>
-                    <tr class="bg-gray-100 dark:bg-gray-700 font-extrabold text-lg">
-                        <td class="p-3 text-left" colspan="2">總結 (Total)</td>
-                        <td class="p-3 text-right ${totalClass}">${total.toLocaleString()}</td>
-                    </tr>
-                </tfoot>
-            `;
-
-            return `
-                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('financeTitle')}</h1>
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl overflow-x-auto">
-                    <table class="min-w-full table-auto text-sm">
-                        ${tableHeaders}
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                        ${tableFooter}
-                    </table>
-                </div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-4">* 以上為模擬資料，僅供展示。實際財務明細請參考正式文件。</p>
-            `;
-        }
-
-        function renderMeetings() {
-            return `
-                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('meetingTitle')}</h1>
-                <div class="space-y-6">
-                    ${APP_STATE.mockData.meetings.map(m => `
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex items-center justify-between hover:shadow-lg transition">
-                            <div>
-                                <h2 class="text-xl font-bold dark:text-white">${isEn() ? m.title_en : m.title_zh}</h2>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${m.date}</p>
-                            </div>
-                            <a href="meeting-${m.date}.pdf" target="_blank" class="text-theme font-medium hover:underline flex items-center gap-1">
-                                檢視檔案
-                                <i data-lucide="file-text" class="w-5 h-5"></i>
-                            </a>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+            `).join('');
+            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('eventTitle')}</h1><div class="max-w-3xl mx-auto">${eventsHtml}</div>`;
         }
 
         function renderOrg() {
-            const leadersHtml = APP_STATE.mockData.orgLeaders.map(p => `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center text-center border-t-4 border-theme">
-                    <div class="text-4xl mb-3">${p.icon}</div>
-                    <h3 class="text-2xl font-bold dark:text-white">${p.name_zh} (${p.name_en})</h3>
-                    <p class="text-theme font-semibold text-lg mb-4">${t(p.roleKey)}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">${isEn() ? p.desc_en : p.desc_zh}</p>
+            const leadersHtml = APP_STATE.mockData.orgLeaders.map(l => `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex flex-col items-center text-center border-t-4 border-theme hover:scale-105 transition-transform duration-300">
+                    <div class="text-6xl mb-4">${l.icon}</div>
+                    <h3 class="text-xl font-bold text-theme">${t(l.roleKey)}</h3>
+                    <p class="text-2xl font-bold dark:text-white my-2">${isEn() ? l.name_en : l.name_zh}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed px-4 text-left">${isEn() ? l.desc_en : l.desc_zh}</p>
                 </div>
             `).join('');
-
             const deptsHtml = APP_STATE.mockData.orgDepts.map(d => `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-yellow-500">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="text-2xl">${d.icon}</div>
-                        <h4 class="text-xl font-bold dark:text-white">${t(d.roleKey)}</h4>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:-translate-y-1 transition duration-300 h-full border-l-4 border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3 mb-4 border-b pb-2 dark:border-gray-700">
+                        <span class="text-3xl">${d.icon}</span>
+                        <h3 class="text-xl font-bold text-theme">${t(d.roleKey)}</h3>
                     </div>
-                    <div class="mb-4 text-sm">
-                        <p class="font-semibold dark:text-white">${t('role_chief')}：${d.chief_zh || d.chief_en}</p>
-                        ${d.deputy ? `<p class="font-semibold dark:text-white">${t('role_deputy')}：${d.deputy_zh || d.deputy_en}</p>` : ''}
+                    <div class="flex justify-between mb-4">
+                        <div class="text-center w-1/2">
+                            <span class="text-xs text-gray-400 block">${t('role_chief')}</span>
+                            <span class="font-bold text-lg dark:text-white">${isEn() && d.chief_en ? d.chief_en : d.chief}</span>
+                        </div>
+                        ${d.deputy ? `<div class="text-center w-1/2 border-l dark:border-gray-700"><span class="text-xs text-gray-400 block">${t('role_deputy')}</span><span class="font-bold text-lg dark:text-white">${isEn() && d.deputy_en ? d.deputy_en : d.deputy}</span></div>` : ''}
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">${isEn() ? d.desc_en : d.desc_zh}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg leading-relaxed text-justify">${isEn() ? d.desc_en : d.desc_zh}</p>
                 </div>
             `).join('');
+            return `<h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('orgTitle')}</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">${leadersHtml}</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">${deptsHtml}</div>`;
+        }
 
-            return `
-                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('orgTitle')}</h1>
-                <div class="space-y-12">
-                    <h2 class="text-3xl font-extrabold text-theme border-b-2 border-theme pb-2 mb-6">領導核心</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        ${leadersHtml}
-                    </div>
+        function renderFinance() {
+            const rows = APP_STATE.mockData.finance.map(f => `
+                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td class="py-3 px-4 dark:text-gray-300">${f.date}</td>
+                    <td class="py-3 px-4 font-medium dark:text-white">${isEn() ? f.item_en : f.item_zh}</td>
+                    <td class="py-3 px-4"><span class="${f.type === 'In' ? 'text-green-500' : 'text-red-500'} font-bold">${f.amount > 0 ? '+' : ''}${f.amount}</span></td>
+                </tr>
+            `).join('');
+            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('financeTitle')}</h1><div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"><div class="p-6 bg-theme/10 border-b border-theme/20"><p class="text-sm text-gray-600 dark:text-gray-300">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p></div><table class="w-full text-left border-collapse"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 uppercase text-xs"><tr><th class="py-3 px-4">${t('col_date')}</th><th class="py-3 px-4">${t('col_item')}</th><th class="py-3 px-4">${t('col_amount')} (TWD)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        }
 
-                    <h2 class="text-3xl font-extrabold text-theme border-b-2 border-theme pb-2 mb-6">各組分工</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        ${deptsHtml}
+        function renderMailboxes() {
+            return `<div class="max-w-4xl mx-auto"><h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('mailboxes')}</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-blue-500 flex flex-col items-center text-center"><div class="bg-blue-100 p-4 rounded-full mb-4"><i data-lucide="scale" class="w-10 h-10 text-blue-600"></i></div><h2 class="text-2xl font-bold mb-2 dark:text-white">${t('rightsMailbox')}</h2><p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('rightsDesc')}</p><a href="https://forms.gle/HAxbZJCiCEFhVkwV6" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a></div><div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-pink-500 flex flex-col items-center text-center"><div class="bg-pink-100 p-4 rounded-full mb-4"><i data-lucide="ghost" class="w-10 h-10 text-pink-600"></i></div><h2 class="text-2xl font-bold mb-2 dark:text-white">${t('anonMailbox')}</h2><p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('anonDesc')}</p><a href="https://forms.gle/6SJpkYYfd48Vj7yv7" target="_blank" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a></div></div></div>`;
+        }
+        
+        function renderClubs() {
+            const clubList = APP_STATE.mockData.clubs.map(c => `
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition group">
+                    <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-gray-100 dark:border-gray-700 shadow-sm group-hover:border-theme transition-colors duration-300">
+                        <img src="${c.img}" class="w-full h-full object-cover">
                     </div>
+                    <span class="text-xs bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-200 mb-2">${c.category}</span>
+                    <h3 class="font-bold dark:text-white text-lg">${isEn() ? c.name_en : c.name_zh}</h3>
+                    <a href="${c.ig}" target="_blank" class="mt-4 text-pink-600 hover:text-pink-700 flex items-center gap-1 font-medium"><i data-lucide="instagram" class="w-4 h-4"></i> Instagram</a>
                 </div>
-            `;
+            `).join('');
+            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('clubTitle')}</h1><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${clubList}</div>`;
         }
 
         function renderContact() {
             return `
-                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">聯絡我們</h1>
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl space-y-6">
-                    <div class="flex items-center gap-4">
-                        <i data-lucide="mail" class="w-8 h-8 text-theme"></i>
-                        <div>
-                            <p class="text-lg font-bold dark:text-white">學生會信箱</p>
-                            <p class="text-gray-600 dark:text-gray-300">pksh.su@email.com (模擬)</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <i data-lucide="instagram" class="w-8 h-8 text-pink-600"></i>
-                        <div>
-                            <p class="text-lg font-bold dark:text-white">Instagram</p>
-                            <a href="https://www.instagram.com/pksh.su/" target="_blank" class="text-pink-600 hover:underline">@pksh.su</a>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <i data-lucide="facebook" class="w-8 h-8 text-blue-600"></i>
-                        <div>
-                            <p class="text-lg font-bold dark:text-white">Facebook</p>
-                            <a href="https://www.facebook.com/52PKSH/" target="_blank" class="text-blue-600 hover:underline">北港高中學生會 (模擬)</a>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <i data-lucide="map-pin" class="w-8 h-8 text-green-600"></i>
-                        <div>
-                            <p class="text-lg font-bold dark:text-white">辦公室地點</p>
-                            <p class="text-gray-600 dark:text-gray-300">行政大樓二樓 (模擬)</p>
+                <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+                    <h1 class="text-3xl font-bold mb-6 text-theme">${t('contact')}</h1>
+                    <div class="space-y-6">
+                        <a href="https://www.instagram.com/pksh.su/" target="_blank" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition group">
+                            <i data-lucide="instagram" class="w-8 h-8 text-pink-600 mr-4 group-hover:scale-110 transition-transform"></i>
+                            <div><h3 class="font-bold text-lg dark:text-white">Instagram</h3><p class="text-sm text-gray-600 dark:text-gray-300">@pksh.su</p></div>
+                        </a>
+                        <a href="mailto:pkshsu@pksh.ylc.edu.tw" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition group">
+                            <i data-lucide="mail" class="w-8 h-8 text-theme mr-4 group-hover:scale-110 transition-transform"></i>
+                            <div><h3 class="font-bold text-lg dark:text-white">Email</h3><p class="text-sm text-gray-600 dark:text-gray-300">pkshsu@pksh.ylc.edu.tw</p></div>
+                        </a>
+                        <div class="pt-6 mt-6 border-t dark:border-gray-700">
+                            <button onclick="navigate('admin')" class="text-sm text-gray-500 hover:text-theme flex items-center transition"><i data-lucide="shield" class="w-4 h-4 mr-1"></i> ${t('admin')}</button>
                         </div>
                     </div>
                 </div>
             `;
         }
-        
-        // 模擬的幹部登入頁面 (無實際登入功能)
-        function renderAdmin() {
-            return `
-                <div class="flex items-center justify-center min-h-[60vh]">
-                    <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl text-center">
-                        <i data-lucide="lock" class="w-12 h-12 text-theme mb-4 mx-auto"></i>
-                        <h1 class="text-3xl font-extrabold mb-6 text-gray-900 dark:text-white">幹部登入專區</h1>
-                        <form onsubmit="alert('此為模擬登入頁面，無實際登入功能'); return false;">
-                            <input type="text" placeholder="帳號 / 學號" class="w-full p-3 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-theme" required>
-                            <input type="password" placeholder="密碼" class="w-full p-3 mb-6 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-theme" required>
-                            <button type="submit" class="w-full bg-theme text-white p-3 rounded-lg font-bold hover:bg-theme-dark transition transform hover:scale-[1.01]">登入</button>
-                        </form>
-                    </div>
+
+        function renderMeetings() {
+            const list = APP_STATE.mockData.meetings.map(m => `
+                <div class="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer border-l-4 border-gray-400">
+                    <div class="flex items-center gap-4"><div class="bg-gray-100 dark:bg-gray-600 p-3 rounded text-gray-500 dark:text-gray-300"><i data-lucide="file-text"></i></div><div><h3 class="font-bold dark:text-white">${isEn() ? m.title_en : m.title_zh}</h3><p class="text-sm text-gray-500">${m.date}</p></div></div><button class="text-theme hover:underline text-sm font-bold">PDF</button>
                 </div>
-            `;
+            `).join('');
+            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('meetingTitle')}</h1><div class="space-y-4 max-w-3xl mx-auto">${list}</div>`;
+        }
+
+        function renderAdmin() {
+             return `<div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow text-center"><h1 class="text-2xl font-bold mb-4 dark:text-white">${t('admin')}</h1><input type="password" placeholder="Password" class="w-full p-2 border mb-4 rounded dark:bg-gray-700"><button class="w-full bg-theme text-white py-2 rounded">Login</button></div>`;
         }
 
         function render() {
-            updateMarquee();
             const container = document.getElementById('app-container');
             const view = APP_STATE.view;
+            
+            if (view !== 'home' && APP_STATE.confessionTimer) {
+                clearInterval(APP_STATE.confessionTimer);
+                APP_STATE.confessionTimer = null;
+            }
 
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const isActive = btn.dataset.key === view;
+                if(isActive) btn.classList.add('text-theme', 'bg-gray-50', 'dark:bg-gray-700', 'font-bold');
+                else btn.classList.remove('text-theme', 'bg-gray-50', 'dark:bg-gray-700', 'font-bold');
+            });
+            updateMarquee();
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                 if(I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
+            });
             const routes = {
-                'home': renderHome, 'events': renderEvents, 'clubs': renderClubs,
-                'mailboxes': renderMailboxes, 'finance': renderFinance, 'contact': renderContact,
-                'org': renderOrg, 'meetings': renderMeetings, 'admin': renderAdmin
+                'home': renderHome, 'events': renderEvents, 'mailboxes': renderMailboxes,
+                'org': renderOrg, 'finance': renderFinance, 'clubs': renderClubs,
+                'contact': renderContact, 'meetings': renderMeetings, 'admin': renderAdmin
             };
             container.innerHTML = routes[view] ? routes[view]() : renderHome();
             
