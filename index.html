@@ -223,7 +223,7 @@
                     tag_zh: '活動', 
                     tag_en: 'Event', 
                     date: '2025-12-24',
-                    // [修正] 金勾盃樣式改為 PDF 下載按鈕
+                    // 金勾盃樣式：PDF 下載按鈕
                     content_zh: `<a href="114金勾盃歌唱決賽時程表(公告版).pdf" target="_blank" class="block w-full text-center bg-red-50 text-red-600 border border-red-200 rounded-lg py-3 hover:bg-red-100 transition font-bold"><i data-lucide="file-down" class="inline-block mr-2"></i>點此下載決賽時程表 (PDF)</a>`,
                     content_en: `<a href="114金勾盃歌唱決賽時程表(公告版).pdf" target="_blank" class="block w-full text-center bg-red-50 text-red-600 border border-red-200 rounded-lg py-3 hover:bg-red-100 transition font-bold"><i data-lucide="file-down" class="inline-block mr-2"></i>Download Schedule (PDF)</a>`
                 }
@@ -235,23 +235,25 @@
                 { content: "學生會辛苦了，活動辦得很棒！", content_en: "Student Council, thank you for your hard work! Great event!", author: "高三老屁股" },
                 { content: "希望能多辦一點校際交流活動！", content_en: "Hope to see more inter-school exchange activities!", author: "想交朋友的人" }
             ],
+            // [更新] 從教學行事曆提取的活動
             events: [
-                // [修正] 地點：志清堂, 英文：Jingle Bells Singing Contest
+                { date: '08/25', title_zh: '114-1 註冊暨開學日', title_en: 'Registration & School Opening', location_zh: '全校', location_en: 'Campus', time: '08:00', type: 'Academic' },
+                { date: '10/02', title_zh: '第一次期中考', title_en: '1st Midterm Exam', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' },
+                { date: '12/05', title_zh: '校慶運動會', title_en: 'Anniversary Sports Day', location_zh: '操場', location_en: 'Playground', time: '08:00', type: 'Entertainment' },
                 { date: '12/24', title_zh: '金勾盃歌唱大賽', title_en: 'Jingle Bells Singing Contest', location_zh: '志清堂', location_en: 'Zhiqing Hall', time: '13:00', type: 'Entertainment' },
-                { date: '01/16', title_zh: '第三次段考 Day1', title_en: '3rd Midterm Exam Day 1', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' },
+                { date: '01/17', title_zh: '大學學測 (01/17-19)', title_en: 'University Entrance Exam', location_zh: '考場', location_en: 'Exam Center', time: '08:00', type: 'Academic' },
             ],
             finance: [
                 { item_zh: '聖誕活動佈置費', item_en: 'Xmas Decoration', amount: -5000, date: '2025-12-15', type: 'Out' },
                 { item_zh: '傳情卡片義賣收入', item_en: 'Card Sale Income', amount: 8500, date: '2025-12-18', type: 'In' },
             ],
             clubs: [
-                // [修正] 使用您上傳的圖片檔名
+                // [修正] 確保副檔名與您上傳的一致
                 { name_zh: '熱舞社', name_en: 'Pop Dance Club', category: 'Dance', img: 'image_b22c9e.jpg', ig: 'https://www.instagram.com/pkdc.20_flaming/' },
                 { name_zh: '熱音社', name_en: 'Pop Music Club', category: 'Music', img: 'image_b22ca2.jpg', ig: 'https://www.instagram.com/pkhmc_/' },
                 { name_zh: '童軍社', name_en: 'Scout Club', category: 'Service', img: 'image_b22ca6.png', ig: 'https://www.instagram.com/pksh_circus_scout/' },
             ],
             orgLeaders: [
-                // [修正] 補齊職務與拼音
                 { 
                     roleKey: 'role_pres', icon: '👑', 
                     name_zh: '張佾傑', name_en: 'CHANG, YI-CHIEH', 
@@ -279,7 +281,6 @@
                 { date: '2025-09-15', title_zh: '第六屆第一次例會記錄', title_en: '6th Session 1st Regular Meeting' }
             ],
             downloads: [
-                // [新增] 資料下載專區檔案
                 { date: '2025-12-24', title_zh: '114金勾盃歌唱決賽時程表(公告版)', title_en: '114 Jingle Bells Finals Schedule', file: '114金勾盃歌唱決賽時程表(公告版).pdf', type: 'Event' },
                 { date: '2025-08-01', title_zh: '114學年度第1學期教學行事簡曆', title_en: '114-1 Academic Calendar', file: '114-1教學行事簡曆.pdf', type: 'Academic' }
             ]
@@ -305,7 +306,8 @@
                 clubTitle: '社團專區',
                 downloadTitle: '資料下載專區',
                 rightsMailbox: '學權信箱', rightsDesc: '發現校園設備損壞、對學校政策有疑問或建議？請填寫此表單，學權組將為您爭取權益。',
-                anonMailbox: '匿名信箱', anonDesc: '心情抒發、想對學生會說悄悄話？這裡是絕對保密的樹洞。',
+                // [更新] 匿名信箱說明
+                anonMailbox: '匿名信箱', anonDesc: '對學生會的施政方針、活動規劃有任何建議或修改想法？歡迎填寫此表單告訴我們（完全匿名）。',
                 goToForm: '前往填寫表單', searchPlaceholder: '輸入關鍵字搜尋公告或活動...', noResults: '沒有找到相關結果',
                 col_date: '日期', col_item: '項目', col_amount: '金額',
                 role_pres: '會長', role_vp: '副會長', role_admin: '行政組', role_act: '活動組', role_mobile: '機動組',
@@ -329,7 +331,7 @@
                 clubTitle: 'Student Clubs',
                 downloadTitle: 'Download Zone',
                 rightsMailbox: 'Student Rights Mailbox', rightsDesc: 'Report damaged facilities or suggest policy changes. The Student Rights Dept will fight for you.',
-                anonMailbox: 'Anonymous Mailbox', anonDesc: 'Share your feelings or whisper to the Student Council. This is a confidential space.',
+                anonMailbox: 'Anonymous Mailbox', anonDesc: 'Have suggestions for the Student Council\'s work or policies? Share your thoughts here (Fully Anonymous).',
                 goToForm: 'Fill out Form', searchPlaceholder: 'Search news or events...', noResults: 'No results found',
                 col_date: 'Date', col_item: 'Item', col_amount: 'Amount',
                 role_pres: 'President', role_vp: 'Vice President', role_admin: 'Administrative Dept', role_act: 'Activity Dept', role_mobile: 'Logistics Dept',
@@ -621,15 +623,33 @@
             return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('financeTitle')}</h1><div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"><div class="p-6 bg-theme/10 border-b border-theme/20"><p class="text-sm text-gray-600 dark:text-gray-300">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p></div><table class="w-full text-left border-collapse"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 uppercase text-xs"><tr><th class="py-3 px-4">${t('col_date')}</th><th class="py-3 px-4">${t('col_item')}</th><th class="py-3 px-4">${t('col_amount')} (TWD)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
         }
 
+        // [更新] 信箱專區
         function renderMailboxes() {
-            return `<div class="max-w-4xl mx-auto"><h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('mailboxes')}</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-blue-500 flex flex-col items-center text-center"><div class="bg-blue-100 p-4 rounded-full mb-4"><i data-lucide="scale" class="w-10 h-10 text-blue-600"></i></div><h2 class="text-2xl font-bold mb-2 dark:text-white">${t('rightsMailbox')}</h2><p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('rightsDesc')}</p><a href="https://forms.gle/HAxbZJCiCEFhVkwV6" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a></div><div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-pink-500 flex flex-col items-center text-center"><div class="bg-pink-100 p-4 rounded-full mb-4"><i data-lucide="ghost" class="w-10 h-10 text-pink-600"></i></div><h2 class="text-2xl font-bold mb-2 dark:text-white">${t('anonMailbox')}</h2><p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('anonDesc')}</p><a href="https://forms.gle/6SJpkYYfd48Vj7yv7" target="_blank" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a></div></div></div>`;
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('mailboxes')}</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-blue-500 flex flex-col items-center text-center">
+                            <div class="bg-blue-100 p-4 rounded-full mb-4"><i data-lucide="scale" class="w-10 h-10 text-blue-600"></i></div>
+                            <h2 class="text-2xl font-bold mb-2 dark:text-white">${t('rightsMailbox')}</h2>
+                            <p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('rightsDesc')}</p>
+                            <a href="https://forms.gle/HAxbZJCiCEFhVkwV6" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-pink-500 flex flex-col items-center text-center">
+                            <div class="bg-pink-100 p-4 rounded-full mb-4"><i data-lucide="ghost" class="w-10 h-10 text-pink-600"></i></div>
+                            <h2 class="text-2xl font-bold mb-2 dark:text-white">${t('anonMailbox')}</h2>
+                            <p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('anonDesc')}</p>
+                            <a href="https://forms.gle/L8v7cPxDGP8wfYnJ6" target="_blank" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a>
+                        </div>
+                    </div>
+                </div>`;
         }
         
         function renderClubs() {
             const clubList = APP_DATA.clubs.map(c => `
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition group">
                     <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-gray-100 dark:border-gray-700 shadow-sm group-hover:border-theme transition-colors duration-300">
-                        <img src="${c.img}" onerror="this.src='https://placehold.co/400x300?text=No+Image'" class="w-full h-full object-cover transform hover:scale-110 transition duration-500">
+                        <img src="${c.img}" onerror="this.src='https://placehold.co/400x300?text=Image+Not+Found'" class="w-full h-full object-cover transform hover:scale-110 transition duration-500">
                     </div>
                     <span class="text-xs bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-200 mb-2">${c.category}</span>
                     <h3 class="font-bold dark:text-white text-lg">${isEn() ? c.name_en : c.name_zh}</h3>
