@@ -15,10 +15,6 @@
                             DEFAULT: '#00c8b7',
                             dark: '#00a092',
                             light: '#e0fbf9'
-                        },
-                        gemini: {
-                            start: '#4E8cff',
-                            end: '#E04f5f'
                         }
                     },
                     animation: {
@@ -60,18 +56,6 @@
         /* 搜尋視窗過渡 */
         #search-modal { transition: opacity 0.3s ease-in-out; }
         
-        /* Gemini 漸層 */
-        .bg-gradient-gemini {
-            background: linear-gradient(135deg, #4E8cff, #E04f5f);
-        }
-
-        /* 聊天視窗動畫 */
-        #gemini-chat-window { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
-        .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; }
-        .chat-user { background-color: #00c8b7; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .chat-ai { background-color: #f3f4f6; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .dark .chat-ai { background-color: #374151; color: #e5e7eb; }
-
         body, div, nav, header { transition: background-color 0.3s, color 0.3s; }
     </style>
 </head>
@@ -93,6 +77,7 @@
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('home')" data-key="home">首頁</button>
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('events')" data-key="events">近期活動</button>
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('clubs')" data-key="clubs">社團專區</button>
+                    <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('downloads')" data-key="downloads">資料下載</button>
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('mailboxes')" data-key="mailboxes">信箱專區</button>
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('finance')" data-key="finance">財務明細</button>
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('meetings')" data-key="meetings">會議紀錄</button>
@@ -123,6 +108,7 @@
                 <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('home')" data-key="home">首頁</button>
                 <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('events')" data-key="events">近期活動</button>
                 <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('clubs')" data-key="clubs">社團專區</button>
+                <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('downloads')" data-key="downloads">資料下載</button>
                 <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('mailboxes')" data-key="mailboxes">信箱專區</button>
                 <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('finance')" data-key="finance">財務明細</button>
                 <button class="block w-full text-left py-3 px-3 rounded-md font-medium hover:bg-gray-50 dark:hover:bg-gray-700" onclick="navigate('meetings')" data-key="meetings">會議紀錄</button>
@@ -140,25 +126,6 @@
             </button>
         </div>
         <div id="search-results" class="w-full max-w-2xl mt-4 space-y-2 overflow-y-auto max-h-[70vh] pb-10"></div>
-    </div>
-
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
-        <div id="gemini-chat-window" class="w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 hidden transform origin-bottom-right scale-90 opacity-0 flex flex-col max-h-[500px]">
-            <div class="bg-gradient-gemini p-4 rounded-t-2xl flex justify-between items-center text-white">
-                <div class="flex items-center gap-2"><i data-lucide="sparkles" class="w-5 h-5"></i><span class="font-bold">Gemini 智慧助手</span></div>
-                <button onclick="toggleGemini()" class="hover:text-gray-200"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div id="gemini-messages" class="flex-grow p-4 overflow-y-auto space-y-3 bg-gray-50 dark:bg-gray-900 h-80">
-                <div class="chat-bubble chat-ai">嗨！我是北港高中的 AI 助手。請問今天有什麼我可以幫您的嗎？✨</div>
-            </div>
-            <div class="p-3 border-t dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-2xl flex gap-2">
-                <input type="text" id="gemini-input" placeholder="輸入訊息..." class="flex-grow p-2 rounded-lg border dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" onkeypress="handleGeminiEnter(event)">
-                <button onclick="sendGeminiMessage()" class="bg-gradient-gemini p-2 rounded-lg text-white hover:opacity-90 transition transform active:scale-95"><i data-lucide="send" class="w-5 h-5"></i></button>
-            </div>
-        </div>
-        <button onclick="toggleGemini()" class="bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl border border-gray-100 dark:border-gray-600 group hover:scale-110 transition duration-300">
-            <div class="bg-gradient-gemini p-3 rounded-full text-white shadow-lg animate-bounce-slow"><i data-lucide="bot" class="w-8 h-8"></i></div>
-        </button>
     </div>
 
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-grow w-full" id="app-container">
@@ -196,7 +163,7 @@
 
         const I18N = {
             zh: {
-                home: '首頁', events: '近期活動', mailboxes: '信箱專區', clubs: '社團專區', 
+                home: '首頁', events: '近期活動', mailboxes: '信箱專區', clubs: '社團專區', downloads: '資料下載',
                 contact: '聯絡我們', org: '組織架構', finance: '財務明細', meetings: '會議紀錄', admin: '幹部登入',
                 marquee: '歡迎來到北港高中學生會！ 12/24(三) 金勾盃活動 • 1/16-20 第三次段考 • 傳情活動熱烈進行中！',
                 heroTitle: '北港高中學生會互動網站',
@@ -209,6 +176,7 @@
                 eventTitle: '近期活動一覽',
                 meetingTitle: '會議記錄存檔',
                 clubTitle: '社團專區',
+                downloadTitle: '資料下載專區',
                 rightsMailbox: '學權信箱', rightsDesc: '發現校園設備損壞、對學校政策有疑問或建議？請填寫此表單，學權組將為您爭取權益。',
                 anonMailbox: '匿名信箱', anonDesc: '心情抒發、想對學生會說悄悄話？這裡是絕對保密的樹洞。',
                 goToForm: '前往填寫表單', searchPlaceholder: '輸入關鍵字搜尋公告或活動...', noResults: '沒有找到相關結果',
@@ -217,7 +185,7 @@
                 role_pr: '公關組', role_ga: '總務組', role_art: '美宣組', role_chief: '組長', role_deputy: '副組長'
             },
             en: {
-                home: 'Home', events: 'Events', mailboxes: 'Mailboxes', clubs: 'Clubs',
+                home: 'Home', events: 'Events', mailboxes: 'Mailboxes', clubs: 'Clubs', downloads: 'Downloads',
                 contact: 'Contact Us', org: 'Organization', finance: 'Finance', meetings: 'Meeting Minutes', admin: 'Staff Login',
                 marquee: 'Welcome to PKSH Student Council! 12/24 Xmas Event • 1/16-20 3rd Midterm Exam • Message Delivery Event Ongoing!',
                 heroTitle: 'PKSH Student Council Interactive Site',
@@ -230,6 +198,7 @@
                 eventTitle: 'Upcoming Events',
                 meetingTitle: 'Meeting Minutes Archive',
                 clubTitle: 'Student Clubs',
+                downloadTitle: 'Downloads',
                 rightsMailbox: 'Student Rights Mailbox', rightsDesc: 'Report damaged facilities or suggest policy changes. The Student Rights Dept will fight for you.',
                 anonMailbox: 'Anonymous Mailbox', anonDesc: 'Share your feelings or whisper to the Student Council. This is a confidential space.',
                 goToForm: 'Fill out Form', searchPlaceholder: 'Search news or events...', noResults: 'No results found',
@@ -238,25 +207,24 @@
                 role_pr: 'Public Relations', role_ga: 'General Affairs', role_art: 'Art & Design', role_chief: 'Chief', role_deputy: 'Deputy'
             }
         };
-
         const APP_STATE = {
             view: 'home',
             lang: 'zh',
             darkMode: false,
             userId: null,
-            // 輪播計時器
             confessionTimer: null,
             confessionIndex: 0,
             mockData: {
-                // 首頁公告
                 announcements: [
                     { 
                         id: 1, 
                         title_zh: '114學年度金勾盃歌唱比賽時程表', 
-                        title_en: '114th Golden Hook Cup Singing Contest Schedule', 
+                        title_en: '114th Jingle Bells Singing Contest Schedule', 
                         tag_zh: '活動', 
                         tag_en: 'Event', 
                         date: '2025-12-24',
+                        // 附檔一放在此處供下載
+                        attachment: '114金勾盃歌唱決賽時程表(公告版).pdf',
                         content_zh: `
                             <table class="w-full text-sm text-left border-collapse mt-2">
                                 <thead class="bg-gray-100 dark:bg-gray-700"><tr><th class="p-2">時間</th><th class="p-2">內容</th><th class="p-2">備註</th></tr></thead>
@@ -280,62 +248,62 @@
                         `
                     }
                 ],
-                // 告白牆模擬資料
                 confessionWall: [
-                    { content: "傳情的巧克力真的很好吃，謝謝學姊！", author: "高一的小明" },
-                    { content: "金勾盃大家加油！期待神秘嘉賓！", author: "路過的同學" },
-                    { content: "天氣變冷了，大家要注意保暖喔～", author: "暖暖包" },
-                    { content: "學生會辛苦了，活動辦得很棒！", author: "高三老屁股" },
-                    { content: "希望能多辦一點校際交流活動！", author: "想交朋友的人" }
+                    { content: "傳情的巧克力真的很好吃，謝謝學姊！", content_en: "The chocolate from the message delivery was delicious, thanks senior!", author: "高一的小明", author_en: "Freshman Ming" },
+                    { content: "金勾盃大家加油！期待神秘嘉賓！", content_en: "Good luck everyone for Jingle Bells! Can't wait for the mystery guest!", author: "路過的同學", author_en: "Passerby Student" },
+                    { content: "天氣變冷了，大家要注意保暖喔～", content_en: "It's getting cold, stay warm everyone~", author: "暖暖包", author_en: "Hand Warmer" },
+                    { content: "學生會辛苦了，活動辦得很棒！", content_en: "Student Council, thank you for your hard work! Great event!", author: "高三老屁股", author_en: "Senior Student" },
+                    { content: "希望能多辦一點校際交流活動！", content_en: "Hope to see more inter-school exchange activities!", author: "想交朋友的人", author_en: "Social Butterfly" }
                 ],
                 events: [
-                    { date: '12/24', title_zh: '金勾盃歌唱大賽', title_en: 'Jingle Bell Singing Contest', location_zh: '活動中心', location_en: 'Activity Center', time: '13:00', type: 'Entertainment' },
+                    { date: '12/24', title_zh: '金勾盃歌唱大賽', title_en: 'Jingle Bells Singing Contest', location_zh: '志清堂', location_en: 'Zhiqing Hall', time: '13:00', type: 'Entertainment' },
                     { date: '01/16', title_zh: '第三次段考 Day1', title_en: '3rd Midterm Exam Day 1', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' },
                 ],
                 finance: [
                     { item_zh: '聖誕活動佈置費', item_en: 'Xmas Decoration', amount: -5000, date: '2025-12-15', type: 'Out' },
                     { item_zh: '傳情卡片義賣收入', item_en: 'Card Sale Income', amount: 8500, date: '2025-12-18', type: 'In' },
                 ],
-                // 新增 Emoji 欄位
+                // 英文姓名改為威妥瑪(WG)拼音，王雅琝指定為 WANG,YA-WEN
                 orgLeaders: [
-                    { roleKey: 'role_pres', icon: '👑', name_zh: '張佾傑', name_en: 'Zhang Yi-Jie', desc_zh: '對內綜理內務，主持召開會員代表大會，對外代表本會，配合學校推展各項活動並負責綜理本會事宜。', desc_en: 'Manages internal affairs, presides over general assembly meetings, represents the council externally, and oversees council matters in cooperation with school activities.' },
-                    { roleKey: 'role_vp', icon: '⭐', name_zh: '王雅琝', name_en: 'Wang Ya-Min', desc_zh: '協助會長執行本會事宜，會長因故缺席時代理之。', desc_en: 'Assists the President in executing council matters and acts on behalf of the President in their absence.' }
+                    { roleKey: 'role_pres', icon: '👑', name_zh: '張佾傑', name_en: 'CHANG, I-CHIEH', desc_zh: '對內綜理內務，主持召開會員代表大會，對外代表本會，配合學校推展各項活動並負責綜理本會事宜。', desc_en: 'Manages internal affairs, presides over general assembly meetings, represents the council externally, and oversees council matters in cooperation with school activities.' },
+                    { roleKey: 'role_vp', icon: '⭐', name_zh: '王雅琝', name_en: 'WANG,YA-WEN', desc_zh: '協助會長執行本會事宜，會長因故缺席時代理之。', desc_en: 'Assists the President in executing council matters and acts on behalf of the President in their absence.' }
                 ],
                 orgDepts: [
-                    { roleKey: 'role_act', icon: '🎉', chief: '鄭雨涵', chief_en: 'Zheng Yu-Han', deputy: '', deputy_en: '', desc_zh: '負責策劃及推行本會所舉辦之各類活動。', desc_en: 'Responsible for planning and implementing various activities organized by the council.' },
-                    { roleKey: 'role_art', icon: '🎨', chief: '朱守晴', chief_en: 'Zhu Shou-Qing', deputy: '黃瓊美', deputy_en: 'Huang Qiong-Mei', desc_zh: '負責本會學藝活動、海報、壁報設計。', desc_en: 'Responsible for art activities, poster design, and wall newspaper design.' },
-                    { roleKey: 'role_admin', icon: '📝', chief: '蔡秉宏', chief_en: 'Tsai Bing-Hong', deputy: '顏子䒟', deputy_en: 'Yan Zi-Dan', desc_zh: '設組長一人，組員若干人。負責本會開會通告、會議記錄及資料之收集整理。', desc_en: 'Responsible for meeting notices, recording minutes, and collecting/organizing data. Consists of one chief and several members.' },
-                    { roleKey: 'role_ga', icon: '💰', chief: '趙芝翊', chief_en: 'Zhao Zhi-Yi', deputy: '', deputy_en: '', desc_zh: '負責本會經費收支，財產保管。', desc_en: 'Responsible for the council’s financial income/expenditure and property custody.' },
-                    { roleKey: 'role_pr', icon: '📢', chief: '許雅琳', chief_en: 'Xu Ya-Lin', deputy: '', deputy_en: '', desc_zh: '負責本會會議之聯絡及舉辦活動之聯繫，對外負責公共關係之職務。', desc_en: 'Responsible for liaison of meetings and activities, and external public relations duties.' },
-                    { roleKey: 'role_mobile', icon: '🛠️', chief: '劉乙葭', chief_en: 'Liu Yi-Jia', deputy: '', deputy_en: '', desc_zh: '負責本會舉辦之場地佈置，及其他服務事項。', desc_en: 'Responsible for venue decoration for council events and other service matters.' }
+                    { roleKey: 'role_act', icon: '🎉', chief: '鄭雨涵', chief_en: 'CHENG, YU-HAN', deputy: '', deputy_en: '', desc_zh: '負責策劃及推行本會所舉辦之各類活動。', desc_en: 'Responsible for planning and implementing various activities organized by the council.' },
+                    { roleKey: 'role_art', icon: '🎨', chief: '朱守晴', chief_en: 'CHU, SHOU-CHING', deputy: '黃瓊美', deputy_en: 'HUANG, CHIUNG-MEI', desc_zh: '負責本會學藝活動、海報、壁報設計。', desc_en: 'Responsible for art activities, poster design, and wall newspaper design.' },
+                    { roleKey: 'role_admin', icon: '📝', chief: '蔡秉宏', chief_en: 'TSAI, PING-HUNG', deputy: '顏子䒟', deputy_en: 'YEN, TZU-TAN', desc_zh: '負責本會開會通告、會議記錄及資料之收集整理。', desc_en: 'Responsible for meeting notices, recording minutes, and collecting/organizing data. Consists of one chief and several members.' },
+                    { roleKey: 'role_ga', icon: '💰', chief: '趙芝翊', chief_en: 'CHAO, CHIH-YI', deputy: '', deputy_en: '', desc_zh: '負責本會經費收支，財產保管。', desc_en: 'Responsible for the council’s financial income/expenditure and property custody.' },
+                    { roleKey: 'role_pr', icon: '📢', chief: '許雅琳', chief_en: 'HSU, YA-LIN', deputy: '', deputy_en: '', desc_zh: '負責本會會議之聯絡及舉辦活動之聯繫，對外負責公共關係之職務。', desc_en: 'Responsible for liaison of meetings and activities, and external public relations duties.' },
+                    { roleKey: 'role_mobile', icon: '🛠️', chief: '劉乙葭', chief_en: 'LIU, I-CHIA', deputy: '', deputy_en: '', desc_zh: '負責本會舉辦之場地佈置，及其他服務事項。', desc_en: 'Responsible for venue decoration for council events and other service matters.' }
                 ],
+                // 社團圖片對應：附檔一(熱舞)、附檔二(熱音)、附檔三(童軍)
                 clubs: [
-                    { name_zh: '熱舞社', name_en: 'Pop Dance Club', category: 'Dance', img: 'dance.jpg', ig: 'https://www.instagram.com/pkdc.20_flaming/' },
-                    { name_zh: '熱音社', name_en: 'Pop Music Club', category: 'Music', img: 'music.jpg', ig: 'https://www.instagram.com/pkhmc_/' },
-                    { name_zh: '童軍社', name_en: 'Scout Club', category: 'Service', img: 'scout.jpg', ig: 'https://www.instagram.com/pksh_circus_scout/' },
+                    { name_zh: '熱舞社', name_en: 'Pop Dance Club', category: 'Dance', img: 'attachment1_dance.jpg', ig: 'https://www.instagram.com/pkdc.20_flaming/' },
+                    { name_zh: '熱音社', name_en: 'Pop Music Club', category: 'Music', img: 'attachment2_music.jpg', ig: 'https://www.instagram.com/pkhmc_/' },
+                    { name_zh: '童軍社', name_en: 'Scout Club', category: 'Service', img: 'attachment3_scout.jpg', ig: 'https://www.instagram.com/pksh_circus_scout/' },
                 ],
                 meetings: [
                     { date: '2025-11-05', title_zh: '期中社團長大會會議記錄', title_en: 'Mid-term Club Leaders Meeting Minutes' },
                     { date: '2025-10-20', title_zh: '校慶籌備第二次會議', title_en: '2nd Anniversary Prep Meeting' },
                     { date: '2025-09-15', title_zh: '第六屆第一次例會記錄', title_en: '6th Session 1st Regular Meeting' }
+                ],
+                downloads: [
+                    // 附檔四放在新專區
+                    { name_zh: '114學年度第一學期教學行事簡曆', name_en: '114-1 Academic Calendar', file: '114-1教學行事簡曆.pdf', date: '2025-08-25' }
                 ]
             }
         };
-
         const firebaseConfig = { apiKey: "mock", authDomain: "mock" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
         signInAnonymously(auth).catch(e => console.log("Auth placeholder"));
         onAuthStateChanged(auth, (user) => {
             APP_STATE.userId = user ? user.uid : null;
             document.getElementById('loading-spinner')?.remove();
             render();
         });
-
         const t = (key) => I18N[APP_STATE.lang][key] || key;
         const isEn = () => APP_STATE.lang === 'en';
-
         function updateMarquee() {
             const el = document.getElementById('marquee-text');
             if(el) el.innerText = t('marquee');
@@ -354,7 +322,6 @@
                 input.value = '';
             }
         };
-
         window.performSearch = () => {
             const query = document.getElementById('search-input').value.toLowerCase();
             const resultsDiv = document.getElementById('search-results');
@@ -387,67 +354,27 @@
                 lucide.createIcons();
             }
         };
-
-        window.toggleGemini = () => {
-            const window = document.getElementById('gemini-chat-window');
-            if (window.classList.contains('hidden')) {
-                window.classList.remove('hidden');
-                setTimeout(() => {
-                    window.classList.remove('scale-90', 'opacity-0');
-                    window.classList.add('scale-100', 'opacity-100');
-                }, 10);
-            } else {
-                window.classList.remove('scale-100', 'opacity-100');
-                window.classList.add('scale-90', 'opacity-0');
-                setTimeout(() => window.classList.add('hidden'), 300);
-            }
-        };
-
-        window.handleGeminiEnter = (e) => {
-            if (e.key === 'Enter') sendGeminiMessage();
-        };
-
-        window.sendGeminiMessage = () => {
-            const input = document.getElementById('gemini-input');
-            const msg = input.value.trim();
-            if(!msg) return;
-            const container = document.getElementById('gemini-messages');
-            container.innerHTML += `<div class="chat-bubble chat-user w-fit ml-auto mb-2">${msg}</div>`;
-            input.value = '';
-            container.scrollTop = container.scrollHeight;
-            const loadingId = 'loading-' + Date.now();
-            container.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-ai w-fit mr-auto mb-2 italic text-gray-400">思考中...</div>`;
-            container.scrollTop = container.scrollHeight;
-            setTimeout(() => {
-                document.getElementById(loadingId).remove();
-                let reply = "";
-                if(msg.includes('活動') || msg.includes('event')) reply = "近期有 **金勾盃歌唱大賽 (12/24)** 和 **第三次段考 (1/16)** 喔！";
-                else if(msg.includes('社團') || msg.includes('club')) reply = "我們有熱音社、熱舞社和童軍社等等！";
-                else reply = "我是北港高中學生會的 AI 助手。目前僅提供基本資訊查詢。😊";
-                container.innerHTML += `<div class="chat-bubble chat-ai w-fit mr-auto mb-2">${marked.parse(reply)}</div>`;
-                container.scrollTop = container.scrollHeight;
-            }, 1000);
-        };
-
+        
         function startConfessionCarousel() {
             if (APP_STATE.confessionTimer) clearInterval(APP_STATE.confessionTimer);
             const updateConfession = () => {
                 const elContent = document.getElementById('confession-content');
                 const elAuthor = document.getElementById('confession-author');
                 if(!elContent || !elAuthor) return;
-
                 const data = APP_STATE.mockData.confessionWall[APP_STATE.confessionIndex];
                 
+                // 翻譯告白牆內容
+                const text = isEn() ? (data.content_en || data.content) : data.content;
+                const author = isEn() ? (data.author_en || data.author) : data.author;
+
                 elContent.classList.remove('animate-fade-in');
                 elContent.style.opacity = 0;
-                
                 setTimeout(() => {
-                    elContent.innerText = `"${data.content}"`;
-                    elAuthor.innerText = `- ${data.author}`;
+                    elContent.innerText = `"${text}"`;
+                    elAuthor.innerText = `- ${author}`;
                     elContent.style.opacity = 1;
                     elContent.classList.add('animate-fade-in');
                 }, 300);
-
                 APP_STATE.confessionIndex = (APP_STATE.confessionIndex + 1) % APP_STATE.mockData.confessionWall.length;
             };
             updateConfession();
@@ -462,172 +389,326 @@
                     <h3 class="text-lg font-bold mt-1 dark:text-white">${isEn() ? item.title_en : item.title_zh}</h3>
                     <p class="text-sm text-gray-400 mt-1 mb-2">${item.date}</p>
                     ${item.content_zh ? `<div class="mt-2 text-gray-600 dark:text-gray-300 overflow-x-auto">${item.content_zh}</div>` : ''}
+                    
+                    ${item.attachment ? `
+                        <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                            <a href="${item.attachment}" download class="flex items-center gap-2 text-theme font-semibold hover:text-theme-dark transition">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                                ${isEn() ? 'Download Schedule PDF' : '下載賽程表 PDF'}
+                            </a>
+                        </div>
+                    ` : ''}
                 </div>
             `).join('');
 
-            return `
-                <div class="bg-theme text-white rounded-2xl p-8 mb-10 shadow-lg relative overflow-hidden">
-                    <div class="relative z-10">
-                        <h1 class="text-4xl font-extrabold mb-4">${t('heroTitle')}</h1>
-                        <p class="text-lg opacity-90">${t('heroSubtitle')}</p>
-                        <button class="mt-6 bg-white text-theme font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition" onclick="navigate('mailboxes')">
-                            ${t('btnComplaint')}
-                        </button>
+            const confessionHtml = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-t-4 border-yellow-400">
+                    <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><i data-lucide="heart" class="w-6 h-6 text-yellow-500 fill-yellow-500/20"></i>${t('confession')}</h2>
+                    <div class="text-center py-6">
+                        <p id="confession-content" class="text-xl italic text-gray-700 dark:text-gray-200 font-medium h-24 sm:h-20 flex items-center justify-center animate-fade-in px-4"></p>
+                        <p id="confession-author" class="text-sm text-gray-500 dark:text-gray-400 mt-4">- 匿名</p>
                     </div>
-                    <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-10 translate-y-10"><i data-lucide="school" class="w-64 h-64"></i></div>
                 </div>
+            `;
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 space-y-6">
-                        <h2 class="text-2xl font-bold dark:text-white flex items-center gap-2"><i data-lucide="bell" class="text-theme"></i> ${t('news')}</h2>
-                        <div class="grid gap-4 md:grid-cols-1">${newsHtml}</div>
+            return `
+                <section id="hero-section" class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-xl mb-12">
+                    <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight mb-4">${t('heroTitle')}</h1>
+                    <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8">${t('heroSubtitle')}</p>
+                    <a href="#" onclick="navigate('mailboxes')" class="bg-theme text-white px-8 py-3 rounded-full text-lg font-bold hover:bg-theme-dark transition transform hover:scale-105 shadow-lg flex items-center justify-center mx-auto w-fit gap-2">
+                        <i data-lucide="inbox" class="w-5 h-5"></i>
+                        ${t('btnComplaint')}
+                    </a>
+                </section>
+                
+                <section id="news-section" class="mb-12">
+                    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 border-b-2 border-theme pb-2">${t('news')}</h2>
+                    <div class="space-y-6">
+                        ${newsHtml}
                     </div>
-                    <div>
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md sticky top-24">
-                            <h2 class="text-xl font-bold text-pink-500 mb-4 flex items-center gap-2"><i data-lucide="heart"></i> ${t('confession')}</h2>
-                            <div class="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg border border-pink-100 dark:border-pink-900 min-h-[120px] flex flex-col justify-center">
-                                <p id="confession-content" class="italic text-gray-700 dark:text-gray-300 text-lg font-medium transition-opacity duration-300">"載入中..."</p>
-                                <p id="confession-author" class="text-right text-xs text-gray-500 mt-2 transition-opacity duration-300"></p>
+                </section>
+
+                <section id="confession-section" class="mb-12">
+                    ${confessionHtml}
+                </section>
+
+                <section id="events-section">
+                    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 border-b-2 border-theme pb-2">${t('eventTitle')}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        ${APP_STATE.mockData.events.map(e => `
+                            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border-l-4 border-yellow-500">
+                                <p class="text-sm font-bold text-yellow-600 dark:text-yellow-400 mb-1">${e.date} | ${e.time}</p>
+                                <h4 class="text-xl font-bold dark:text-white">${isEn() ? e.title_en : e.title_zh}</h4>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i>${isEn() ? e.location_en : e.location_zh}</p>
                             </div>
-                            <a href="https://forms.gle/6SJpkYYfd48Vj7yv7" target="_blank" class="block w-full mt-4 bg-pink-500 text-white font-bold py-2 rounded text-center hover:bg-pink-600 transition">我要告白</a>
+                        `).join('')}
+                    </div>
+                </section>
+            `;
+        }
+        
+        function renderEvents() {
+            return `
+                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('eventTitle')}</h1>
+                <div class="space-y-6">
+                    ${APP_STATE.mockData.events.map(e => `
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center justify-between border-l-8 border-theme">
+                            <div>
+                                <p class="text-sm font-bold text-theme mb-1">${e.date} | ${e.time}</p>
+                                <h2 class="text-2xl font-bold dark:text-white">${isEn() ? e.title_en : e.title_zh}</h2>
+                                <p class="text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1"><i data-lucide="map-pin" class="w-5 h-5"></i>${isEn() ? e.location_en : e.location_zh}</p>
+                            </div>
+                            <span class="text-xs font-semibold bg-theme/20 text-theme px-3 py-1 rounded-full">${e.type}</span>
                         </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderClubs() {
+            return `
+                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('clubTitle')}</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${APP_STATE.mockData.clubs.map(c => `
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition group">
+                            <img src="${c.img}" alt="${isEn() ? c.name_en : c.name_zh}" class="w-full h-48 object-cover group-hover:scale-[1.03] transition duration-300">
+                            <div class="p-5">
+                                <span class="text-xs font-semibold bg-theme/20 text-theme px-3 py-1 rounded-full mb-2 inline-block">${c.category}</span>
+                                <h3 class="text-xl font-bold dark:text-white mb-2">${isEn() ? c.name_en : c.name_zh}</h3>
+                                ${c.ig ? `
+                                    <a href="${c.ig}" target="_blank" class="text-pink-600 dark:text-pink-400 flex items-center gap-1 font-medium hover:underline">
+                                        <i data-lucide="instagram" class="w-4 h-4"></i>
+                                        Instagram
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        // 新增：資料下載專區
+        function renderDownloads() {
+            return `
+                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('downloadTitle')}</h1>
+                <div class="space-y-6">
+                    ${APP_STATE.mockData.downloads.map(d => `
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex items-center justify-between hover:shadow-lg transition border-l-4 border-blue-500">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg text-blue-600 dark:text-blue-400">
+                                    <i data-lucide="file-text" class="w-8 h-8"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold dark:text-white">${isEn() ? d.name_en : d.name_zh}</h2>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${t('col_date')}: ${d.date}</p>
+                                </div>
+                            </div>
+                            <a href="${d.file}" download class="px-4 py-2 bg-theme text-white rounded-lg font-medium hover:bg-theme-dark transition flex items-center gap-2">
+                                <i data-lucide="download" class="w-5 h-5"></i>
+                                <span class="hidden sm:inline">Download</span>
+                            </a>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderMailboxes() {
+            return `
+                <h1 class="text-4xl font-extrabold mb-10 text-gray-900 dark:text-white">信箱專區</h1>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl border-l-8 border-theme">
+                        <h2 class="text-3xl font-bold text-theme mb-3">${t('rightsMailbox')}</h2>
+                        <p class="text-gray-600 dark:text-gray-300 mb-6">${t('rightsDesc')}</p>
+                        <a href="https://forms.gle/your-rights-form-link" target="_blank" class="bg-theme text-white px-6 py-3 rounded-full font-medium hover:bg-theme-dark transition transform hover:scale-[1.01] flex items-center justify-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                            ${t('goToForm')}
+                        </a>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl border-l-8 border-yellow-500">
+                        <h2 class="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-3">${t('anonMailbox')}</h2>
+                        <p class="text-gray-600 dark:text-gray-300 mb-6">${t('anonDesc')}</p>
+                        <a href="https://forms.gle/your-anon-form-link" target="_blank" class="bg-yellow-500 text-white px-6 py-3 rounded-full font-medium hover:bg-yellow-600 transition transform hover:scale-[1.01] flex items-center justify-center gap-2">
+                            <i data-lucide="feather" class="w-5 h-5"></i>
+                            ${t('goToForm')}
+                        </a>
                     </div>
                 </div>
             `;
         }
 
-        function renderEvents() {
-            const eventsHtml = APP_STATE.mockData.events.map(ev => `
-                <div class="flex items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4 border-l-4 ${ev.type === 'Entertainment' ? 'border-pink-500' : 'border-blue-500'}">
-                    <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg text-center min-w-[80px]">
-                        <span class="block text-xl font-bold text-gray-800 dark:text-white">${ev.date.split('/')[1]}</span>
-                        <span class="block text-xs text-gray-500">${ev.date.split('/')[0]}月</span>
-                    </div>
-                    <div class="ml-4 flex-grow">
-                        <h3 class="text-lg font-bold dark:text-white">${isEn() ? ev.title_en : ev.title_zh}</h3>
-                        <p class="text-sm text-gray-500 flex items-center gap-1">
-                            <i data-lucide="map-pin" class="w-3 h-3"></i> ${isEn() ? ev.location_en : ev.location_zh} | 
-                            <i data-lucide="clock" class="w-3 h-3"></i> ${ev.time}
-                        </p>
-                    </div>
-                </div>
-            `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('eventTitle')}</h1><div class="max-w-3xl mx-auto">${eventsHtml}</div>`;
-        }
-
-        function renderOrg() {
-            const leadersHtml = APP_STATE.mockData.orgLeaders.map(l => `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex flex-col items-center text-center border-t-4 border-theme hover:scale-105 transition-transform duration-300">
-                    <div class="text-6xl mb-4">${l.icon}</div>
-                    <h3 class="text-xl font-bold text-theme">${t(l.roleKey)}</h3>
-                    <p class="text-2xl font-bold dark:text-white my-2">${isEn() ? l.name_en : l.name_zh}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed px-4 text-left">${isEn() ? l.desc_en : l.desc_zh}</p>
-                </div>
-            `).join('');
-            const deptsHtml = APP_STATE.mockData.orgDepts.map(d => `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:-translate-y-1 transition duration-300 h-full border-l-4 border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center gap-3 mb-4 border-b pb-2 dark:border-gray-700">
-                        <span class="text-3xl">${d.icon}</span>
-                        <h3 class="text-xl font-bold text-theme">${t(d.roleKey)}</h3>
-                    </div>
-                    <div class="flex justify-between mb-4">
-                        <div class="text-center w-1/2">
-                            <span class="text-xs text-gray-400 block">${t('role_chief')}</span>
-                            <span class="font-bold text-lg dark:text-white">${isEn() && d.chief_en ? d.chief_en : d.chief}</span>
-                        </div>
-                        ${d.deputy ? `<div class="text-center w-1/2 border-l dark:border-gray-700"><span class="text-xs text-gray-400 block">${t('role_deputy')}</span><span class="font-bold text-lg dark:text-white">${isEn() && d.deputy_en ? d.deputy_en : d.deputy}</span></div>` : ''}
-                    </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg leading-relaxed text-justify">${isEn() ? d.desc_en : d.desc_zh}</p>
-                </div>
-            `).join('');
-            return `<h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('orgTitle')}</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">${leadersHtml}</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">${deptsHtml}</div>`;
-        }
-
         function renderFinance() {
-            const rows = APP_STATE.mockData.finance.map(f => `
-                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <td class="py-3 px-4 dark:text-gray-300">${f.date}</td>
-                    <td class="py-3 px-4 font-medium dark:text-white">${isEn() ? f.item_en : f.item_zh}</td>
-                    <td class="py-3 px-4"><span class="${f.type === 'In' ? 'text-green-500' : 'text-red-500'} font-bold">${f.amount > 0 ? '+' : ''}${f.amount}</span></td>
-                </tr>
-            `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('financeTitle')}</h1><div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"><div class="p-6 bg-theme/10 border-b border-theme/20"><p class="text-sm text-gray-600 dark:text-gray-300">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p></div><table class="w-full text-left border-collapse"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 uppercase text-xs"><tr><th class="py-3 px-4">${t('col_date')}</th><th class="py-3 px-4">${t('col_item')}</th><th class="py-3 px-4">${t('col_amount')} (TWD)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-        }
+            const tableHeaders = `
+                <thead class="bg-theme/20 dark:bg-gray-700 text-theme dark:text-white">
+                    <tr>
+                        <th class="p-3 text-left w-1/4">${t('col_date')}</th>
+                        <th class="p-3 text-left w-1/2">${t('col_item')}</th>
+                        <th class="p-3 text-right w-1/4">${t('col_amount')}</th>
+                    </tr>
+                </thead>
+            `;
 
-        function renderMailboxes() {
-            return `<div class="max-w-4xl mx-auto"><h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('mailboxes')}</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-blue-500 flex flex-col items-center text-center"><div class="bg-blue-100 p-4 rounded-full mb-4"><i data-lucide="scale" class="w-10 h-10 text-blue-600"></i></div><h2 class="text-2xl font-bold mb-2 dark:text-white">${t('rightsMailbox')}</h2><p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('rightsDesc')}</p><a href="https://forms.gle/HAxbZJCiCEFhVkwV6" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a></div><div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-pink-500 flex flex-col items-center text-center"><div class="bg-pink-100 p-4 rounded-full mb-4"><i data-lucide="ghost" class="w-10 h-10 text-pink-600"></i></div><h2 class="text-2xl font-bold mb-2 dark:text-white">${t('anonMailbox')}</h2><p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('anonDesc')}</p><a href="https://forms.gle/6SJpkYYfd48Vj7yv7" target="_blank" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a></div></div></div>`;
-        }
-        
-        function renderClubs() {
-            const clubList = APP_STATE.mockData.clubs.map(c => `
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition group">
-                    <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-gray-100 dark:border-gray-700 shadow-sm group-hover:border-theme transition-colors duration-300">
-                        <img src="${c.img}" class="w-full h-full object-cover">
-                    </div>
-                    <span class="text-xs bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-200 mb-2">${c.category}</span>
-                    <h3 class="font-bold dark:text-white text-lg">${isEn() ? c.name_en : c.name_zh}</h3>
-                    <a href="${c.ig}" target="_blank" class="mt-4 text-pink-600 hover:text-pink-700 flex items-center gap-1 font-medium"><i data-lucide="instagram" class="w-4 h-4"></i> Instagram</a>
-                </div>
-            `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('clubTitle')}</h1><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${clubList}</div>`;
-        }
+            const tableRows = APP_STATE.mockData.finance.map(f => {
+                const amountClass = f.amount > 0 ? 'text-green-600 dark:text-green-400 font-bold' : 'text-red-600 dark:text-red-400 font-bold';
+                const sign = f.amount > 0 ? '+' : '';
+                return `
+                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <td class="p-3 text-gray-500 dark:text-gray-400">${f.date}</td>
+                        <td class="p-3 dark:text-white">${isEn() ? f.item_en : f.item_zh}</td>
+                        <td class="p-3 text-right ${amountClass}">${sign}${f.amount.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
 
-        function renderContact() {
+            const total = APP_STATE.mockData.finance.reduce((sum, f) => sum + f.amount, 0);
+            const totalClass = total >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+
+            const tableFooter = `
+                <tfoot>
+                    <tr class="bg-gray-100 dark:bg-gray-700 font-extrabold text-lg">
+                        <td class="p-3 text-left" colspan="2">總結 (Total)</td>
+                        <td class="p-3 text-right ${totalClass}">${total.toLocaleString()}</td>
+                    </tr>
+                </tfoot>
+            `;
+
             return `
-                <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-                    <h1 class="text-3xl font-bold mb-6 text-theme">${t('contact')}</h1>
-                    <div class="space-y-6">
-                        <a href="https://www.instagram.com/pksh.su/" target="_blank" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition group">
-                            <i data-lucide="instagram" class="w-8 h-8 text-pink-600 mr-4 group-hover:scale-110 transition-transform"></i>
-                            <div><h3 class="font-bold text-lg dark:text-white">Instagram</h3><p class="text-sm text-gray-600 dark:text-gray-300">@pksh.su</p></div>
-                        </a>
-                        <a href="mailto:pkshsu@pksh.ylc.edu.tw" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition group">
-                            <i data-lucide="mail" class="w-8 h-8 text-theme mr-4 group-hover:scale-110 transition-transform"></i>
-                            <div><h3 class="font-bold text-lg dark:text-white">Email</h3><p class="text-sm text-gray-600 dark:text-gray-300">pkshsu@pksh.ylc.edu.tw</p></div>
-                        </a>
-                        <div class="pt-6 mt-6 border-t dark:border-gray-700">
-                            <button onclick="navigate('admin')" class="text-sm text-gray-500 hover:text-theme flex items-center transition"><i data-lucide="shield" class="w-4 h-4 mr-1"></i> ${t('admin')}</button>
-                        </div>
-                    </div>
+                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('financeTitle')}</h1>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl overflow-x-auto">
+                    <table class="min-w-full table-auto text-sm">
+                        ${tableHeaders}
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                        ${tableFooter}
+                    </table>
                 </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-4">* 以上為模擬資料，僅供展示。實際財務明細請參考正式文件。</p>
             `;
         }
 
         function renderMeetings() {
-            const list = APP_STATE.mockData.meetings.map(m => `
-                <div class="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer border-l-4 border-gray-400">
-                    <div class="flex items-center gap-4"><div class="bg-gray-100 dark:bg-gray-600 p-3 rounded text-gray-500 dark:text-gray-300"><i data-lucide="file-text"></i></div><div><h3 class="font-bold dark:text-white">${isEn() ? m.title_en : m.title_zh}</h3><p class="text-sm text-gray-500">${m.date}</p></div></div><button class="text-theme hover:underline text-sm font-bold">PDF</button>
+            return `
+                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('meetingTitle')}</h1>
+                <div class="space-y-6">
+                    ${APP_STATE.mockData.meetings.map(m => `
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex items-center justify-between hover:shadow-lg transition">
+                            <div>
+                                <h2 class="text-xl font-bold dark:text-white">${isEn() ? m.title_en : m.title_zh}</h2>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${m.date}</p>
+                            </div>
+                            <a href="meeting-${m.date}.pdf" target="_blank" class="text-theme font-medium hover:underline flex items-center gap-1">
+                                檢視檔案
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </a>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('meetingTitle')}</h1><div class="space-y-4 max-w-3xl mx-auto">${list}</div>`;
+            `;
         }
 
+        function renderOrg() {
+            const leadersHtml = APP_STATE.mockData.orgLeaders.map(p => `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center text-center border-t-4 border-theme">
+                    <div class="text-4xl mb-3">${p.icon}</div>
+                    <h3 class="text-2xl font-bold dark:text-white">${isEn() ? p.name_en : p.name_zh}</h3>
+                    <p class="text-theme font-semibold text-lg mb-4">${t(p.roleKey)}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">${isEn() ? p.desc_en : p.desc_zh}</p>
+                </div>
+            `).join('');
+
+            const deptsHtml = APP_STATE.mockData.orgDepts.map(d => `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-yellow-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-2xl">${d.icon}</div>
+                        <h4 class="text-xl font-bold dark:text-white">${t(d.roleKey)}</h4>
+                    </div>
+                    <div class="mb-4 text-sm">
+                        <p class="font-semibold dark:text-white">${t('role_chief')}：${isEn() ? d.chief_en : d.chief_zh}</p>
+                        ${d.deputy ? `<p class="font-semibold dark:text-white">${t('role_deputy')}：${isEn() ? d.deputy_en : d.deputy_zh}</p>` : ''}
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">${isEn() ? d.desc_en : d.desc_zh}</p>
+                </div>
+            `).join('');
+
+            return `
+                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">${t('orgTitle')}</h1>
+                <div class="space-y-12">
+                    <h2 class="text-3xl font-extrabold text-theme border-b-2 border-theme pb-2 mb-6">領導核心</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        ${leadersHtml}
+                    </div>
+
+                    <h2 class="text-3xl font-extrabold text-theme border-b-2 border-theme pb-2 mb-6">各組分工</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${deptsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContact() {
+            return `
+                <h1 class="text-4xl font-extrabold mb-8 text-gray-900 dark:text-white">聯絡我們</h1>
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl space-y-6">
+                    <div class="flex items-center gap-4">
+                        <i data-lucide="mail" class="w-8 h-8 text-theme"></i>
+                        <div>
+                            <p class="text-lg font-bold dark:text-white">學生會信箱</p>
+                            <p class="text-gray-600 dark:text-gray-300">pksh.su@email.com (模擬)</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <i data-lucide="instagram" class="w-8 h-8 text-pink-600"></i>
+                        <div>
+                            <p class="text-lg font-bold dark:text-white">Instagram</p>
+                            <a href="https://www.instagram.com/pksh.su/" target="_blank" class="text-pink-600 hover:underline">@pksh.su</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <i data-lucide="facebook" class="w-8 h-8 text-blue-600"></i>
+                        <div>
+                            <p class="text-lg font-bold dark:text-white">Facebook</p>
+                            <a href="https://www.facebook.com/52PKSH/" target="_blank" class="text-blue-600 hover:underline">北港高中學生會 (模擬)</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <i data-lucide="map-pin" class="w-8 h-8 text-green-600"></i>
+                        <div>
+                            <p class="text-lg font-bold dark:text-white">辦公室地點</p>
+                            <p class="text-gray-600 dark:text-gray-300">行政大樓二樓 (模擬)</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
         function renderAdmin() {
-             return `<div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow text-center"><h1 class="text-2xl font-bold mb-4 dark:text-white">${t('admin')}</h1><input type="password" placeholder="Password" class="w-full p-2 border mb-4 rounded dark:bg-gray-700"><button class="w-full bg-theme text-white py-2 rounded">Login</button></div>`;
+            return `
+                <div class="flex items-center justify-center min-h-[60vh]">
+                    <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl text-center">
+                        <i data-lucide="lock" class="w-12 h-12 text-theme mb-4 mx-auto"></i>
+                        <h1 class="text-3xl font-extrabold mb-6 text-gray-900 dark:text-white">幹部登入專區</h1>
+                        <form onsubmit="alert('此為模擬登入頁面，無實際登入功能'); return false;">
+                            <input type="text" placeholder="帳號 / 學號" class="w-full p-3 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-theme" required>
+                            <input type="password" placeholder="密碼" class="w-full p-3 mb-6 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-theme" required>
+                            <button type="submit" class="w-full bg-theme text-white p-3 rounded-lg font-bold hover:bg-theme-dark transition transform hover:scale-[1.01]">登入</button>
+                        </form>
+                    </div>
+                </div>
+            `;
         }
 
         function render() {
+            updateMarquee();
             const container = document.getElementById('app-container');
             const view = APP_STATE.view;
-            
-            if (view !== 'home' && APP_STATE.confessionTimer) {
-                clearInterval(APP_STATE.confessionTimer);
-                APP_STATE.confessionTimer = null;
-            }
 
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                const isActive = btn.dataset.key === view;
-                if(isActive) btn.classList.add('text-theme', 'bg-gray-50', 'dark:bg-gray-700', 'font-bold');
-                else btn.classList.remove('text-theme', 'bg-gray-50', 'dark:bg-gray-700', 'font-bold');
-            });
-            updateMarquee();
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                 if(I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
-            });
             const routes = {
-                'home': renderHome, 'events': renderEvents, 'mailboxes': renderMailboxes,
-                'org': renderOrg, 'finance': renderFinance, 'clubs': renderClubs,
-                'contact': renderContact, 'meetings': renderMeetings, 'admin': renderAdmin
+                'home': renderHome, 'events': renderEvents, 'clubs': renderClubs,
+                'mailboxes': renderMailboxes, 'finance': renderFinance, 'contact': renderContact,
+                'org': renderOrg, 'meetings': renderMeetings, 'admin': renderAdmin, 'downloads': renderDownloads
             };
             container.innerHTML = routes[view] ? routes[view]() : renderHome();
             
