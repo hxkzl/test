@@ -18,12 +18,17 @@
                         }
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out'
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'float': 'float 6s ease-in-out infinite'
                     },
                     keyframes: {
                         fadeIn: {
                             '0%': { opacity: '0' },
                             '100%': { opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
                         }
                     }
                 }
@@ -187,7 +192,6 @@
 
         // ============================================
         // ⚠️【請將您從 Firebase Console 取得的 Config 貼在下方】⚠️
-        // 如果保持預設值，網頁將以「靜態模式」運作，功能完全正常，但無法真正儲存告白。
         // ============================================
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
@@ -212,7 +216,7 @@
             console.error("Firebase 初始化失敗:", e);
         }
 
-        // --- 靜態資料 (完整修正版) ---
+        // --- 靜態資料 ---
         const STATIC_DATA = {
             announcements: [
                 { 
@@ -233,7 +237,6 @@
                 { content: "學生會辛苦了，活動辦得很棒！", content_en: "Student Council, thank you for your hard work! Great event!", author: "高三老屁股" },
                 { content: "希望能多辦一點校際交流活動！", content_en: "Hope to see more inter-school exchange activities!", author: "想交朋友的人" }
             ],
-            // [更新] 新增 1 月份活動，移除過期活動
             events: [
                 { date: '01/01', title_zh: '元旦', title_en: "New Year's Day", location_zh: '全校', location_en: 'Campus', time: '全天', type: 'Holiday' },
                 { date: '01/09', title_zh: '第八節輔導課結束', title_en: '8th Period Supplementary Classes End', location_zh: '各班教室', location_en: 'Classrooms', time: '17:00', type: 'Academic' },
@@ -246,7 +249,6 @@
                 { item_zh: '聖誕活動佈置費', item_en: 'Xmas Decoration', amount: -5000, date: '2025-12-15', type: 'Out' },
                 { item_zh: '傳情卡片義賣收入', item_en: 'Card Sale Income', amount: 8500, date: '2025-12-18', type: 'In' },
             ],
-            // [更新] 社團圖片改用 Emoji
             clubs: [
                 { name_zh: '熱舞社', name_en: 'Pop Dance Club', category: 'Dance', emoji: '💃', ig: 'https://www.instagram.com/pkdc.20_flaming/' },
                 { name_zh: '熱音社', name_en: 'Pop Music Club', category: 'Music', emoji: '🎸', ig: 'https://www.instagram.com/pkhmc_/' },
@@ -274,7 +276,6 @@
                 { roleKey: 'role_pr', icon: '📢', chief: '許雅琳', chief_en: 'HSU, YA-LIN', deputy: '', deputy_en: '', desc_zh: '負責本會會議之聯絡及舉辦活動之聯繫。', desc_en: 'Responsible for public relations.' },
                 { roleKey: 'role_mobile', icon: '🛠️', chief: '劉乙葭', chief_en: 'LIU, I-CHIA', deputy: '', deputy_en: '', desc_zh: '負責本會舉辦之場地佈置。', desc_en: 'Responsible for logistics.' }
             ],
-            // [更新] 會議記錄清空
             meetings: [],
             downloads: [
                 { date: '2025-12-24', title_zh: '114金勾盃歌唱決賽時程表(公告版)', title_en: '114 Jingle Bells Finals Schedule', file: '114金勾盃歌唱決賽時程表(公告版).pdf', type: 'Event' },
@@ -289,7 +290,7 @@
             zh: {
                 home: '首頁', events: '近期活動', mailboxes: '信箱專區', clubs: '社團專區', downloads: '資料下載',
                 contact: '聯絡我們', org: '組織架構', finance: '財務明細', meetings: '會議紀錄', admin: '幹部登入',
-                marquee: '', // [更新] 跑馬燈清空
+                marquee: '', 
                 heroTitle: '北港高中學生會互動網站',
                 heroSubtitle: '你的聲音，我們的行動。共創更美好的校園生活。',
                 btnComplaint: '前往信箱專區',
@@ -313,7 +314,7 @@
             en: {
                 home: 'Home', events: 'Events', mailboxes: 'Mailboxes', clubs: 'Clubs', downloads: 'Downloads',
                 contact: 'Contact Us', org: 'Organization', finance: 'Finance', meetings: 'Meeting Minutes', admin: 'Staff Login',
-                marquee: '', // [Update] Marquee cleared
+                marquee: '', 
                 heroTitle: 'PKSH Student Council Interactive Site',
                 heroSubtitle: 'Your Voice, Our Action. Creating a better campus life together.',
                 btnComplaint: 'Go to Mailboxes',
@@ -528,13 +529,16 @@
             `).join('');
 
             return `
-                <div class="bg-theme text-white rounded-2xl p-8 mb-10 shadow-lg relative overflow-hidden">
+                <div class="bg-theme text-white rounded-2xl p-8 mb-10 shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
                     <div class="relative z-10">
                         <h1 class="text-4xl font-extrabold mb-4">${t('heroTitle')}</h1>
                         <p class="text-lg opacity-90">${t('heroSubtitle')}</p>
                         <button class="mt-6 bg-white text-theme font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition" onclick="navigate('mailboxes')">
                             ${t('btnComplaint')}
                         </button>
+                    </div>
+                    <div class="relative z-10 flex-shrink-0 animate-float">
+                        <img src="大頭貼.jpg" onerror="this.src='https://ui-avatars.com/api/?name=PKSH&background=00c8b7&color=fff&size=200'" class="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-white/30 shadow-2xl object-cover">
                     </div>
                     <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-10 translate-y-10"><i data-lucide="school" class="w-64 h-64"></i></div>
                 </div>
