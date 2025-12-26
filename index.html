@@ -52,8 +52,8 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* 搜尋視窗過渡 */
-        #search-modal { transition: opacity 0.3s ease-in-out; }
+        /* 視窗過渡動畫 */
+        #search-modal, #confession-modal { transition: opacity 0.3s ease-in-out; }
         
         body, div, nav, header { transition: background-color 0.3s, color 0.3s; }
     </style>
@@ -130,7 +130,7 @@
     <div id="confession-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md shadow-2xl transform scale-100 transition-all">
             <h3 class="text-2xl font-bold mb-4 text-theme">我要告白 💌</h3>
-            <p class="text-sm text-gray-500 mb-4">你的留言將會傳送到 Firebase 資料庫，經顯示於首頁。</p>
+            <p class="text-sm text-gray-500 mb-4 dark:text-gray-400">寫下你想說的話，讓全校都看見！（若未設定 Firebase，將僅顯示成功訊息但不會儲存）</p>
             
             <div class="space-y-4">
                 <div>
@@ -148,8 +148,8 @@
             </div>
 
             <div class="flex justify-end gap-3 mt-6">
-                <button onclick="toggleConfessionModal()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg dark:hover:bg-gray-700">取消</button>
-                <button onclick="submitConfessionToFirebase()" class="px-6 py-2 bg-theme text-white rounded-lg font-bold hover:bg-theme-dark transition shadow-lg">送出</button>
+                <button onclick="toggleConfessionModal()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg dark:hover:bg-gray-700 dark:text-gray-300">取消</button>
+                <button onclick="submitConfession()" class="px-6 py-2 bg-theme text-white rounded-lg font-bold hover:bg-theme-dark transition shadow-lg">送出</button>
             </div>
         </div>
     </div>
@@ -186,7 +186,8 @@
         import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // ============================================
-        // ⚠️ 請在此處填入您的 Firebase 設定 ⚠️
+        // ⚠️【請將您從 Firebase Console 取得的 Config 貼在下方】⚠️
+        // 如果保持預設值，網頁將以「靜態模式」運作，功能完全正常，但無法真正儲存告白。
         // ============================================
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
@@ -197,22 +198,22 @@
             appId: "APP_ID"
         };
 
-        // 嘗試初始化 Firebase，如果沒填 Key 則使用靜態模式
+        // 嘗試初始化 Firebase
         let db = null;
         try {
+            // 簡單檢查使用者是否已替換 API Key
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
-                console.log("Firebase initialized!");
+                console.log("✅ Firebase 連線成功！");
             } else {
-                console.warn("Firebase config not set. Using static mode.");
+                console.warn("⚠️ Firebase Config 未設定，目前使用靜態資料模式。");
             }
         } catch (e) {
-            console.error("Firebase init error:", e);
+            console.error("Firebase 初始化失敗:", e);
         }
 
-        // --- 預設靜態資料 (Fallback Data) ---
-        // 說明：如果 Firebase 連線失敗或尚未設定，將顯示這些資料
+        // --- 靜態資料 (完整修正版) ---
         const STATIC_DATA = {
             announcements: [
                 { 
@@ -222,7 +223,7 @@
                     tag_zh: '活動', 
                     tag_en: 'Event', 
                     date: '2025-12-24',
-                    // 修改：金勾盃直接顯示 PDF 下載樣式
+                    // [修正] 金勾盃樣式改為 PDF 下載按鈕
                     content_zh: `<a href="114金勾盃歌唱決賽時程表(公告版).pdf" target="_blank" class="block w-full text-center bg-red-50 text-red-600 border border-red-200 rounded-lg py-3 hover:bg-red-100 transition font-bold"><i data-lucide="file-down" class="inline-block mr-2"></i>點此下載決賽時程表 (PDF)</a>`,
                     content_en: `<a href="114金勾盃歌唱決賽時程表(公告版).pdf" target="_blank" class="block w-full text-center bg-red-50 text-red-600 border border-red-200 rounded-lg py-3 hover:bg-red-100 transition font-bold"><i data-lucide="file-down" class="inline-block mr-2"></i>Download Schedule (PDF)</a>`
                 }
@@ -235,6 +236,7 @@
                 { content: "希望能多辦一點校際交流活動！", content_en: "Hope to see more inter-school exchange activities!", author: "想交朋友的人" }
             ],
             events: [
+                // [修正] 地點：志清堂, 英文：Jingle Bells Singing Contest
                 { date: '12/24', title_zh: '金勾盃歌唱大賽', title_en: 'Jingle Bells Singing Contest', location_zh: '志清堂', location_en: 'Zhiqing Hall', time: '13:00', type: 'Entertainment' },
                 { date: '01/16', title_zh: '第三次段考 Day1', title_en: '3rd Midterm Exam Day 1', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' },
             ],
@@ -243,12 +245,13 @@
                 { item_zh: '傳情卡片義賣收入', item_en: 'Card Sale Income', amount: 8500, date: '2025-12-18', type: 'In' },
             ],
             clubs: [
+                // [修正] 使用您上傳的圖片檔名
                 { name_zh: '熱舞社', name_en: 'Pop Dance Club', category: 'Dance', img: 'image_b22c9e.jpg', ig: 'https://www.instagram.com/pkdc.20_flaming/' },
                 { name_zh: '熱音社', name_en: 'Pop Music Club', category: 'Music', img: 'image_b22ca2.jpg', ig: 'https://www.instagram.com/pkhmc_/' },
                 { name_zh: '童軍社', name_en: 'Scout Club', category: 'Service', img: 'image_b22ca6.png', ig: 'https://www.instagram.com/pksh_circus_scout/' },
             ],
-            // 組織成員：完整職務與 WG 拼音
             orgLeaders: [
+                // [修正] 補齊職務與拼音
                 { 
                     roleKey: 'role_pres', icon: '👑', 
                     name_zh: '張佾傑', name_en: 'CHANG, YI-CHIEH', 
@@ -276,6 +279,7 @@
                 { date: '2025-09-15', title_zh: '第六屆第一次例會記錄', title_en: '6th Session 1st Regular Meeting' }
             ],
             downloads: [
+                // [新增] 資料下載專區檔案
                 { date: '2025-12-24', title_zh: '114金勾盃歌唱決賽時程表(公告版)', title_en: '114 Jingle Bells Finals Schedule', file: '114金勾盃歌唱決賽時程表(公告版).pdf', type: 'Event' },
                 { date: '2025-08-01', title_zh: '114學年度第1學期教學行事簡曆', title_en: '114-1 Academic Calendar', file: '114-1教學行事簡曆.pdf', type: 'Academic' }
             ]
@@ -284,7 +288,6 @@
         // 資料容器
         let APP_DATA = JSON.parse(JSON.stringify(STATIC_DATA));
 
-        // --- 應用程式狀態 ---
         const I18N = {
             zh: {
                 home: '首頁', events: '近期活動', mailboxes: '信箱專區', clubs: '社團專區', downloads: '資料下載',
@@ -349,9 +352,9 @@
 
         // --- Firebase 資料載入邏輯 ---
         async function loadDataFromFirebase() {
-            if (!db) return; // 沒設定就跳過
-
-            // 載入告白牆 (只抓最新的 10 則)
+            if (!db) return; // 沒設定 DB 就用靜態資料
+            
+            // 嘗試載入告白牆
             try {
                 const q = query(collection(db, "confessions"), orderBy("timestamp", "desc"), limit(10));
                 const querySnapshot = await getDocs(q);
@@ -360,23 +363,21 @@
                     const d = doc.data();
                     fetchedConfessions.push({
                         content: d.content,
-                        content_en: d.content_en || d.content, // 如果沒翻譯就顯示原文
+                        content_en: d.content_en || d.content,
                         author: d.author
                     });
                 });
                 if (fetchedConfessions.length > 0) {
                     APP_DATA.confessionWall = fetchedConfessions;
-                    console.log("Loaded confessions from Firebase");
+                    console.log("已從 Firebase 更新告白牆資料");
                 }
             } catch (error) {
-                console.log("Error loading confessions (using static data):", error);
+                console.log("讀取 Firebase 告白牆失敗 (可能未設定權限)，維持靜態資料:", error);
             }
-
-            // (未來可擴充：從 Firebase 載入公告 announcements, events 等)
         }
 
-        // --- 送出告白到 Firebase ---
-        window.submitConfessionToFirebase = async () => {
+        // --- 送出告白邏輯 ---
+        window.submitConfession = async () => {
             const content = document.getElementById('confession-input-content').value;
             const content_en = document.getElementById('confession-input-content-en').value;
             const author = document.getElementById('confession-input-author').value;
@@ -386,8 +387,10 @@
                 return;
             }
 
+            // 如果 Firebase 沒連線，顯示模擬成功
             if (!db) {
-                Swal.fire('系統未連線', 'Firebase 尚未設定，無法送出資料。目前為展示模式。', 'info');
+                Swal.fire('模擬送出成功！', '因為尚未設定 Firebase，這只是演示效果。資料不會真的儲存喔！', 'info');
+                toggleConfessionModal();
                 return;
             }
 
@@ -397,20 +400,24 @@
                     content_en: content_en || content,
                     author: author || '匿名',
                     timestamp: serverTimestamp(),
-                    status: 'approved' // 簡化流程，直接核准
+                    status: 'approved' // 簡化：直接核准
                 });
 
                 Swal.fire('送出成功！', '你的心聲已經傳達出去了！', 'success');
                 toggleConfessionModal();
+                // 清空輸入框
                 document.getElementById('confession-input-content').value = '';
                 document.getElementById('confession-input-content-en').value = '';
+                document.getElementById('confession-input-author').value = '';
                 
-                // 重新載入資料並刷新
+                // 重新載入並刷新
                 await loadDataFromFirebase();
-                render(); 
+                // 如果目前在首頁，重新渲染以顯示新告白
+                if (APP_STATE.view === 'home') renderHome(); 
+
             } catch (e) {
                 console.error("Error adding document: ", e);
-                Swal.fire('傳送失敗', '發生錯誤，請稍後再試。', 'error');
+                Swal.fire('傳送失敗', '發生錯誤，請檢查 Console 或稍後再試。', 'error');
             }
         };
 
@@ -423,7 +430,7 @@
             }
         }
 
-        // --- 邏輯控制 ---
+        // --- 核心顯示邏輯 ---
 
         function updateMarquee() {
             const el = document.getElementById('marquee-text');
@@ -484,7 +491,7 @@
                 const elAuthor = document.getElementById('confession-author');
                 if(!elContent || !elAuthor) return;
                 
-                if (APP_DATA.confessionWall.length === 0) {
+                if (!APP_DATA.confessionWall || APP_DATA.confessionWall.length === 0) {
                     elContent.innerText = "暫無告白...";
                     return;
                 }
@@ -495,7 +502,6 @@
                 elContent.style.opacity = 0;
                 
                 setTimeout(() => {
-                    // 翻譯告白內容
                     const text = isEn() ? (data.content_en || data.content) : data.content;
                     elContent.innerText = `"${text}"`;
                     elAuthor.innerText = `- ${data.author}`;
@@ -509,7 +515,7 @@
             APP_STATE.confessionTimer = setInterval(updateConfession, 5000);
         }
 
-        // --- 頁面渲染函式 ---
+        // --- 視圖渲染器 ---
 
         function renderHome() {
             const announcements = APP_DATA.announcements;
