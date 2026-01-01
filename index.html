@@ -19,12 +19,13 @@
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'float': 'float 6s ease-in-out infinite'
+                        'float': 'float 6s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite'
                     },
                     keyframes: {
                         fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
                         },
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
@@ -48,7 +49,7 @@
         .bg-theme { background-color: var(--primary-color); }
         .border-theme { border-color: var(--primary-color); }
         
-        /* 跑馬燈 */
+        /* Marquee */
         .marquee-container { overflow: hidden; white-space: nowrap; position: relative; }
         .marquee-content { display: inline-block; animation: marquee 30s linear infinite; }
         .marquee-content:hover { animation-play-state: paused; }
@@ -57,16 +58,28 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* 視窗過渡動畫 */
+        /* Modal Transitions */
         #search-modal, #confession-modal { transition: opacity 0.3s ease-in-out; }
         
-        body, div, nav, header { transition: background-color 0.3s, color 0.3s; }
+        /* Global Transitions */
+        body, div, nav, header, button { transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        .dark ::-webkit-scrollbar-track { background: #2d3748; }
+        ::-webkit-scrollbar-thumb { background: #00c8b7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00a092; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 flex flex-col min-h-screen">
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 flex flex-col min-h-screen relative">
+
+    <button onclick="window.scrollTo(0,0)" id="back-to-top" class="fixed bottom-6 right-6 z-40 bg-theme text-white p-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 hover:bg-theme-dark transform hover:scale-110">
+        <i data-lucide="arrow-up" class="w-6 h-6"></i>
+    </button>
 
     <div class="bg-gray-800 text-white dark:bg-black text-sm py-2 px-4 marquee-container min-h-[36px]">
-        <div class="marquee-content" id="marquee-text"></div>
+        <div class="marquee-content" id="marquee-text">載入中...</div>
     </div>
 
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur shadow-sm dark:bg-gray-800/95 dark:border-b dark:border-gray-700">
@@ -77,7 +90,7 @@
                     <span class="text-xl font-bold text-gray-900 dark:text-white hidden sm:block">北港高中<span class="text-theme">學生會</span></span>
                 </a>
 
-                <nav class="hidden xl:flex space-x-1 items-center overflow-x-auto">
+                <nav class="hidden xl:flex space-x-1 items-center overflow-x-auto no-scrollbar">
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('home')" data-key="home">首頁</button>
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('events')" data-key="events">近期活動</button>
                     <button class="nav-btn px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap" onclick="navigate('clubs')" data-key="clubs">社團專區</button>
@@ -122,7 +135,7 @@
         </div>
     </header>
 
-    <div id="search-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex flex-col pt-20 px-4 items-center">
+    <div id="search-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex flex-col pt-20 px-4 items-center animate-fade-in">
         <div class="w-full max-w-2xl relative">
             <input type="text" id="search-input" class="w-full bg-white dark:bg-gray-800 text-xl p-4 rounded-xl shadow-2xl dark:text-white border-2 border-theme focus:outline-none" placeholder="輸入關鍵字搜尋..." onkeyup="performSearch()">
             <button onclick="toggleSearch()" class="absolute right-4 top-4 text-gray-500 hover:text-red-500">
@@ -133,33 +146,33 @@
     </div>
 
     <div id="confession-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md shadow-2xl transform scale-100 transition-all">
-            <h3 class="text-2xl font-bold mb-4 text-theme">我要告白 💌</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md shadow-2xl transform scale-100 transition-all animate-fade-in">
+            <h3 class="text-2xl font-bold mb-4 text-theme flex items-center gap-2"><i data-lucide="heart" class="text-pink-500"></i> 我要告白</h3>
             <p class="text-sm text-gray-500 mb-4 dark:text-gray-400">寫下你想說的話，讓全校都看見！（若未設定 Firebase，將僅顯示成功訊息但不會儲存）</p>
             
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium mb-1 dark:text-gray-300">告白內容</label>
-                    <textarea id="confession-input-content" rows="3" class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-theme outline-none" placeholder="想說什麼..."></textarea>
+                    <label class="block text-sm font-medium mb-1 dark:text-gray-300">告白內容 <span class="text-red-500">*</span></label>
+                    <textarea id="confession-input-content" rows="3" class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-theme outline-none transition" placeholder="想說什麼..."></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1 dark:text-gray-300">英文翻譯 (選填)</label>
-                    <textarea id="confession-input-content-en" rows="2" class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-theme outline-none" placeholder="English translation..."></textarea>
+                    <textarea id="confession-input-content-en" rows="2" class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-theme outline-none transition" placeholder="English translation..."></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1 dark:text-gray-300">署名</label>
-                    <input type="text" id="confession-input-author" class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-theme outline-none" placeholder="例如：高一小明">
+                    <input type="text" id="confession-input-author" class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-theme outline-none transition" placeholder="例如：高一小明">
                 </div>
             </div>
 
             <div class="flex justify-end gap-3 mt-6">
-                <button onclick="toggleConfessionModal()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg dark:hover:bg-gray-700 dark:text-gray-300">取消</button>
-                <button onclick="submitConfession()" class="px-6 py-2 bg-theme text-white rounded-lg font-bold hover:bg-theme-dark transition shadow-lg">送出</button>
+                <button onclick="toggleConfessionModal()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg dark:hover:bg-gray-700 dark:text-gray-300 transition">取消</button>
+                <button onclick="submitConfession()" class="px-6 py-2 bg-theme text-white rounded-lg font-bold hover:bg-theme-dark transition shadow-lg hover:shadow-xl">送出</button>
             </div>
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-grow w-full" id="app-container">
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-grow w-full animate-fade-in" id="app-container">
         </main>
 
     <footer class="bg-gray-100 dark:bg-gray-800 mt-auto py-8 border-t dark:border-gray-700">
@@ -167,15 +180,15 @@
             <p class="font-bold text-lg mb-4 text-theme">PKSH Student Council</p>
             
             <div class="flex justify-center items-center gap-6 mb-4">
-                <a href="https://www.instagram.com/pksh.su/" target="_blank" class="hover:text-pink-600 transition flex flex-col items-center gap-1">
+                <a href="https://www.instagram.com/pksh.su/" target="_blank" class="hover:text-pink-600 transition flex flex-col items-center gap-1 hover:-translate-y-1 duration-200">
                     <i data-lucide="instagram" class="w-6 h-6"></i>
                     <span class="text-xs">學生會 IG</span>
                 </a>
-                <a href="https://www.facebook.com/52PKSH/?locale=zh_TW" target="_blank" class="hover:text-blue-600 transition flex flex-col items-center gap-1">
+                <a href="https://www.facebook.com/52PKSH/?locale=zh_TW" target="_blank" class="hover:text-blue-600 transition flex flex-col items-center gap-1 hover:-translate-y-1 duration-200">
                     <i data-lucide="facebook" class="w-6 h-6"></i>
                     <span class="text-xs">學校 FB</span>
                 </a>
-                <a href="https://www.pksh.ylc.edu.tw/home" target="_blank" class="hover:text-theme transition flex flex-col items-center gap-1">
+                <a href="https://www.pksh.ylc.edu.tw/home" target="_blank" class="hover:text-theme transition flex flex-col items-center gap-1 hover:-translate-y-1 duration-200">
                     <i data-lucide="globe" class="w-6 h-6"></i>
                     <span class="text-xs">學校官網</span>
                 </a>
@@ -186,12 +199,13 @@
     </footer>
 
     <script type="module">
-        // 1. 引入 Firebase SDK
+        // 1. 引入 Firebase SDK (包含 Auth)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         // ============================================
-        // ⚠️【請將您從 Firebase Console 取得的 Config 貼在下方】⚠️
+        // ⚠️ Config
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDWmy__e9_7YbhBTJNvLvGVglj-fOTFWMg",
@@ -202,12 +216,14 @@
             appId: "1:142500679754:web:a758dc9a8b5ae34f9296b3"
         };
 
-        // 嘗試初始化 Firebase
         let db = null;
+        let auth = null;
+
         try {
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
+                auth = getAuth(app);
                 console.log("✅ Firebase 連線成功！");
             } else {
                 console.warn("⚠️ Firebase Config 未設定，目前使用靜態資料模式。");
@@ -216,34 +232,31 @@
             console.error("Firebase 初始化失敗:", e);
         }
 
-        // --- 靜態資料 ---
+        // --- 靜態資料 (Fallback) ---
         const STATIC_DATA = {
             announcements: [
                 { 
-                    id: 1, 
+                    id: 'static_1', 
                     title_zh: '114學年度金勾盃歌唱比賽時程表', 
                     title_en: 'Jingle Bells Singing Contest Schedule', 
-                    tag_zh: '活動', 
-                    tag_en: 'Event', 
+                    tag_zh: '活動', tag_en: 'Event', 
                     date: '2025-12-24',
-                    content_zh: `<a href="114金勾盃歌唱決賽時程表(公告版).pdf" target="_blank" class="block w-full text-center bg-red-50 text-red-600 border border-red-200 rounded-lg py-3 hover:bg-red-100 transition font-bold"><i data-lucide="file-down" class="inline-block mr-2"></i>點此下載決賽時程表 (PDF)</a>`,
-                    content_en: `<a href="114金勾盃歌唱決賽時程表(公告版).pdf" target="_blank" class="block w-full text-center bg-red-50 text-red-600 border border-red-200 rounded-lg py-3 hover:bg-red-100 transition font-bold"><i data-lucide="file-down" class="inline-block mr-2"></i>Download Schedule (PDF)</a>`
+                    content_zh: `<a href="#" class="block w-full text-center bg-red-50 text-red-600 border border-red-200 rounded-lg py-3 hover:bg-red-100 transition font-bold"><i data-lucide="file-down" class="inline-block mr-2"></i>點此下載決賽時程表 (PDF)</a>`,
+                    content_en: `<a href="#" class="block w-full text-center bg-red-50 text-red-600 border border-red-200 rounded-lg py-3 hover:bg-red-100 transition font-bold"><i data-lucide="file-down" class="inline-block mr-2"></i>Download Schedule (PDF)</a>`
                 }
             ],
             confessionWall: [
-                { content: "傳情的巧克力真的很好吃，謝謝學姊！", content_en: "The chocolate delivery was delicious, thank you senior!", author: "高一的小明" },
-                { content: "金勾盃大家加油！期待神秘嘉賓！", content_en: "Good luck everyone on Jingle Bells! Can't wait for the mystery guest!", author: "路過的同學" },
-                { content: "天氣變冷了，大家要注意保暖喔～", content_en: "It's getting cold, stay warm everyone~", author: "暖暖包" },
-                { content: "學生會辛苦了，活動辦得很棒！", content_en: "Student Council, thank you for your hard work! Great event!", author: "高三老屁股" },
-                { content: "希望能多辦一點校際交流活動！", content_en: "Hope to see more inter-school exchange activities!", author: "想交朋友的人" }
+                { id: 's1', content: "傳情的巧克力真的很好吃，謝謝學姊！", content_en: "The chocolate delivery was delicious, thank you senior!", author: "高一的小明" },
+                { id: 's2', content: "金勾盃大家加油！期待神秘嘉賓！", content_en: "Good luck everyone on Jingle Bells! Can't wait for the mystery guest!", author: "路過的同學" },
+                { id: 's3', content: "學生會辛苦了，活動辦得很棒！", content_en: "Student Council, thank you for your hard work! Great event!", author: "高三老屁股" }
             ],
             events: [
-                { date: '01/01', title_zh: '元旦', title_en: "New Year's Day", location_zh: '全校', location_en: 'Campus', time: '全天', type: 'Holiday' },
-                { date: '01/09', title_zh: '第八節輔導課結束', title_en: '8th Period Supplementary Classes End', location_zh: '各班教室', location_en: 'Classrooms', time: '17:00', type: 'Academic' },
-                { date: '01/16', title_zh: '高一高二職三期末考 (1/16, 19-20)', title_en: 'Final Exams', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' },
-                { date: '01/17', title_zh: '大學學測 (1/17-19)', title_en: 'GSAT (University Entrance Exam)', location_zh: '考場', location_en: 'Exam Centers', time: '08:00', type: 'Academic' },
-                { date: '01/20', title_zh: '休業式、公告自主學習名單', title_en: 'Closing Ceremony & Self-study List Announcement', location_zh: '各班教室', location_en: 'Classrooms', time: '全天', type: 'Academic' },
-                { date: '01/21', title_zh: '提前上 114-2 課程 (1/21-23)', title_en: 'Early Start of 114-2 Semester', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' }
+                { id: 'e1', date: '01/01', title_zh: '元旦', title_en: "New Year's Day", location_zh: '全校', location_en: 'Campus', time: '全天', type: 'Holiday' },
+                { id: 'e2', date: '01/09', title_zh: '第八節輔導課結束', title_en: '8th Period Supplementary Classes End', location_zh: '各班教室', location_en: 'Classrooms', time: '17:00', type: 'Academic' },
+                { id: 'e3', date: '01/16', title_zh: '高一高二職三期末考 (1/16, 19-20)', title_en: 'Final Exams', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' },
+                { id: 'e4', date: '01/17', title_zh: '大學學測 (1/17-19)', title_en: 'GSAT', location_zh: '考場', location_en: 'Exam Centers', time: '08:00', type: 'Academic' },
+                { id: 'e5', date: '01/20', title_zh: '休業式、公告自主學習名單', title_en: 'Closing Ceremony', location_zh: '各班教室', location_en: 'Classrooms', time: '全天', type: 'Academic' },
+                { id: 'e6', date: '01/21', title_zh: '提前上 114-2 課程 (1/21-23)', title_en: 'Early Start of 114-2', location_zh: '各班教室', location_en: 'Classrooms', time: '08:00', type: 'Academic' }
             ],
             finance: [
                 { item_zh: '聖誕活動佈置費', item_en: 'Xmas Decoration', amount: -5000, date: '2025-12-15', type: 'Out' },
@@ -255,85 +268,72 @@
                 { name_zh: '童軍社', name_en: 'Scout Club', category: 'Service', emoji: '🏕️', ig: 'https://www.instagram.com/pksh_circus_scout/' },
             ],
             orgLeaders: [
-                { 
-                    roleKey: 'role_pres', icon: '👑', 
-                    name_zh: '張佾傑', name_en: 'CHANG, YI-CHIEH', 
-                    desc_zh: '對內綜理內務，主持召開會員代表大會，對外代表本會，配合學校推展各項活動並負責綜理本會事宜。', 
-                    desc_en: 'Manages internal affairs, presides over general assembly meetings, represents the council externally, and oversees council matters in cooperation with school activities.' 
-                },
-                { 
-                    roleKey: 'role_vp', icon: '⭐', 
-                    name_zh: '王雅琝', name_en: 'WANG, YA-WEN', 
-                    desc_zh: '協助會長執行本會事宜，會長因故缺席時代理之。', 
-                    desc_en: 'Assists the President in executing council matters and acts on behalf of the President in their absence.' 
-                }
+                { roleKey: 'role_pres', icon: '👑', name_zh: '張佾傑', name_en: 'CHANG, YI-CHIEH', desc_zh: '對內綜理內務，對外代表本會。', desc_en: 'Represents the council externally.' },
+                { roleKey: 'role_vp', icon: '⭐', name_zh: '王雅琝', name_en: 'WANG, YA-WEN', desc_zh: '協助會長執行本會事宜。', desc_en: 'Assists the President.' }
             ],
             orgDepts: [
-                { roleKey: 'role_act', icon: '🎉', chief: '鄭雨涵', chief_en: 'CHENG, YU-HAN', deputy: '', deputy_en: '', desc_zh: '負責策劃及推行本會所舉辦之各類活動。', desc_en: 'Responsible for planning activities.' },
-                { roleKey: 'role_art', icon: '🎨', chief: '朱守晴', chief_en: 'CHU, SHOU-CHING', deputy: '黃瓊美', deputy_en: 'HUANG, CHIUNG-MEI', desc_zh: '負責本會學藝活動、海報、壁報設計。', desc_en: 'Responsible for art and design.' },
-                { roleKey: 'role_admin', icon: '📝', chief: '蔡秉宏', chief_en: 'TSAI, PING-HUNG', deputy: '顏子䒟', deputy_en: 'YEN, TZU-TAN', desc_zh: '負責本會開會通告、會議記錄。', desc_en: 'Responsible for meeting minutes.' },
-                { roleKey: 'role_ga', icon: '💰', chief: '趙芝翊', chief_en: 'CHAO, CHIH-YI', deputy: '', deputy_en: '', desc_zh: '負責本會經費收支，財產保管。', desc_en: 'Responsible for finance.' },
-                { roleKey: 'role_pr', icon: '📢', chief: '許雅琳', chief_en: 'HSU, YA-LIN', deputy: '', deputy_en: '', desc_zh: '負責本會會議之聯絡及舉辦活動之聯繫。', desc_en: 'Responsible for public relations.' },
-                { roleKey: 'role_mobile', icon: '🛠️', chief: '劉乙葭', chief_en: 'LIU, I-CHIA', deputy: '', deputy_en: '', desc_zh: '負責本會舉辦之場地佈置。', desc_en: 'Responsible for logistics.' }
+                { roleKey: 'role_act', icon: '🎉', chief: '鄭雨涵', desc_zh: '負責策劃各類活動。', desc_en: 'Plans activities.' },
+                { roleKey: 'role_art', icon: '🎨', chief: '朱守晴', deputy: '黃瓊美', desc_zh: '負責海報、壁報設計。', desc_en: 'Art and design.' },
+                { roleKey: 'role_admin', icon: '📝', chief: '蔡秉宏', deputy: '顏子䒟', desc_zh: '負責會議記錄。', desc_en: 'Meeting minutes.' },
+                { roleKey: 'role_ga', icon: '💰', chief: '趙芝翊', desc_zh: '負責經費收支。', desc_en: 'Finance management.' },
+                { roleKey: 'role_pr', icon: '📢', chief: '許雅琳', desc_zh: '負責公關聯絡。', desc_en: 'Public relations.' },
+                { roleKey: 'role_mobile', icon: '🛠️', chief: '劉乙葭', desc_zh: '負責場地佈置。', desc_en: 'Logistics.' }
             ],
             meetings: [],
             downloads: [
-                { date: '2025-12-24', title_zh: '114金勾盃歌唱決賽時程表(公告版)', title_en: '114 Jingle Bells Finals Schedule', file: '114金勾盃歌唱決賽時程表(公告版).pdf', type: 'Event' },
-                { date: '2025-08-01', title_zh: '114學年度第1學期教學行事簡曆', title_en: '114-1 Academic Calendar', file: '114-1教學行事簡曆.pdf', type: 'Academic' }
+                { date: '2025-12-24', title_zh: '114金勾盃歌唱決賽時程表(公告版)', title_en: '114 Jingle Bells Finals Schedule', file: '#', type: 'Event' },
+                { date: '2025-08-01', title_zh: '114學年度第1學期教學行事簡曆', title_en: '114-1 Academic Calendar', file: '#', type: 'Academic' }
             ]
         };
 
         // 資料容器
         let APP_DATA = JSON.parse(JSON.stringify(STATIC_DATA));
+        let SYSTEM_SETTINGS = {
+            marquee: '📢 歡迎來到北港高中學生會官方網站！最新活動：金勾盃歌唱比賽決賽將於 12/25 舉行！'
+        };
 
         const I18N = {
             zh: {
                 home: '首頁', events: '近期活動', mailboxes: '信箱專區', clubs: '社團專區', downloads: '資料下載',
-                contact: '聯絡我們', org: '組織架構', finance: '財務明細', meetings: '會議紀錄', admin: '幹部登入',
-                marquee: '', 
+                contact: '聯絡我們', org: '組織架構', finance: '財務明細', meetings: '會議紀錄', admin: '後台管理',
+                marquee: '', // 動態載入
                 heroTitle: '北港高中學生會互動網站',
                 heroSubtitle: '你的聲音，我們的行動。共創更美好的校園生活。',
-                btnComplaint: '前往信箱專區',
-                news: '最新公告',
-                confession: '匿名告白牆',
-                financeTitle: '財務明細',
-                orgTitle: '學生會組織架構',
-                eventTitle: '近期活動一覽',
-                meetingTitle: '會議記錄存檔',
-                clubTitle: '社團專區',
-                downloadTitle: '資料下載專區',
-                rightsMailbox: '學權信箱', rightsDesc: '發現校園設備損壞、對學校政策有疑問或建議？請填寫此表單，學權組將為您爭取權益。',
-                anonMailbox: '匿名信箱', anonDesc: '對學生會的施政方針、活動規劃有任何建議或修改想法？歡迎填寫此表單告訴我們（完全匿名）。',
+                btnComplaint: '前往信箱專區', news: '最新公告', confession: '匿名告白牆',
+                financeTitle: '財務明細', orgTitle: '學生會組織架構', eventTitle: '近期活動一覽',
+                meetingTitle: '會議記錄存檔', clubTitle: '社團專區', downloadTitle: '資料下載專區',
+                rightsMailbox: '學權信箱', rightsDesc: '發現校園設備損壞、對學校政策有疑問或建議？請填寫此表單。',
+                anonMailbox: '匿名信箱', anonDesc: '對學生會的施政方針、活動規劃有任何建議？歡迎匿名填寫。',
                 goToForm: '前往填寫表單', searchPlaceholder: '輸入關鍵字搜尋公告或活動...', noResults: '沒有找到相關結果',
                 col_date: '日期', col_item: '項目', col_amount: '金額',
                 role_pres: '會長', role_vp: '副會長', role_admin: '行政組', role_act: '活動組', role_mobile: '機動組',
                 role_pr: '公關組', role_ga: '總務組', role_art: '美宣組', role_chief: '組長', role_deputy: '副組長',
-                download_btn: '下載檔案',
-                write_confession: '我要告白'
+                download_btn: '下載檔案', write_confession: '我要告白',
+                filter_all: '全部', filter_academic: '教務', filter_holiday: '假日', filter_event: '活動',
+                login_title: '學生會幹部登入', login_btn: '登入', login_email: '電子郵件', login_pwd: '密碼',
+                admin_dashboard: '管理儀表板', admin_news: '公告管理', admin_events: '活動管理', admin_confess: '告白審核', admin_system: '系統設定', admin_logout: '登出',
+                add_btn: '新增', save_btn: '儲存設定', delete_btn: '刪除', no_data: '暫無資料'
             },
             en: {
                 home: 'Home', events: 'Events', mailboxes: 'Mailboxes', clubs: 'Clubs', downloads: 'Downloads',
-                contact: 'Contact Us', org: 'Organization', finance: 'Finance', meetings: 'Meeting Minutes', admin: 'Staff Login',
+                contact: 'Contact Us', org: 'Organization', finance: 'Finance', meetings: 'Minutes', admin: 'Admin Panel',
                 marquee: '', 
-                heroTitle: 'PKSH Student Council Interactive Site',
+                heroTitle: 'PKSH Student Council',
                 heroSubtitle: 'Your Voice, Our Action. Creating a better campus life together.',
-                btnComplaint: 'Go to Mailboxes',
-                news: 'Latest News',
-                confession: 'Confession Wall',
-                financeTitle: 'Financial Details',
-                orgTitle: 'Organizational Chart',
-                eventTitle: 'Upcoming Events',
-                meetingTitle: 'Meeting Minutes Archive',
-                clubTitle: 'Student Clubs',
-                downloadTitle: 'Download Zone',
-                rightsMailbox: 'Student Rights Mailbox', rightsDesc: 'Report damaged facilities or suggest policy changes. The Student Rights Dept will fight for you.',
-                anonMailbox: 'Anonymous Mailbox', anonDesc: 'Have suggestions for the Student Council\'s work or policies? Share your thoughts here (Fully Anonymous).',
+                btnComplaint: 'Go to Mailboxes', news: 'Latest News', confession: 'Confession Wall',
+                financeTitle: 'Financial Details', orgTitle: 'Organization', eventTitle: 'Upcoming Events',
+                meetingTitle: 'Meeting Minutes', clubTitle: 'Student Clubs', downloadTitle: 'Download Zone',
+                rightsMailbox: 'Student Rights Mailbox', rightsDesc: 'Report damaged facilities or suggest policy changes.',
+                anonMailbox: 'Anonymous Mailbox', anonDesc: 'Suggestions for the Student Council? Share your thoughts anonymously.',
                 goToForm: 'Fill out Form', searchPlaceholder: 'Search news or events...', noResults: 'No results found',
                 col_date: 'Date', col_item: 'Item', col_amount: 'Amount',
-                role_pres: 'President', role_vp: 'Vice President', role_admin: 'Administrative Dept', role_act: 'Activity Dept', role_mobile: 'Logistics Dept',
+                role_pres: 'President', role_vp: 'Vice President', role_admin: 'Admin Dept', role_act: 'Activity Dept', role_mobile: 'Logistics Dept',
                 role_pr: 'Public Relations', role_ga: 'General Affairs', role_art: 'Art & Design', role_chief: 'Chief', role_deputy: 'Deputy',
-                download_btn: 'Download',
-                write_confession: 'Write Confession'
+                download_btn: 'Download', write_confession: 'Write Confession',
+                filter_all: 'All', filter_academic: 'Academic', filter_holiday: 'Holiday', filter_event: 'Event',
+                login_title: 'Staff Login', login_btn: 'Login', login_email: 'Email', login_pwd: 'Password',
+                admin_dashboard: 'Dashboard', admin_news: 'Manage News', admin_events: 'Manage Events', admin_confess: 'Confessions', admin_system: 'System Settings', admin_logout: 'Logout',
+                add_btn: 'Add', save_btn: 'Save Settings', delete_btn: 'Delete', no_data: 'No Data'
             }
         };
 
@@ -342,24 +342,68 @@
             lang: 'zh',
             darkMode: false,
             confessionTimer: null,
-            confessionIndex: 0
+            confessionIndex: 0,
+            eventFilter: 'All',
+            user: null, // User Auth State
+            adminTab: 'news' // news, events, confessions, system
         };
 
         const t = (key) => I18N[APP_STATE.lang][key] || key;
         const isEn = () => APP_STATE.lang === 'en';
 
-        // --- Firebase 資料載入邏輯 ---
-        async function loadDataFromFirebase() {
-            if (!db) return; // 沒設定 DB 就用靜態資料
+        // --- Helper: Robust Date Formatting ---
+        // 解決 undefined 問題的核心函式
+        function formatDateHelper(dateStr) {
+            // 預設值
+            let month = '??';
+            let day = '??';
             
-            // 嘗試載入告白牆
+            if (!dateStr) return { month, day };
+
+            // 嘗試處理 YYYY-MM-DD 或 MM/DD 或 MM-DD
             try {
-                const q = query(collection(db, "confessions"), orderBy("timestamp", "desc"), limit(10));
-                const querySnapshot = await getDocs(q);
+                // 如果包含 '-'，將其替換為 '/'
+                const standardized = dateStr.replace(/-/g, '/');
+                const parts = standardized.split('/');
+                
+                if (parts.length >= 2) {
+                    // 如果有年份 (例如 2025/12/27)，取最後兩位
+                    // 如果是 12/27，parts[0]是月，parts[1]是日
+                    if (parts.length === 3) {
+                        month = parts[1];
+                        day = parts[2];
+                    } else {
+                        month = parts[0];
+                        day = parts[1];
+                    }
+                }
+            } catch (e) {
+                console.error("Date parse error", e);
+            }
+            return { month, day };
+        }
+
+        // --- Firebase Data Handling ---
+        
+        async function loadDataFromFirebase() {
+            if (!db) return;
+            try {
+                // 0. Load System Settings (Marquee)
+                const settingsRef = doc(db, "settings", "config");
+                const settingsSnap = await getDoc(settingsRef);
+                if (settingsSnap.exists()) {
+                    SYSTEM_SETTINGS.marquee = settingsSnap.data().marquee || SYSTEM_SETTINGS.marquee;
+                }
+                updateMarquee(); // Update UI immediately
+
+                // 1. Load Confessions
+                const qConfess = query(collection(db, "confessions"), orderBy("timestamp", "desc"), limit(20));
+                const snapConfess = await getDocs(qConfess);
                 const fetchedConfessions = [];
-                querySnapshot.forEach((doc) => {
+                snapConfess.forEach((doc) => {
                     const d = doc.data();
                     fetchedConfessions.push({
+                        id: doc.id,
                         content: d.content,
                         content_en: d.content_en || d.content,
                         author: d.author
@@ -367,14 +411,142 @@
                 });
                 if (fetchedConfessions.length > 0) {
                     APP_DATA.confessionWall = fetchedConfessions;
-                    console.log("已從 Firebase 更新告白牆資料");
                 }
+
+                // 2. Load Announcements (News)
+                const qNews = query(collection(db, "announcements"), orderBy("date", "desc"));
+                const snapNews = await getDocs(qNews);
+                const fetchedNews = [];
+                snapNews.forEach(doc => {
+                     const d = doc.data();
+                     fetchedNews.push({ id: doc.id, ...d });
+                });
+                if(fetchedNews.length > 0) {
+                    APP_DATA.announcements = [...fetchedNews, ...STATIC_DATA.announcements];
+                }
+
+                // 3. Load Events
+                const qEvents = query(collection(db, "events"), orderBy("date", "asc"));
+                const snapEvents = await getDocs(qEvents);
+                const fetchedEvents = [];
+                snapEvents.forEach(doc => {
+                    const d = doc.data();
+                    fetchedEvents.push({ id: doc.id, ...d });
+                });
+                if(fetchedEvents.length > 0) {
+                    APP_DATA.events = [...fetchedEvents, ...STATIC_DATA.events];
+                    APP_DATA.events.sort((a,b) => a.date.localeCompare(b.date));
+                }
+
+                if(APP_STATE.view === 'home' || APP_STATE.view === 'events') render(); 
             } catch (error) {
-                console.log("讀取 Firebase 告白牆失敗 (可能未設定權限)，維持靜態資料:", error);
+                console.log("Firebase 讀取失敗:", error);
             }
         }
 
-        // --- 送出告白邏輯 ---
+        // --- Auth & Admin Logic ---
+
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                APP_STATE.user = user;
+                if (APP_STATE.view === 'admin') render(); 
+            });
+        }
+
+        window.handleLogin = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const pwd = document.getElementById('admin-pwd').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, pwd);
+                Swal.fire({ icon: 'success', title: '登入成功', timer: 1500, showConfirmButton: false });
+            } catch (error) {
+                Swal.fire('登入失敗', '請檢查帳號密碼', 'error');
+            }
+        };
+
+        window.handleLogout = async () => {
+            try {
+                await signOut(auth);
+                Swal.fire({ icon: 'success', title: '已登出', timer: 1000, showConfirmButton: false });
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        // --- Admin CRUD Operations ---
+
+        window.switchAdminTab = (tab) => {
+            APP_STATE.adminTab = tab;
+            render();
+        }
+
+        window.addNews = async () => {
+            const title = document.getElementById('news-title').value;
+            const content = document.getElementById('news-content').value;
+            const date = document.getElementById('news-date').value;
+            if(!title || !date) return Swal.fire('欄位未填', '請填寫標題與日期', 'warning');
+            
+            try {
+                await addDoc(collection(db, "announcements"), {
+                    title_zh: title, title_en: title, 
+                    content_zh: content, content_en: content,
+                    tag_zh: '公告', tag_en: 'Notice',
+                    date: date, timestamp: serverTimestamp()
+                });
+                Swal.fire('新增成功', '', 'success');
+                await loadDataFromFirebase();
+            } catch(e) { Swal.fire('錯誤', e.message, 'error'); }
+        }
+
+        window.addEvent = async () => {
+            const title = document.getElementById('event-title').value;
+            const date = document.getElementById('event-date').value; // YYYY-MM-DD
+            const time = document.getElementById('event-time').value;
+            const loc = document.getElementById('event-loc').value;
+            const type = document.getElementById('event-type').value;
+
+            if(!title || !date) return Swal.fire('欄位未填', '請填寫完整資訊', 'warning');
+            
+            try {
+                // 強制統一儲存格式，解決顯示 bug
+                // 輸入 YYYY-MM-DD -> 儲存為 YYYY-MM-DD (標準化)
+                await addDoc(collection(db, "events"), {
+                    title_zh: title, title_en: title,
+                    date: date, // 儲存原始日期字串，由顯示端 Helper 處理
+                    time: time, location_zh: loc, location_en: loc,
+                    type: type, timestamp: serverTimestamp()
+                });
+                Swal.fire('新增成功', '', 'success');
+                await loadDataFromFirebase();
+            } catch(e) { Swal.fire('錯誤', e.message, 'error'); }
+        }
+
+        window.saveSystemSettings = async () => {
+            const marqueeText = document.getElementById('system-marquee').value;
+            try {
+                await setDoc(doc(db, "settings", "config"), { marquee: marqueeText });
+                SYSTEM_SETTINGS.marquee = marqueeText;
+                updateMarquee();
+                Swal.fire('設定已儲存', '跑馬燈已更新', 'success');
+            } catch(e) { Swal.fire('儲存失敗', e.message, 'error'); }
+        }
+
+        window.deleteItem = async (collectionName, id) => {
+            if(!db) return;
+            const result = await Swal.fire({ title: '確定刪除？', icon: 'warning', showCancelButton: true });
+            if(result.isConfirmed) {
+                try {
+                    await deleteDoc(doc(db, collectionName, id));
+                    Swal.fire('已刪除', '', 'success');
+                    await loadDataFromFirebase();
+                    render();
+                } catch(e) { Swal.fire('刪除失敗', '無法刪除靜態資料或權限不足', 'error'); }
+            }
+        }
+
+        // --- Public Operations ---
+
         window.submitConfession = async () => {
             const content = document.getElementById('confession-input-content').value;
             const content_en = document.getElementById('confession-input-content-en').value;
@@ -385,65 +557,46 @@
                 return;
             }
 
-            // 如果 Firebase 沒連線，顯示模擬成功
             if (!db) {
-                Swal.fire('模擬送出成功！', '因為尚未設定 Firebase，這只是演示效果。資料不會真的儲存喔！', 'info');
+                Swal.fire('模擬送出成功', '目前為靜態模式，資料不會儲存。', 'info');
                 toggleConfessionModal();
                 return;
             }
 
             try {
                 await addDoc(collection(db, "confessions"), {
-                    content: content,
-                    content_en: content_en || content,
-                    author: author || '匿名',
-                    timestamp: serverTimestamp(),
-                    status: 'approved' // 簡化：直接核准
+                    content, content_en: content_en || content, author: author || '匿名',
+                    timestamp: serverTimestamp(), status: 'approved'
                 });
-
                 Swal.fire('送出成功！', '你的心聲已經傳達出去了！', 'success');
                 toggleConfessionModal();
-                // 清空輸入框
                 document.getElementById('confession-input-content').value = '';
-                document.getElementById('confession-input-content-en').value = '';
-                document.getElementById('confession-input-author').value = '';
-                
-                // 重新載入並刷新
                 await loadDataFromFirebase();
-                // 如果目前在首頁，重新渲染以顯示新告白
-                if (APP_STATE.view === 'home') renderHome(); 
-
             } catch (e) {
-                console.error("Error adding document: ", e);
-                Swal.fire('傳送失敗', '發生錯誤，請檢查 Console 或稍後再試。', 'error');
+                console.error("Error:", e);
+                Swal.fire('傳送失敗', '請稍後再試。', 'error');
             }
         };
 
         window.toggleConfessionModal = () => {
             const modal = document.getElementById('confession-modal');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
+            modal.classList.toggle('hidden');
         }
 
-        // --- 核心顯示邏輯 ---
-
+        // --- Logic ---
         function updateMarquee() {
             const el = document.getElementById('marquee-text');
-            if(el) el.innerText = t('marquee');
+            if(el) el.innerText = SYSTEM_SETTINGS.marquee;
         }
 
         window.toggleSearch = () => {
             const modal = document.getElementById('search-modal');
             const input = document.getElementById('search-input');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
                 input.focus();
                 input.placeholder = t('searchPlaceholder');
             } else {
-                modal.classList.add('hidden');
                 document.getElementById('search-results').innerHTML = '';
                 input.value = '';
             }
@@ -489,31 +642,41 @@
                 const elAuthor = document.getElementById('confession-author');
                 if(!elContent || !elAuthor) return;
                 
-                if (!APP_DATA.confessionWall || APP_DATA.confessionWall.length === 0) {
+                const list = APP_DATA.confessionWall;
+                if (!list || list.length === 0) {
                     elContent.innerText = "暫無告白...";
                     return;
                 }
-
-                const data = APP_DATA.confessionWall[APP_STATE.confessionIndex];
+                const data = list[APP_STATE.confessionIndex];
                 
-                elContent.classList.remove('animate-fade-in');
                 elContent.style.opacity = 0;
+                elAuthor.style.opacity = 0;
                 
                 setTimeout(() => {
                     const text = isEn() ? (data.content_en || data.content) : data.content;
                     elContent.innerText = `"${text}"`;
-                    elAuthor.innerText = `- ${data.author}`;
+                    elAuthor.innerText = `- ${data.author || 'Anonymous'}`;
                     elContent.style.opacity = 1;
-                    elContent.classList.add('animate-fade-in');
+                    elAuthor.style.opacity = 1;
                 }, 300);
 
-                APP_STATE.confessionIndex = (APP_STATE.confessionIndex + 1) % APP_DATA.confessionWall.length;
+                APP_STATE.confessionIndex = (APP_STATE.confessionIndex + 1) % list.length;
             };
             updateConfession();
             APP_STATE.confessionTimer = setInterval(updateConfession, 5000);
         }
 
-        // --- 視圖渲染器 ---
+        // --- Scroll to Top ---
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('back-to-top');
+            if (window.scrollY > 300) {
+                btn.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                btn.classList.add('opacity-0', 'pointer-events-none');
+            }
+        });
+
+        // --- Render Functions ---
 
         function renderHome() {
             const announcements = APP_DATA.announcements;
@@ -529,11 +692,11 @@
             `).join('');
 
             return `
-                <div class="bg-theme text-white rounded-2xl p-8 mb-10 shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="bg-theme text-white rounded-2xl p-8 mb-10 shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-in">
                     <div class="relative z-10">
                         <h1 class="text-4xl font-extrabold mb-4">${t('heroTitle')}</h1>
                         <p class="text-lg opacity-90">${t('heroSubtitle')}</p>
-                        <button class="mt-6 bg-white text-theme font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition" onclick="navigate('mailboxes')">
+                        <button class="mt-6 bg-white text-theme font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition shadow-lg hover:scale-105 transform duration-200" onclick="navigate('mailboxes')">
                             ${t('btnComplaint')}
                         </button>
                     </div>
@@ -552,10 +715,10 @@
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md sticky top-24">
                             <h2 class="text-xl font-bold text-pink-500 mb-4 flex items-center gap-2"><i data-lucide="heart"></i> ${t('confession')}</h2>
                             <div class="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg border border-pink-100 dark:border-pink-900 min-h-[120px] flex flex-col justify-center">
-                                <p id="confession-content" class="italic text-gray-700 dark:text-gray-300 text-lg font-medium transition-opacity duration-300">"載入中..."</p>
+                                <p id="confession-content" class="italic text-gray-700 dark:text-gray-300 text-lg font-medium transition-opacity duration-300">"Loading..."</p>
                                 <p id="confession-author" class="text-right text-xs text-gray-500 mt-2 transition-opacity duration-300"></p>
                             </div>
-                            <button onclick="toggleConfessionModal()" class="block w-full mt-4 bg-pink-500 text-white font-bold py-2 rounded text-center hover:bg-pink-600 transition shadow-md hover:shadow-lg">
+                            <button onclick="toggleConfessionModal()" class="block w-full mt-4 bg-pink-500 text-white font-bold py-2 rounded text-center hover:bg-pink-600 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                                 ${t('write_confession')}
                             </button>
                         </div>
@@ -565,28 +728,65 @@
         }
 
         function renderEvents() {
-            const eventsHtml = APP_DATA.events.map(ev => `
-                <div class="flex items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4 border-l-4 ${ev.type === 'Entertainment' ? 'border-pink-500' : 'border-blue-500'}">
+            const filter = APP_STATE.eventFilter;
+            const filteredEvents = filter === 'All' 
+                ? APP_DATA.events 
+                : APP_DATA.events.filter(e => e.type === filter);
+
+            const eventsHtml = filteredEvents.length > 0 ? filteredEvents.map(ev => {
+                // [FIX] 使用 Helper 處理日期格式，避免 undefined
+                const { month, day } = formatDateHelper(ev.date);
+                
+                return `
+                <div class="flex items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4 border-l-4 ${ev.type === 'Holiday' ? 'border-red-500' : ev.type === 'Academic' ? 'border-blue-500' : 'border-theme'} hover:shadow-md transition">
                     <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg text-center min-w-[80px]">
-                        <span class="block text-xl font-bold text-gray-800 dark:text-white">${ev.date.split('/')[1]}</span>
-                        <span class="block text-xs text-gray-500">${ev.date.split('/')[0]}月</span>
+                        <span class="block text-xl font-bold text-gray-800 dark:text-white">${day}</span>
+                        <span class="block text-xs text-gray-500">${month}月</span>
                     </div>
                     <div class="ml-4 flex-grow">
-                        <h3 class="text-lg font-bold dark:text-white">${isEn() ? ev.title_en : ev.title_zh}</h3>
-                        <p class="text-sm text-gray-500 flex items-center gap-1">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold dark:text-white">${isEn() ? ev.title_en : ev.title_zh}</h3>
+                            <span class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300">${isEn() ? ev.type : (ev.type==='Holiday'?'假日':ev.type==='Academic'?'教務':'活動')}</span>
+                        </div>
+                        <p class="text-sm text-gray-500 flex items-center gap-1 mt-1">
                             <i data-lucide="map-pin" class="w-3 h-3"></i> ${isEn() ? ev.location_en : ev.location_zh} | 
                             <i data-lucide="clock" class="w-3 h-3"></i> ${ev.time}
                         </p>
                     </div>
                 </div>
-            `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('eventTitle')}</h1><div class="max-w-3xl mx-auto">${eventsHtml}</div>`;
+            `}).join('') : `<div class="text-center text-gray-500 py-10">此分類暫無活動</div>`;
+
+            const makeBtn = (type, label) => `
+                <button onclick="setEventFilter('${type}')" class="px-4 py-2 rounded-full text-sm font-bold transition ${APP_STATE.eventFilter === type ? 'bg-theme text-white shadow-md' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300'}">
+                    ${label}
+                </button>
+            `;
+
+            return `
+                <div class="max-w-3xl mx-auto">
+                    <h1 class="text-3xl font-bold mb-6 text-theme text-center">${t('eventTitle')}</h1>
+                    <div class="flex justify-center gap-3 mb-8 flex-wrap">
+                        ${makeBtn('All', t('filter_all'))}
+                        ${makeBtn('Academic', t('filter_academic'))}
+                        ${makeBtn('Holiday', t('filter_holiday'))}
+                        ${makeBtn('Event', t('filter_event'))}
+                    </div>
+                    <div class="animate-fade-in">
+                        ${eventsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.setEventFilter = (filter) => {
+            APP_STATE.eventFilter = filter;
+            render();
         }
 
         function renderOrg() {
             const leadersHtml = APP_DATA.orgLeaders.map(l => `
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md flex flex-col items-center text-center border-t-4 border-theme hover:scale-105 transition-transform duration-300">
-                    <div class="text-6xl mb-4">${l.icon}</div>
+                    <div class="text-6xl mb-4 animate-bounce-slow">${l.icon}</div>
                     <h3 class="text-xl font-bold text-theme">${t(l.roleKey)}</h3>
                     <p class="text-2xl font-bold dark:text-white my-2 uppercase">${isEn() ? l.name_en : l.name_zh}</p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed px-4 text-left w-full">${isEn() ? l.desc_en : l.desc_zh}</p>
@@ -613,32 +813,31 @@
 
         function renderFinance() {
             const rows = APP_DATA.finance.map(f => `
-                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <td class="py-3 px-4 dark:text-gray-300">${f.date}</td>
+                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                    <td class="py-3 px-4 dark:text-gray-300 whitespace-nowrap">${f.date}</td>
                     <td class="py-3 px-4 font-medium dark:text-white">${isEn() ? f.item_en : f.item_zh}</td>
-                    <td class="py-3 px-4"><span class="${f.type === 'In' ? 'text-green-500' : 'text-red-500'} font-bold">${f.amount > 0 ? '+' : ''}${f.amount}</span></td>
+                    <td class="py-3 px-4 text-right"><span class="${f.type === 'In' ? 'text-green-500 bg-green-50 dark:bg-green-900/30' : 'text-red-500 bg-red-50 dark:bg-red-900/30'} font-bold px-2 py-1 rounded">${f.amount > 0 ? '+' : ''}${f.amount}</span></td>
                 </tr>
             `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('financeTitle')}</h1><div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"><div class="p-6 bg-theme/10 border-b border-theme/20"><p class="text-sm text-gray-600 dark:text-gray-300">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p></div><table class="w-full text-left border-collapse"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 uppercase text-xs"><tr><th class="py-3 px-4">${t('col_date')}</th><th class="py-3 px-4">${t('col_item')}</th><th class="py-3 px-4">${t('col_amount')} (TWD)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+            return `<h1 class="text-3xl font-bold mb-6 text-theme text-center">${t('financeTitle')}</h1><div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"><div class="p-6 bg-theme/10 border-b border-theme/20"><p class="text-sm text-gray-600 dark:text-gray-300">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p></div><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 uppercase text-xs"><tr><th class="py-3 px-4">${t('col_date')}</th><th class="py-3 px-4">${t('col_item')}</th><th class="py-3 px-4 text-right">${t('col_amount')} (TWD)</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
         }
 
-        // [更新] 信箱專區
         function renderMailboxes() {
             return `
                 <div class="max-w-4xl mx-auto">
                     <h1 class="text-3xl font-bold mb-8 text-center text-theme">${t('mailboxes')}</h1>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-blue-500 flex flex-col items-center text-center">
+                        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-blue-500 flex flex-col items-center text-center transform hover:-translate-y-1 duration-300">
                             <div class="bg-blue-100 p-4 rounded-full mb-4"><i data-lucide="scale" class="w-10 h-10 text-blue-600"></i></div>
                             <h2 class="text-2xl font-bold mb-2 dark:text-white">${t('rightsMailbox')}</h2>
                             <p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('rightsDesc')}</p>
-                            <a href="https://forms.gle/HAxbZJCiCEFhVkwV6" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a>
+                            <a href="https://forms.gle/HAxbZJCiCEFhVkwV6" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2 shadow-md">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a>
                         </div>
-                        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-pink-500 flex flex-col items-center text-center">
+                        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition border-t-8 border-pink-500 flex flex-col items-center text-center transform hover:-translate-y-1 duration-300">
                             <div class="bg-pink-100 p-4 rounded-full mb-4"><i data-lucide="ghost" class="w-10 h-10 text-pink-600"></i></div>
                             <h2 class="text-2xl font-bold mb-2 dark:text-white">${t('anonMailbox')}</h2>
                             <p class="text-gray-500 dark:text-gray-400 mb-6 flex-grow">${t('anonDesc')}</p>
-                            <a href="https://forms.gle/L8v7cPxDGP8wfYnJ6" target="_blank" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a>
+                            <a href="https://forms.gle/L8v7cPxDGP8wfYnJ6" target="_blank" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition flex justify-center items-center gap-2 shadow-md">${t('goToForm')} <i data-lucide="external-link" class="w-4 h-4"></i></a>
                         </div>
                     </div>
                 </div>`;
@@ -647,42 +846,41 @@
         function renderClubs() {
             const clubList = APP_DATA.clubs.map(c => `
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition group">
-                    <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-gray-100 dark:border-gray-700 shadow-sm group-hover:border-theme transition-colors duration-300 flex items-center justify-center bg-gray-50 dark:bg-gray-700">
-                        <span class="text-4xl select-none animate-pulse absolute">...</span>
-                        <div class="w-full h-full flex items-center justify-center text-6xl select-none group-hover:scale-110 transition duration-300">
+                    <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-4 border-gray-100 dark:border-gray-700 shadow-sm group-hover:border-theme transition-colors duration-300 flex items-center justify-center bg-gray-50 dark:bg-gray-700 relative">
+                        <div class="w-full h-full flex items-center justify-center text-6xl select-none group-hover:scale-110 transition duration-300 z-10">
                             ${c.emoji}
                         </div>
                     </div>
                     <span class="text-xs bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-200 mb-2">${c.category}</span>
                     <h3 class="font-bold dark:text-white text-lg">${isEn() ? c.name_en : c.name_zh}</h3>
-                    <a href="${c.ig}" target="_blank" class="mt-4 text-pink-600 hover:text-pink-700 flex items-center gap-1 font-medium"><i data-lucide="instagram" class="w-4 h-4"></i> Instagram</a>
+                    <a href="${c.ig}" target="_blank" class="mt-4 text-pink-600 hover:text-pink-700 flex items-center gap-1 font-medium group-hover:underline"><i data-lucide="instagram" class="w-4 h-4"></i> Instagram</a>
                 </div>
             `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('clubTitle')}</h1><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${clubList}</div>`;
+            return `<h1 class="text-3xl font-bold mb-6 text-theme text-center">${t('clubTitle')}</h1><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${clubList}</div>`;
         }
 
         function renderDownloads() {
             const list = APP_DATA.downloads.map(d => `
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow flex items-center justify-between border-l-4 border-theme hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow flex items-center justify-between border-l-4 border-theme hover:bg-gray-50 dark:hover:bg-gray-700 transition group">
                     <div class="flex items-center gap-4">
-                        <div class="bg-theme/10 p-3 rounded-full text-theme"><i data-lucide="file-down"></i></div>
+                        <div class="bg-theme/10 p-3 rounded-full text-theme group-hover:bg-theme group-hover:text-white transition"><i data-lucide="file-down"></i></div>
                         <div>
                             <h3 class="font-bold text-lg dark:text-white">${isEn() ? d.title_en : d.title_zh}</h3>
-                            <p class="text-sm text-gray-500">${d.date} • PDF</p>
+                            <p class="text-sm text-gray-500">${d.date} • ${d.type}</p>
                         </div>
                     </div>
-                    <a href="${d.file}" target="_blank" class="bg-theme text-white px-4 py-2 rounded-lg hover:bg-theme/80 transition flex items-center gap-2">
+                    <a href="${d.file}" target="_blank" class="bg-theme text-white px-4 py-2 rounded-lg hover:bg-theme/80 transition flex items-center gap-2 shadow">
                         <span class="hidden sm:inline">${t('download_btn')}</span> <i data-lucide="download" class="w-4 h-4"></i>
                     </a>
                 </div>
             `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('downloadTitle')}</h1><div class="max-w-4xl mx-auto space-y-4">${list}</div>`;
+            return `<h1 class="text-3xl font-bold mb-6 text-theme text-center">${t('downloadTitle')}</h1><div class="max-w-4xl mx-auto space-y-4">${list}</div>`;
         }
 
         function renderContact() {
             return `
-                <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-                    <h1 class="text-3xl font-bold mb-6 text-theme">${t('contact')}</h1>
+                <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border-t-8 border-theme">
+                    <h1 class="text-3xl font-bold mb-6 text-theme text-center">${t('contact')}</h1>
                     <div class="space-y-6">
                         <a href="https://www.instagram.com/pksh.su/" target="_blank" class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition group">
                             <i data-lucide="instagram" class="w-8 h-8 text-pink-600 mr-4 group-hover:scale-110 transition-transform"></i>
@@ -693,7 +891,7 @@
                             <div><h3 class="font-bold text-lg dark:text-white">Email</h3><p class="text-sm text-gray-600 dark:text-gray-300">pkshsu@pksh.ylc.edu.tw</p></div>
                         </a>
                         <div class="pt-6 mt-6 border-t dark:border-gray-700">
-                            <button onclick="navigate('admin')" class="text-sm text-gray-500 hover:text-theme flex items-center transition"><i data-lucide="shield" class="w-4 h-4 mr-1"></i> ${t('admin')}</button>
+                            <button onclick="navigate('admin')" class="text-sm text-gray-500 hover:text-theme flex items-center transition mx-auto"><i data-lucide="shield" class="w-4 h-4 mr-1"></i> ${t('admin')}</button>
                         </div>
                     </div>
                 </div>
@@ -701,18 +899,156 @@
         }
 
         function renderMeetings() {
-            const list = APP_DATA.meetings.map(m => `
+            const list = APP_DATA.meetings.length ? APP_DATA.meetings.map(m => `
                 <div class="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer border-l-4 border-gray-400">
                     <div class="flex items-center gap-4"><div class="bg-gray-100 dark:bg-gray-600 p-3 rounded text-gray-500 dark:text-gray-300"><i data-lucide="file-text"></i></div><div><h3 class="font-bold dark:text-white">${isEn() ? m.title_en : m.title_zh}</h3><p class="text-sm text-gray-500">${m.date}</p></div></div><button class="text-theme hover:underline text-sm font-bold">PDF</button>
                 </div>
-            `).join('');
-            return `<h1 class="text-3xl font-bold mb-6 text-theme">${t('meetingTitle')}</h1><div class="space-y-4 max-w-3xl mx-auto">${list}</div>`;
+            `).join('') : `<p class="text-center text-gray-500">暫無公開的會議記錄。</p>`;
+            return `<h1 class="text-3xl font-bold mb-6 text-theme text-center">${t('meetingTitle')}</h1><div class="space-y-4 max-w-3xl mx-auto">${list}</div>`;
         }
 
+        // --- Admin System ---
         function renderAdmin() {
-             return `<div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow text-center"><h1 class="text-2xl font-bold mb-4 dark:text-white">${t('admin')}</h1><input type="password" placeholder="Password" class="w-full p-2 border mb-4 rounded dark:bg-gray-700"><button class="w-full bg-theme text-white py-2 rounded">Login</button></div>`;
+            if (!APP_STATE.user) {
+                // Login Form
+                return `
+                    <div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border-t-8 border-theme mt-10">
+                        <h1 class="text-2xl font-bold mb-6 dark:text-white text-center">${t('login_title')}</h1>
+                        <form onsubmit="handleLogin(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold mb-1 dark:text-gray-300">${t('login_email')}</label>
+                                <input type="email" id="admin-email" required class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:border-theme">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1 dark:text-gray-300">${t('login_pwd')}</label>
+                                <input type="password" id="admin-pwd" required class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:border-theme">
+                            </div>
+                            <button type="submit" class="w-full bg-theme text-white py-2 rounded hover:bg-theme-dark transition font-bold">${t('login_btn')}</button>
+                        </form>
+                    </div>
+                `;
+            } else {
+                // Dashboard
+                const tab = APP_STATE.adminTab;
+                let contentHtml = '';
+
+                // Tab Content: News
+                if (tab === 'news') {
+                    const list = APP_DATA.announcements.filter(a => a.id && !a.id.startsWith('static_')).map(a => `
+                         <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-3 rounded mb-2">
+                            <div><p class="font-bold dark:text-white">${a.title_zh}</p><span class="text-xs text-gray-500">${a.date}</span></div>
+                            <button onclick="deleteItem('announcements', '${a.id}')" class="text-red-500 text-sm hover:underline">${t('delete_btn')}</button>
+                         </div>
+                    `).join('');
+                    contentHtml = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h3 class="font-bold mb-2 dark:text-white">新增公告</h3>
+                                <input id="news-title" class="w-full mb-2 p-2 rounded dark:bg-gray-800 dark:text-white" placeholder="標題">
+                                <input id="news-date" type="date" class="w-full mb-2 p-2 rounded dark:bg-gray-800 dark:text-white">
+                                <textarea id="news-content" class="w-full mb-2 p-2 rounded dark:bg-gray-800 dark:text-white" placeholder="內容 (支援 HTML)"></textarea>
+                                <button onclick="addNews()" class="bg-theme text-white px-4 py-2 rounded w-full">${t('add_btn')}</button>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow h-[400px] overflow-y-auto">
+                                <h3 class="font-bold mb-2 dark:text-white">管理公告 (Firebase)</h3>
+                                ${list || `<p class="text-gray-400 text-sm">${t('no_data')}</p>`}
+                            </div>
+                        </div>
+                    `;
+                }
+                // Tab Content: Events
+                else if (tab === 'events') {
+                     const list = APP_DATA.events.filter(e => e.id && !e.id.startsWith('e')).map(e => `
+                         <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-3 rounded mb-2">
+                            <div><p class="font-bold dark:text-white">${e.title_zh}</p><span class="text-xs text-gray-500">${e.date} | ${e.type}</span></div>
+                            <button onclick="deleteItem('events', '${e.id}')" class="text-red-500 text-sm hover:underline">${t('delete_btn')}</button>
+                         </div>
+                    `).join('');
+                    contentHtml = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                                <h3 class="font-bold mb-2 dark:text-white">新增活動</h3>
+                                <input id="event-title" class="w-full mb-2 p-2 rounded dark:bg-gray-800 dark:text-white" placeholder="活動名稱">
+                                <div class="flex gap-2 mb-2">
+                                    <input id="event-date" type="date" class="w-1/2 p-2 rounded dark:bg-gray-800 dark:text-white">
+                                    <input id="event-time" class="w-1/2 p-2 rounded dark:bg-gray-800 dark:text-white" placeholder="時間 (e.g. 08:00)">
+                                </div>
+                                <input id="event-loc" class="w-full mb-2 p-2 rounded dark:bg-gray-800 dark:text-white" placeholder="地點">
+                                <select id="event-type" class="w-full mb-2 p-2 rounded dark:bg-gray-800 dark:text-white">
+                                    <option value="Activity">Activity (活動)</option>
+                                    <option value="Academic">Academic (教務)</option>
+                                    <option value="Holiday">Holiday (假日)</option>
+                                </select>
+                                <button onclick="addEvent()" class="bg-theme text-white px-4 py-2 rounded w-full">${t('add_btn')}</button>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow h-[400px] overflow-y-auto">
+                                <h3 class="font-bold mb-2 dark:text-white">管理活動 (Firebase)</h3>
+                                ${list || `<p class="text-gray-400 text-sm">${t('no_data')}</p>`}
+                            </div>
+                        </div>
+                    `;
+                }
+                // Tab Content: Confessions
+                else if (tab === 'confessions') {
+                     const list = APP_DATA.confessionWall.filter(c => c.id && !c.id.startsWith('s')).map(c => `
+                         <div class="border-b dark:border-gray-700 p-3 flex justify-between items-start">
+                            <div>
+                                <p class="text-sm dark:text-white font-bold">${c.content}</p>
+                                <p class="text-xs text-gray-500 mt-1">By: ${c.author}</p>
+                            </div>
+                            <button onclick="deleteItem('confessions', '${c.id}')" class="text-red-500 text-xs border border-red-200 p-1 rounded hover:bg-red-50">${t('delete_btn')}</button>
+                         </div>
+                    `).join('');
+                    contentHtml = `
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <h3 class="font-bold mb-4 dark:text-white">最新告白管理</h3>
+                            <div class="max-h-[500px] overflow-y-auto">
+                             ${list || `<p class="text-center py-10 text-gray-500">${t('no_data')}</p>`}
+                            </div>
+                        </div>
+                    `;
+                }
+                // Tab Content: System Settings
+                else if (tab === 'system') {
+                    contentHtml = `
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                            <h3 class="font-bold mb-4 dark:text-white text-lg">系統全域設定</h3>
+                            
+                            <div class="mb-6">
+                                <label class="block font-bold mb-2 dark:text-gray-300">首頁跑馬燈內容</label>
+                                <textarea id="system-marquee" rows="3" class="w-full p-3 rounded border dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-theme outline-none">${SYSTEM_SETTINGS.marquee}</textarea>
+                                <p class="text-xs text-gray-500 mt-1">更新後所有使用者重新整理頁面即可看到變更。</p>
+                            </div>
+
+                            <button onclick="saveSystemSettings()" class="bg-theme text-white px-6 py-2 rounded font-bold hover:bg-theme-dark transition">${t('save_btn')}</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="bg-white dark:bg-gray-800 min-h-[600px] rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden border border-gray-100 dark:border-gray-700">
+                        <div class="w-full md:w-64 bg-gray-50 dark:bg-gray-900 p-4 flex flex-col gap-2 border-r dark:border-gray-700">
+                            <div class="mb-6 px-2">
+                                <h2 class="text-xl font-bold text-theme">${t('admin_dashboard')}</h2>
+                                <p class="text-xs text-gray-500 truncate">${APP_STATE.user.email}</p>
+                            </div>
+                            <button onclick="switchAdminTab('news')" class="text-left px-4 py-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 ${tab==='news'?'bg-white dark:bg-gray-800 shadow font-bold text-theme':''}">${t('admin_news')}</button>
+                            <button onclick="switchAdminTab('events')" class="text-left px-4 py-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 ${tab==='events'?'bg-white dark:bg-gray-800 shadow font-bold text-theme':''}">${t('admin_events')}</button>
+                            <button onclick="switchAdminTab('confessions')" class="text-left px-4 py-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 ${tab==='confessions'?'bg-white dark:bg-gray-800 shadow font-bold text-theme':''}">${t('admin_confess')}</button>
+                            <button onclick="switchAdminTab('system')" class="text-left px-4 py-2 rounded hover:bg-gray-200 dark:hover:bg-gray-800 ${tab==='system'?'bg-white dark:bg-gray-800 shadow font-bold text-theme':''}">${t('admin_system')}</button>
+                            <div class="mt-auto">
+                                <button onclick="handleLogout()" class="w-full text-left px-4 py-2 rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">${t('admin_logout')}</button>
+                            </div>
+                        </div>
+                        <div class="flex-grow p-6 bg-gray-100 dark:bg-gray-950/50">
+                            ${contentHtml}
+                        </div>
+                    </div>
+                `;
+            }
         }
 
+        // --- Core Render ---
         function render() {
             const container = document.getElementById('app-container');
             const view = APP_STATE.view;
@@ -728,9 +1064,16 @@
                 else btn.classList.remove('text-theme', 'bg-gray-50', 'dark:bg-gray-700', 'font-bold');
             });
             updateMarquee();
+            
+            // i18n updates for nav buttons
             document.querySelectorAll('.nav-btn').forEach(el => {
                  if(I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
             });
+            // Update mobile menu buttons
+            document.querySelectorAll('#mobile-menu button').forEach(el => {
+                if(el.dataset.key && I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
+            });
+
             const routes = {
                 'home': renderHome, 'events': renderEvents, 'mailboxes': renderMailboxes,
                 'org': renderOrg, 'finance': renderFinance, 'clubs': renderClubs, 'downloads': renderDownloads,
@@ -748,6 +1091,7 @@
 
         window.navigate = (view) => {
             APP_STATE.view = view;
+            APP_STATE.eventFilter = 'All'; // Reset filter on nav
             document.getElementById('mobile-menu').classList.add('hidden');
             render();
         };
@@ -771,7 +1115,7 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        // 初始化
+        // Init
         (async () => {
             await loadDataFromFirebase();
             render();
@@ -779,4 +1123,3 @@
     </script>
 </body>
 </html>
-
