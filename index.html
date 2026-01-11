@@ -1,1 +1,1782 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北港高中學生會 | PKSH Student Council</title>
+    <link rel="icon" type="image/png" href="大頭貼.jpg">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // [已恢復] 啟用深色模式切換
+            theme: {
+                fontFamily: {
+                    sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        theme: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6', // Primary Teal
+                            600: '#0d9488', 
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        }
+                    },
+                    animation: {
+                        'fade-up': 'fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        /* 隱藏捲軸但保留功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 玻璃擬態 */
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* 導覽列 */
+        .nav-scroll-container {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 0.25rem;
+            height: 100%;
+            align-items: center;
+            padding: 0 0.5rem;
+        }
+        .nav-scroll-container::-webkit-scrollbar { display: none; }
+        
+        .nav-btn {
+            flex-shrink: 0; 
+            white-space: nowrap; 
+        }
+
+        /* 跑馬燈 */
+        .marquee-container { overflow: hidden; white-space: nowrap; position: relative; }
+        .marquee-content { display: inline-block; animation: marquee 30s linear infinite; }
+        .marquee-content:hover { animation-play-state: paused; }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 連結樣式 */
+        .news-content a:not(.btn-link) {
+            color: #0d9488;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .news-content a:not(.btn-link):hover { color: #0f766e; }
+        .news-content a.btn-link { text-decoration: none !important; }
+
+        /* 卡片互動 */
+        .hover-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1); }
+
+        /* 照片遮罩 */
+        .gallery-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+        }
+        
+        /* Lightbox Navigation Buttons */
+        .lightbox-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 1rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s;
+            z-index: 60;
+        }
+        .lightbox-nav-btn:hover { background: rgba(255, 255, 255, 0.3); scale: 1.1; }
+        .lightbox-prev { left: 1rem; }
+        .lightbox-next { right: 1rem; }
+        @media (max-width: 640px) {
+            .lightbox-nav-btn { padding: 0.5rem; }
+            .lightbox-prev { left: 0.5rem; }
+            .lightbox-next { right: 0.5rem; }
+        }
+
+        /* Lightbox Tools */
+        .lightbox-tool-btn {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 9999px;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .lightbox-tool-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 flex flex-col min-h-screen relative font-sans selection:bg-theme-100 selection:text-theme-800">
+
+    <script>
+        window.onerror = function(msg, url, line) {
+            if (msg.includes('ResizeObserver')) return;
+        };
+    </script>
+
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-[10%] -right-[10%] w-[600px] h-[600px] bg-theme-200/20 rounded-full blur-[100px] dark:bg-theme-900/10"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-200/20 rounded-full blur-[100px] dark:bg-blue-900/10"></div>
+    </div>
+
+    <button onclick="window.scrollTo(0,0)" id="back-to-top" class="fixed bottom-8 right-8 z-50 bg-theme-600 text-white p-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 hover:bg-theme-700 hover:scale-110 border border-theme-100 dark:border-slate-700 group">
+        <i data-lucide="arrow-up" class="w-6 h-6 group-hover:-translate-y-0.5 transition-transform"></i>
+    </button>
+
+    <div class="relative z-20 bg-slate-900 text-white text-xs py-2.5 px-4 overflow-hidden">
+        <div class="marquee-container flex items-center h-6">
+            <div class="marquee-content font-mono tracking-wider opacity-90 transition-all duration-300" id="marquee-text">Loading...</div>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 glass shadow-sm transition-all duration-300">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+                <a href="#" class="flex-shrink-0 flex items-center gap-3 group" onclick="navigate('home')">
+                    <img src="大頭貼.jpg" onerror="this.src='https://ui-avatars.com/api/?name=PKSH&background=0d9488&color=fff'" alt="Logo" class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-700 group-hover:ring-theme-400 transition-all">
+                    <div class="flex flex-col">
+                        <span class="text-base sm:text-lg font-bold tracking-tight leading-none text-slate-900 dark:text-white">北港高中<span class="text-theme-500">學生會</span></span>
+                        <span class="text-[10px] font-semibold text-slate-400 tracking-widest mt-0.5 uppercase">PKSH SU</span>
+                    </div>
+                </a>
+
+                <div class="hidden xl:flex flex-1 min-w-0 items-center justify-center">
+                    <nav class="nav-scroll-container">
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('home')" data-key="home">首頁</button>
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('events')" data-key="events">近期活動</button>
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('gallery')" data-key="gallery">活動花絮</button>
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('clubs')" data-key="clubs">社團專區</button>
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('mailboxes')" data-key="mailboxes">信箱專區</button>
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('downloads')" data-key="downloads">資料下載</button>
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('finance')" data-key="finance">財務明細</button>
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('meetings')" data-key="meetings">會議紀錄</button>
+                        <button class="nav-btn px-2.5 py-2 text-base font-bold tracking-tight rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-gray-800" onclick="navigate('org')" data-key="org">組織架構</button>
+                        <button class="nav-btn ml-1 px-4 py-2 rounded-full bg-theme-600 text-white text-base font-bold shadow-md hover:bg-theme-700 hover:shadow-lg transition-all" onclick="navigate('contact')" data-key="contact">聯絡我們</button>
+                    </nav>
+                </div>
+
+                <div class="flex items-center space-x-2 flex-shrink-0">
+                    <button onclick="toggleSearch()" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="toggleLang()" class="w-8 h-8 flex items-center justify-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 hover:border-theme-500 hover:text-theme-500 transition">
+                        <span id="lang-display">EN</span>
+                    </button>
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition">
+                        <i data-lucide="moon" id="dark-icon" class="w-5 h-5"></i>
+                        <i data-lucide="sun" id="light-icon" class="w-5 h-5 hidden"></i>
+                    </button>
+                    <button id="menu-button" class="xl:hidden p-2 text-slate-600 dark:text-slate-200">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="mobile-menu" class="xl:hidden hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 absolute w-full z-40 shadow-2xl animate-fade-in">
+            <div class="p-4 space-y-1 max-h-[80vh] overflow-y-auto">
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('home')" data-key="home">首頁</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('events')" data-key="events">近期活動</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('gallery')" data-key="gallery">活動花絮</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('clubs')" data-key="clubs">社團專區</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('mailboxes')" data-key="mailboxes">信箱專區</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('downloads')" data-key="downloads">資料下載</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('finance')" data-key="finance">財務明細</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('meetings')" data-key="meetings">會議紀錄</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-medium text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800" onclick="navigate('org')" data-key="org">組織架構</button>
+                <button class="block w-full text-left py-3 px-4 rounded-xl font-bold text-theme-600 bg-theme-50 dark:bg-theme-900/20" onclick="navigate('contact')" data-key="contact">聯絡我們</button>
+            </div>
+        </div>
+    </header>
+
+    <div id="search-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md hidden flex flex-col pt-32 px-4 items-center animate-fade-in transition-opacity">
+        <div class="w-full max-w-2xl relative transform transition-all scale-100">
+            <input type="text" id="search-input" class="w-full bg-white dark:bg-slate-800 text-xl p-5 pl-6 rounded-2xl shadow-2xl dark:text-white border-none ring-1 ring-black/5 focus:ring-2 focus:ring-theme-500 focus:outline-none transition-all" placeholder="搜尋網站內容..." onkeyup="performSearch()">
+            <button onclick="toggleSearch()" class="absolute right-5 top-5 text-gray-400 hover:text-theme-500 transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div id="search-results" class="w-full max-w-2xl mt-4 space-y-2 overflow-y-auto max-h-[60vh] pb-10"></div>
+    </div>
+
+    <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none" tabindex="0">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/70 hover:text-white z-50 transition-colors bg-white/10 p-2 rounded-full">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+
+        <button class="lightbox-nav-btn lightbox-prev" onclick="changeLightbox(-1)">
+            <i data-lucide="chevron-left" class="w-8 h-8"></i>
+        </button>
+        <button class="lightbox-nav-btn lightbox-next" onclick="changeLightbox(1)">
+            <i data-lucide="chevron-right" class="w-8 h-8"></i>
+        </button>
+
+        <div class="max-w-6xl w-full max-h-screen flex flex-col items-center justify-center relative">
+            <img id="lightbox-img" src="" class="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+            <p id="lightbox-caption" class="text-white/90 mt-4 text-center text-lg font-medium tracking-wide"></p>
+            
+            <div class="flex items-center gap-4 mt-4">
+                <button onclick="downloadPhoto()" class="lightbox-tool-btn group" title="下載照片">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                </button>
+                <button onclick="sharePhoto()" class="lightbox-tool-btn group" title="分享照片">
+                    <i data-lucide="share-2" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <p id="lightbox-counter" class="text-white/50 text-sm mt-3"></p>
+        </div>
+    </div>
+
+    <main class="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 flex-grow w-full relative z-10 animate-fade-in" id="app-container">
+    </main>
+
+    <footer class="bg-white/50 dark:bg-slate-900/50 backdrop-blur border-t border-slate-200 dark:border-slate-800 mt-auto py-12 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex justify-center items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-theme-400 to-theme-600 p-0.5 grayscale hover:grayscale-0 transition-all">
+                    <img src="大頭貼.jpg" onerror="this.src='https://ui-avatars.com/api/?name=PKSH&background=fff&color=0d9488'" class="w-full h-full rounded-full object-cover bg-white">
+                </div>
+                <span class="font-bold text-lg text-slate-800 dark:text-white tracking-tight">PKSH Student Council</span>
+            </div>
+            <div class="flex justify-center items-center gap-6 mb-8">
+                <a href="https://www.instagram.com/pksh.su/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-pink-500 hover:bg-white shadow-sm transition-all hover:-translate-y-1">
+                    <i data-lucide="instagram" class="w-5 h-5"></i>
+                </a>
+                <a href="https://www.facebook.com/52PKSH/?locale=zh_TW" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-blue-600 hover:bg-white shadow-sm transition-all hover:-translate-y-1">
+                    <i data-lucide="facebook" class="w-5 h-5"></i>
+                </a>
+                <a href="https://www.pksh.ylc.edu.tw/home" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-theme-600 hover:bg-white shadow-sm transition-all hover:-translate-y-1">
+                    <i data-lucide="globe" class="w-5 h-5"></i>
+                </a>
+            </div>
+            <p class="text-xs text-slate-400 font-medium tracking-wide">© 2025 國立北港高中學生會. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        // 1. 引入 Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // ============================================
+        // ⚠️ Config (請確保這裡填入你的 Firebase Config)
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWmy__e9_7YbhBTJNvLvGVglj-fOTFWMg",
+            authDomain: "pksh-student-council.firebaseapp.com",
+            projectId: "pksh-student-council",
+            storageBucket: "pksh-student-council.firebasestorage.app",
+            messagingSenderId: "142500679754",
+            appId: "1:142500679754:web:a758dc9a8b5ae34f9296b3"
+        };
+        let db = null;
+        let auth = null;
+
+        try {
+            if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                console.log("✅ Firebase 連線成功！");
+            } else {
+                console.warn("⚠️ Firebase Config 未設定，目前使用靜態資料模式。");
+            }
+        } catch (e) {
+            console.error("Firebase 初始化失敗:", e);
+        }
+
+        // --- 靜態資料 (Fallback) ---
+        const STATIC_DATA = {
+            announcements: [
+                { 
+                    id: 'static_1', 
+                    title_zh: '學生會連結樹', 
+                    title_en: 'Student Union Link Tree', 
+                    tag_zh: '公告', tag_en: 'Notice', 
+                    date: '2026-01-01',
+                    content_zh: 'https://linktr.ee/pkshsu?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAb21jcAPC4qRleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAaeHqdgPGR_-3r8dZkSNWf5ppn5iFKdKdgi26JypXij6uoGGQUrU6CP1NAXAig_aem_CFVbEBehnQMXtEfUGpJ7LA', 
+                    content_en: 'https://linktr.ee/pkshsu?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAb21jcAPC4qRleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA81NjcwNjczNDMzNTI0MjcAAaeHqdgPGR_-3r8dZkSNWf5ppn5iFKdKdgi26JypXij6uoGGQUrU6CP1NAXAig_aem_CFVbEBehnQMXtEfUGpJ7LA'
+                }
+            ],
+            events: [],
+            finance: [],
+            // [NEW] 預設照片 (相簿功能升級)
+            photos: [
+                { url: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', title_zh: '校園一隅 (範例)', title_en: 'Campus Corner', album: '校園生活' }
+            ],
+            clubs: [
+                { name_zh: '熱舞社', name_en: 'Pop Dance Club', category: 'Dance', emoji: '💃', ig: 'https://www.instagram.com/pkdc.20_flaming/' },
+                { name_zh: '熱音社', name_en: 'Pop Music Club', category: 'Music', emoji: '🎸', ig: 'https://www.instagram.com/pkhmc_/' },
+                { name_zh: '童軍社', name_en: 'Scout Club', category: 'Service', emoji: '🏕️', ig: 'https://www.instagram.com/pksh_circus_scout/' },
+            ],
+            orgLeaders: [
+                { roleKey: 'role_pres', icon: '👑', name_zh: '張佾傑', name_en: 'CHANG, YI-CHIEH', desc_zh: '對內綜理內務，主持召開會員代表大會，對外代表本會，配合學校推展各項活動並負責綜理本會事宜。', desc_en: 'Manages internal affairs.'},
+                { roleKey: 'role_vp', icon: '⭐', name_zh: '王雅琝', name_en: 'WANG, YA-WEN', desc_zh: '協助會長執行本會事宜，會長因故缺席時代理之。', desc_en: 'Assists the President.'}
+            ],
+            orgDepts: [
+                { roleKey: 'role_act', icon: '🎉', chief_zh: '鄭雨涵', chief_en: 'CHENG, YU-HAN', desc_zh: '負責策劃及推行本會所舉辦之各類活動。', desc_en: 'Activities planning.'},
+                { roleKey: 'role_art', icon: '🎨', chief_zh: '朱守晴', chief_en: 'CHU, SHOU-CHING', deputy_zh: '黃瓊美', deputy_en: 'HUANG, CHIUNG-MEI', desc_zh: '負責本會學藝活動、海報、壁報設計。', desc_en: 'Art and Design.'},
+                { roleKey: 'role_admin', icon: '📝', chief_zh: '蔡秉宏', chief_en: 'TSAI, PING-HUNG', deputy_zh: '顏子䒟', deputy_en: 'YEN, TZU-TAN', desc_zh: '負責本會開會通告、會議記錄。', desc_en: 'Administration.'},
+                { roleKey: 'role_ga', icon: '💰', chief_zh: '趙芝翊', chief_en: 'CHAO, CHIH-YI', desc_zh: '負責本會經費收支，財產保管。', desc_en: 'General Affairs.'},
+                { roleKey: 'role_pr', icon: '📢', chief_zh: '許雅琳', chief_en: 'HSU, YA-LIN', desc_zh: '負責本會會議之聯絡及舉辦活動之聯繫。', desc_en: 'Public Relations.'},
+                { roleKey: 'role_mobile', icon: '🛠️', chief_zh: '劉乙葭', chief_en: 'LIU, YI-CHIA', desc_zh: '負責本會舉辦之場地佈置。', desc_en: 'Logistics.'}
+            ],
+            meetings: [],
+            downloads: []
+        };
+        let APP_DATA = JSON.parse(JSON.stringify(STATIC_DATA));
+        let SYSTEM_SETTINGS = {
+            marquee: '📢 歡迎來到北港高中學生會官方網站！',
+            marqueeSize: 'text-xs' // [NEW] 預設字體大小
+        };
+        const I18N = {
+            zh: {
+                home: '首頁', events: '近期活動', mailboxes: '信箱專區', clubs: '社團專區', downloads: '資料下載',
+                contact: '聯絡我們', org: '組織架構', finance: '財務明細', meetings: '會議紀錄', admin: '後台管理',
+                gallery: '活動花絮',
+                marquee: '', 
+                heroTitle: '北港高中學生會',
+                heroSubtitle: '你的聲音，我們的行動。共創更美好的校園生活。',
+                btnComplaint: '前往信箱專區', news: '最新公告',
+                financeTitle: '財務明細', orgTitle: '學生會組織架構', eventTitle: '近期活動一覽',
+                meetingTitle: '會議記錄存檔', clubTitle: '社團專區', downloadTitle: '資料下載專區',
+                galleryTitle: '精彩活動花絮',
+                rightsMailbox: '學權信箱', rightsDesc: '發現校園設備損壞、對學校政策有疑問或建議？請填寫此表單。',
+                anonMailbox: '匿名信箱', anonDesc: '對學生會的施政方針、活動規劃有任何建議？歡迎匿名填寫。',
+                goToForm: '前往填寫表單', searchPlaceholder: '搜尋網站內容...', noResults: '沒有找到相關結果',
+                col_date: '日期', col_item: '項目', col_amount: '金額',
+                role_pres: '會長', role_vp: '副會長', role_admin: '行政組', role_act: '活動組', role_mobile: '機動組',
+                role_pr: '公關組', role_ga: '總務組', role_art: '美宣組', role_chief: '組長', role_deputy: '副組長',
+                download_btn: '下載檔案',
+                filter_all: '全部', filter_academic: '教務', filter_holiday: '假日', filter_event: '活動',
+                login_title: '學生會幹部登入', login_btn: '登入', login_email: '電子郵件', login_pwd: '密碼',
+                admin_dashboard: '管理儀表板', admin_news: '公告管理', admin_events: '活動管理', admin_photos: '照片管理', admin_system: '系統設定', admin_logout: '登出',
+                add_btn: '新增', save_btn: '儲存設定', delete_btn: '刪除', no_data: '暫無資料',
+                admin_finance: '財務管理', admin_meetings: '會議記錄', admin_downloads: '下載管理'
+            },
+            en: {
+                home: 'Home', events: 'Events', mailboxes: 'Mailboxes', clubs: 'Clubs', downloads: 'Downloads',
+                contact: 'Contact Us', org: 'Organization', finance: 'Finance', meetings: 'Minutes', admin: 'Admin Panel',
+                gallery: 'Gallery',
+                marquee: '', 
+                heroTitle: 'PKSH Student Council',
+                heroSubtitle: 'Your Voice, Our Action. Creating a better campus life together.',
+                btnComplaint: 'Go to Mailboxes', news: 'Latest News',
+                financeTitle: 'Financial Details', orgTitle: 'Organization', eventTitle: 'Upcoming Events',
+                meetingTitle: 'Meeting Minutes', clubTitle: 'Student Clubs', downloadTitle: 'Download Zone',
+                galleryTitle: 'Activity Gallery',
+                rightsMailbox: 'Student Rights Mailbox', rightsDesc: 'Report damaged facilities or suggest policy changes.',
+                anonMailbox: 'Anonymous Mailbox', anonDesc: 'Suggestions for the Student Council? Share your thoughts anonymously.',
+                goToForm: 'Fill out Form', searchPlaceholder: 'Search news or events...', noResults: 'No results found',
+                col_date: 'Date', col_item: 'Item', col_amount: 'Amount',
+                role_pres: 'President', role_vp: 'Vice President', role_admin: 'Admin Dept', role_act: 'Activity Dept', role_mobile: 'Logistics Dept',
+                role_pr: 'Public Relations', role_ga: 'General Affairs', role_art: 'Art & Design', role_chief: 'Chief', role_deputy: 'Deputy',
+                download_btn: 'Download',
+                filter_all: 'All', filter_academic: 'Academic', filter_holiday: 'Holiday', filter_event: 'Event',
+                login_title: 'Staff Login', login_btn: 'Login', login_email: 'Email', login_pwd: 'Password',
+                admin_dashboard: 'Dashboard', admin_news: 'Manage News', admin_events: 'Manage Events', admin_photos: 'Manage Photos', admin_system: 'System Settings', admin_logout: 'Logout',
+                add_btn: 'Add', save_btn: 'Save Settings', delete_btn: 'Delete', no_data: 'No Data',
+                admin_finance: 'Manage Finance', admin_meetings: 'Manage Minutes', admin_downloads: 'Manage Downloads'
+            }
+        };
+        const APP_STATE = {
+            view: 'home',
+            lang: 'zh',
+            darkMode: false,
+            eventFilter: 'All',
+            user: null, 
+            adminTab: 'news', 
+            isLoading: false,
+            // [NEW] Gallery State
+            galleryView: 'albums', // 'albums' or 'photos'
+            activeAlbum: null,
+            // [NEW] Lightbox State
+            lightboxList: [],
+            lightboxIndex: 0
+        };
+
+        const t = (key) => I18N[APP_STATE.lang][key] || key;
+        const isEn = () => APP_STATE.lang === 'en';
+
+        const val = (data, field) => {
+            if (!data) return '';
+            if (isEn()) return data[field + '_en'] || data[field + '_zh'] || data[field] || '';
+            return data[field + '_zh'] || data[field] || '';
+        };
+
+        function formatDateHelper(dateStr) {
+            let month = '??'; let day = '??';
+            if (!dateStr) return { month, day };
+            try {
+                const parts = dateStr.replace(/-/g, '/').split('/');
+                if (parts.length >= 2) {
+                    if (parts.length === 3) { month = parts[1]; day = parts[2]; } else { month = parts[0]; day = parts[1]; }
+                }
+            } catch (e) { console.error("Date parse error", e); }
+            return { month, day };
+        }
+
+        function formatContent(text) {
+            if (!text) return '';
+            if (/<[a-z][\s\S]*>/i.test(text) && !text.startsWith('http')) return text;
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, (url) => {
+                const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+                if (ytMatch && ytMatch[1]) {
+                    return `<div class="my-4 w-full aspect-video"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" class="w-full h-full rounded-2xl shadow-lg border-2 border-white dark:border-gray-700" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+                }
+                if (url.toLowerCase().endsWith('.pdf')) {
+                    let filename = '下載 PDF 文件';
+                    try { filename = decodeURIComponent(new URL(url).pathname.split('/').pop()); } catch(e){}
+                    return `<a href="${url}" target="_blank" class="btn-link group block mt-3 w-full text-center bg-gradient-to-r from-red-50 to-white border border-red-200 text-red-600 rounded-xl py-3.5 hover:from-red-100 hover:to-red-50 hover:shadow-md transition-all font-bold"><i data-lucide="file-down" class="inline-block mr-2 w-5 h-5 group-hover:scale-110 transition-transform"></i>${filename}</a>`;
+                }
+                if (/\.(jpeg|jpg|gif|png)$/i.test(url)) {
+                     return `<img src="${url}" class="mt-3 rounded-2xl shadow-lg max-h-80 mx-auto border-4 border-white dark:border-gray-700 hover:scale-[1.02] transition-transform" alt="Image">`;
+                }
+                return `<a href="${url}" target="_blank" class="text-theme-600 font-bold hover:text-theme-700 transition-colors inline-flex items-center gap-1 border-b-2 border-theme-200 hover:border-theme-500 pb-0.5">🔗 開啟連結 <i data-lucide="external-link" class="w-3 h-3"></i></a>`;
+            });
+        }
+
+        // --- Firebase Data Handling ---
+        async function loadDataFromFirebase() {
+            if (!db) return;
+            try {
+                APP_STATE.isLoading = true;
+                const settingsRef = doc(db, "settings", "config");
+                const settingsSnap = await getDoc(settingsRef);
+                if (settingsSnap.exists()) {
+                    const d = settingsSnap.data();
+                    if(Array.isArray(d.marquee)) SYSTEM_SETTINGS.marquee = d.marquee;
+                    else SYSTEM_SETTINGS.marquee = d.marquee || SYSTEM_SETTINGS.marquee;
+                    // [NEW] Load Font Size
+                    if(d.marqueeSize) SYSTEM_SETTINGS.marqueeSize = d.marqueeSize;
+                }
+                updateMarquee();
+                const qNews = query(collection(db, "announcements"), orderBy("date", "desc"));
+                const snapNews = await getDocs(qNews);
+                const fetchedNews = [];
+                snapNews.forEach(doc => { fetchedNews.push({ id: doc.id, ...doc.data() }); });
+                if(fetchedNews.length > 0) APP_DATA.announcements = [...fetchedNews, ...STATIC_DATA.announcements];
+                
+                const qEvents = query(collection(db, "events"), orderBy("date", "asc"));
+                const snapEvents = await getDocs(qEvents);
+                const fetchedEvents = [];
+                snapEvents.forEach(doc => { fetchedEvents.push({ id: doc.id, ...doc.data() }); });
+                if(fetchedEvents.length > 0) {
+                    APP_DATA.events = [...fetchedEvents, ...STATIC_DATA.events];
+                    APP_DATA.events.sort((a,b) => a.date.localeCompare(b.date));
+                }
+
+                const qFinance = query(collection(db, "finance"), orderBy("date", "desc"));
+                const snapFinance = await getDocs(qFinance);
+                const fetchedFinance = [];
+                snapFinance.forEach(doc => fetchedFinance.push({ id: doc.id, ...doc.data() }));
+                if(fetchedFinance.length > 0) APP_DATA.finance = fetchedFinance;
+
+                const qMeetings = query(collection(db, "meetings"), orderBy("date", "desc"));
+                const snapMeetings = await getDocs(qMeetings);
+                const fetchedMeetings = [];
+                snapMeetings.forEach(doc => fetchedMeetings.push({ id: doc.id, ...doc.data() }));
+                if(fetchedMeetings.length > 0) APP_DATA.meetings = fetchedMeetings;
+
+                const qDownloads = query(collection(db, "downloads"), orderBy("date", "desc"));
+                const snapDownloads = await getDocs(qDownloads);
+                const fetchedDownloads = [];
+                snapDownloads.forEach(doc => fetchedDownloads.push({ id: doc.id, ...doc.data() }));
+                if(fetchedDownloads.length > 0) APP_DATA.downloads = fetchedDownloads;
+
+                const qPhotos = query(collection(db, "photos"), orderBy("timestamp", "desc"));
+                const snapPhotos = await getDocs(qPhotos);
+                const fetchedPhotos = [];
+                snapPhotos.forEach(doc => fetchedPhotos.push({ id: doc.id, ...doc.data() }));
+                if(fetchedPhotos.length > 0) APP_DATA.photos = fetchedPhotos;
+
+                // 確保 View 不為空
+                if(!APP_STATE.view) APP_STATE.view = 'home';
+                render();
+            } catch (error) {
+                console.log("Firebase 讀取失敗:", error);
+            } finally {
+                APP_STATE.isLoading = false;
+            }
+        }
+
+        // --- Auth & Admin Logic ---
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                APP_STATE.user = user;
+                if (APP_STATE.view === 'admin') render(); 
+            });
+        }
+
+        window.handleLogin = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const pwd = document.getElementById('admin-pwd').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, pwd);
+                Swal.fire({ icon: 'success', title: '登入成功', timer: 1500, showConfirmButton: false });
+            } catch (error) {
+                Swal.fire('登入失敗', '請檢查帳號密碼', 'error');
+            }
+        };
+
+        window.handleLogout = async () => {
+            try {
+                await signOut(auth);
+                Swal.fire({ icon: 'success', title: '已登出', timer: 1000, showConfirmButton: false });
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        window.switchAdminTab = (tab) => {
+            APP_STATE.adminTab = tab;
+            render();
+        }
+
+        window.autoTranslate = async (sourceId, targetId) => {
+            const sourceText = document.getElementById(sourceId).value;
+            const targetInput = document.getElementById(targetId);
+            if (!sourceText) return Swal.fire('請先輸入中文', '', 'warning');
+            targetInput.value = '翻譯中...';
+            targetInput.disabled = true;
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceText)}&langpair=zh-TW|en-US`);
+                const data = await res.json();
+                if (data.responseData && data.responseData.translatedText) {
+                    targetInput.value = data.responseData.translatedText;
+                } else {
+                    targetInput.value = '';
+                    Swal.fire('翻譯失敗', '請手動輸入', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                targetInput.value = '';
+                Swal.fire('連線錯誤', '請稍後再試', 'error');
+            } finally {
+                targetInput.disabled = false;
+            }
+        };
+
+        // CRUD Helpers
+        window.addNews = async () => {
+            const title_zh = document.getElementById('news-title-zh').value;
+            const title_en = document.getElementById('news-title-en').value;
+            const content_zh = document.getElementById('news-content-zh').value;
+            const content_en = document.getElementById('news-content-en').value;
+            const date = document.getElementById('news-date').value;
+            if(!title_zh || !date) return Swal.fire('欄位未填', '請填寫中文標題與日期', 'warning');
+            try {
+                await addDoc(collection(db, "announcements"), {
+                    title_zh, title_en: title_en || title_zh, content_zh, content_en: content_en || content_zh,
+                    tag_zh: '公告', tag_en: 'Notice', date, timestamp: serverTimestamp()
+                });
+                Swal.fire('新增成功', '', 'success'); await loadDataFromFirebase();
+            } catch(e) { Swal.fire('錯誤', e.message, 'error');
+            }
+        }
+
+        window.addEvent = async () => {
+            const title_zh = document.getElementById('event-title-zh').value;
+            const title_en = document.getElementById('event-title-en').value;
+            const date = document.getElementById('event-date').value;
+            const time = document.getElementById('event-time').value;
+            // [修正] 取得兩個分開的地點欄位
+            const loc_zh = document.getElementById('event-loc-zh').value;
+            const loc_en = document.getElementById('event-loc-en').value;
+            const type = document.getElementById('event-type').value;
+            const link = document.getElementById('event-link').value;
+            
+            if(!title_zh || !date) return Swal.fire('欄位未填', '請填寫完整資訊', 'warning');
+            
+            try {
+                await addDoc(collection(db, "events"), {
+                    title_zh, 
+                    title_en: title_en || title_zh, 
+                    date, 
+                    time, 
+                    location_zh: loc_zh, 
+                    // [修正] 如果沒填英文地點，就預設用中文
+                    location_en: loc_en || loc_zh,
+                    type, 
+                    link: link || '', 
+                    timestamp: serverTimestamp()
+                });
+                Swal.fire('新增成功', '', 'success'); await loadDataFromFirebase();
+            } catch(e) { Swal.fire('錯誤', e.message, 'error');
+            }
+        }
+
+        // [FIXED] addFinance Function to match new HTML IDs
+        window.addFinance = async () => {
+            const date = document.getElementById('fin-date').value;
+            // [修正] 改為讀取 fin-item-zh 和 fin-item-en
+            const item_zh = document.getElementById('fin-item-zh').value;
+            const item_en = document.getElementById('fin-item-en').value;
+            let amount = parseInt(document.getElementById('fin-amount').value);
+            const type = document.getElementById('fin-type').value;
+            
+            // [修正] 檢查欄位變數名稱
+            if(!date || !item_zh || !amount) return Swal.fire('資料不全', '', 'warning');
+            
+            if (type === 'Out') amount = -Math.abs(amount); else amount = Math.abs(amount);
+            
+            try {
+                await addDoc(collection(db, "finance"), {
+                    date, 
+                    item_zh, 
+                    // [修正] 英文沒填則使用中文
+                    item_en: item_en || item_zh, 
+                    amount, 
+                    type, 
+                    timestamp: serverTimestamp()
+                });
+                Swal.fire('已新增財務', '', 'success'); await loadDataFromFirebase(); render(); 
+            } catch(e) { Swal.fire('錯誤', e.message, 'error');
+            }
+        }
+
+        // [FIXED] addMeeting Function to match new HTML IDs
+        window.addMeeting = async () => {
+            const date = document.getElementById('mt-date').value;
+            // [修正] 改為讀取 mt-title-zh 和 mt-title-en
+            const title_zh = document.getElementById('mt-title-zh').value;
+            const title_en = document.getElementById('mt-title-en').value;
+            const link = document.getElementById('mt-link').value; 
+            
+            if(!date || !title_zh) return Swal.fire('資料不全', '', 'warning');
+            
+            try {
+                await addDoc(collection(db, "meetings"), {
+                    date, 
+                    title_zh, 
+                    // [修正] 英文沒填則使用中文
+                    title_en: title_en || title_zh, 
+                    file: link || '#', 
+                    timestamp: serverTimestamp()
+                });
+                Swal.fire('已新增會議記錄', '', 'success'); await loadDataFromFirebase(); render();
+            } catch(e) { Swal.fire('錯誤', e.message, 'error');
+            }
+        }
+
+        // [FIXED] addDownload Function to match new HTML IDs
+        window.addDownload = async () => {
+            const date = document.getElementById('dl-date').value;
+            // [修正] 改為讀取 dl-title-zh 和 dl-title-en
+            const title_zh = document.getElementById('dl-title-zh').value;
+            const title_en = document.getElementById('dl-title-en').value;
+            const link = document.getElementById('dl-link').value;
+            const type = document.getElementById('dl-type').value;
+            
+            if(!date || !title_zh || !link) return Swal.fire('資料不全', '', 'warning');
+            
+            try {
+                await addDoc(collection(db, "downloads"), {
+                    date, 
+                    title_zh, 
+                    // [修正] 英文沒填則使用中文
+                    title_en: title_en || title_zh, 
+                    file: link, 
+                    type, 
+                    timestamp: serverTimestamp()
+                });
+                Swal.fire('已新增下載', '', 'success'); await loadDataFromFirebase(); render();
+            } catch(e) { Swal.fire('錯誤', e.message, 'error');
+            }
+        }
+
+        window.addPhoto = async () => {
+            const url = document.getElementById('photo-url').value;
+            const title_zh = document.getElementById('photo-title-zh').value;
+            const title_en = document.getElementById('photo-title-en').value;
+            const album = document.getElementById('photo-album').value; // [NEW] Album Field
+            if(!url) return Swal.fire('請輸入圖片網址', '', 'warning');
+            try {
+                await addDoc(collection(db, "photos"), {
+                    url, 
+                    title_zh: title_zh || '活動照片', 
+                    title_en: title_en || 'Activity Photo', 
+                    album: album || '未分類', // Default album
+                    timestamp: serverTimestamp()
+                });
+                Swal.fire('新增成功', '', 'success'); await loadDataFromFirebase();
+            } catch(e) { Swal.fire('錯誤', e.message, 'error');
+            }
+        }
+
+        window.saveSystemSettings = async () => {
+            const marqueeText = document.getElementById('system-marquee').value;
+            const marqueeArray = marqueeText.split('|').map(s => s.trim()).filter(s => s);
+            const marqueeSize = document.getElementById('system-marquee-size').value; // [NEW] Size value
+
+            try {
+                await setDoc(doc(db, "settings", "config"), { 
+                    marquee: marqueeArray.length > 1 ? marqueeArray : marqueeText,
+                    marqueeSize: marqueeSize 
+                });
+                SYSTEM_SETTINGS.marquee = marqueeArray.length > 1 ? marqueeArray : marqueeText;
+                SYSTEM_SETTINGS.marqueeSize = marqueeSize;
+                updateMarquee();
+                Swal.fire('設定已儲存', '系統設定已更新', 'success');
+            } catch(e) { Swal.fire('儲存失敗', e.message, 'error');
+            }
+        }
+
+        window.deleteItem = async (collectionName, id) => {
+            if(!db) return;
+            const result = await Swal.fire({ title: '確定刪除？', icon: 'warning', showCancelButton: true });
+            if(result.isConfirmed) {
+                try {
+                    await deleteDoc(doc(db, collectionName, id));
+                    Swal.fire('已刪除', '', 'success'); await loadDataFromFirebase(); render();
+                } catch(e) { Swal.fire('刪除失敗', '無法刪除靜態資料或權限不足', 'error');
+                }
+            }
+        }
+
+        // --- Logic ---
+        function updateMarquee() {
+            const el = document.getElementById('marquee-text');
+            if(!el) return;
+            // [NEW] Apply Font Size
+            el.className = `marquee-content font-mono tracking-wider opacity-90 transition-all duration-300 ${SYSTEM_SETTINGS.marqueeSize || 'text-xs'}`;
+
+            let content = '';
+            if (Array.isArray(SYSTEM_SETTINGS.marquee)) {
+                content = SYSTEM_SETTINGS.marquee.join(' &nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp; ');
+            } else {
+                content = SYSTEM_SETTINGS.marquee;
+            }
+            el.innerHTML = content;
+        }
+
+        window.toggleSearch = () => {
+            const modal = document.getElementById('search-modal');
+            const input = document.getElementById('search-input');
+            const resultDiv = document.getElementById('search-results');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => { modal.classList.remove('opacity-0'); input.focus(); }, 10);
+                input.placeholder = t('searchPlaceholder');
+            } else {
+                modal.classList.add('opacity-0');
+                setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); resultDiv.innerHTML = ''; input.value = ''; }, 300);
+            }
+        };
+        window.performSearch = () => {
+            const queryText = document.getElementById('search-input').value.toLowerCase();
+            const resultsDiv = document.getElementById('search-results');
+            if (queryText.length < 2) {
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const hits = [];
+            APP_DATA.announcements.forEach(a => {
+                const title = val(a, 'title');
+                if (title.toLowerCase().includes(queryText)) hits.push({ type: isEn()?'News':'公告', title: title, date: a.date, icon: 'bell' });
+            });
+            APP_DATA.events.forEach(e => {
+                const title = val(e, 'title');
+                if (title.toLowerCase().includes(queryText)) hits.push({ type: isEn()?'Event':'活動', title: title, date: e.date, icon: 'calendar' });
+            });
+            if (hits.length === 0) {
+                resultsDiv.innerHTML = `<div class="text-center text-white/80 text-lg mt-10 font-medium">${t('noResults')}</div>`;
+            } else {
+                resultsDiv.innerHTML = hits.map(h => `
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-md hover:scale-[1.02]">
+                        <div class="bg-theme-50 dark:bg-theme-900/30 p-2.5 rounded-full text-theme-600 dark:text-theme-400"><i data-lucide="${h.icon}"></i></div>
+                        <div>
+                            <p class="font-bold dark:text-white text-lg">${h.title}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500 dark:text-gray-300 font-bold">${h.type}</span>
+                                <span class="text-xs text-gray-400">${h.date}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        };
+
+        // --- Lightbox with Navigation ---
+        // [FIXED] Updated openLightbox to fetch list dynamically based on view state
+        window.openLightbox = (index) => {
+            // Determine the list based on current view
+            if (APP_STATE.galleryView === 'photos' && APP_STATE.activeAlbum) {
+                APP_STATE.lightboxList = APP_DATA.photos.filter(p => (p.album || '未分類') === APP_STATE.activeAlbum);
+            } else {
+                // Fallback or other views (e.g. latest photos on home)
+                APP_STATE.lightboxList = APP_DATA.photos;
+            }
+            
+            APP_STATE.lightboxIndex = index;
+            
+            updateLightboxContent();
+            
+            const modal = document.getElementById('lightbox-modal');
+            modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+            modal.focus(); // Focus for keyboard events
+        };
+
+        function updateLightboxContent() {
+            const p = APP_STATE.lightboxList[APP_STATE.lightboxIndex];
+            if(!p) return;
+            const img = document.getElementById('lightbox-img');
+            const text = document.getElementById('lightbox-caption');
+            const counter = document.getElementById('lightbox-counter');
+            
+            img.src = p.url;
+            text.innerText = val(p, 'title');
+            counter.innerText = `${APP_STATE.lightboxIndex + 1} / ${APP_STATE.lightboxList.length}`;
+        }
+
+        window.changeLightbox = (direction) => {
+            event.stopPropagation();
+            let newIndex = APP_STATE.lightboxIndex + direction;
+            if (newIndex < 0) newIndex = APP_STATE.lightboxList.length - 1;
+            if (newIndex >= APP_STATE.lightboxList.length) newIndex = 0;
+            APP_STATE.lightboxIndex = newIndex;
+            updateLightboxContent();
+        }
+
+        window.closeLightbox = () => {
+            const modal = document.getElementById('lightbox-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        // [NEW] Download Photo
+        window.downloadPhoto = async () => {
+            const p = APP_STATE.lightboxList[APP_STATE.lightboxIndex];
+            if(!p) return;
+            try {
+                const response = await fetch(p.url);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `pksh_photo_${Date.now()}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (e) {
+                // Fallback for cross-origin issues
+                window.open(p.url, '_blank');
+            }
+        }
+
+        // [NEW] Share Photo
+        window.sharePhoto = async () => {
+            const p = APP_STATE.lightboxList[APP_STATE.lightboxIndex];
+            if(!p) return;
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: val(p, 'title'),
+                        text: `看看這張來自北港高中學生會的照片：${val(p, 'title')}`,
+                        url: p.url
+                    });
+                } catch (err) {
+                    console.error("Share failed:", err);
+                }
+            } else {
+                // Fallback: Copy URL
+                navigator.clipboard.writeText(p.url);
+                Swal.fire({
+                    icon: 'success',
+                    title: '連結已複製',
+                    text: '照片連結已複製到剪貼簿',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+
+        // Lightbox Keyboard Support
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('lightbox-modal').classList.contains('hidden')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') changeLightbox(-1);
+            if (e.key === 'ArrowRight') changeLightbox(1);
+        });
+
+        // --- Render Functions ---
+        function renderHome() {
+            const announcements = APP_DATA.announcements;
+            const newsHtml = announcements.map(item => `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-l-[6px] border-theme-500 hover-lift relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-2 relative z-10">
+                        <span class="text-xs font-bold text-theme-600 dark:text-theme-400 uppercase tracking-wider bg-theme-50 dark:bg-theme-900/30 px-2 py-1 rounded">${val(item, 'tag')}</span>
+                        <span class="text-xs text-gray-400 font-mono">${item.date}</span>
+                    </div>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3 dark:text-white leading-tight relative z-10">${val(item, 'title')}</h3>
+                    ${item.content_zh ? `<div class="text-gray-600 dark:text-gray-300 overflow-x-auto news-content leading-relaxed relative z-10">${formatContent(val(item, 'content'))}</div>` : ''}
+                </div>
+            `).join('');
+            // 右側功能：活動倒數 + 最新照片預覽
+            let rightSideHtml = '';
+            // 1. 活動倒數
+            let nextEventHtml = `<div class="p-8 text-center text-gray-400 dark:text-gray-500 font-medium">暫無即將到來的活動</div>`;
+            const futureEvents = APP_DATA.events.filter(e => new Date(e.date) >= new Date());
+            if (futureEvents.length > 0) {
+                const nextEv = futureEvents[0];
+                const daysLeft = Math.ceil((new Date(nextEv.date) - new Date()) / (1000 * 60 * 60 * 24));
+                nextEventHtml = `
+                    <div class="text-center relative z-10">
+                        <span class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">NEXT EVENT</span>
+                        <h3 class="text-2xl font-black mt-3 dark:text-white bg-clip-text text-transparent bg-gradient-to-r from-theme-500 to-blue-500">${val(nextEv, 'title')}</h3>
+                        <div class="my-6 relative inline-block">
+                            <span class="text-6xl font-black text-theme-500 drop-shadow-sm">${daysLeft}</span>
+                            <span class="text-gray-400 font-bold block mt-1 text-sm tracking-widest">DAYS LEFT</span>
+                        </div>
+                        <p class="text-sm text-gray-500 font-medium bg-gray-100 dark:bg-gray-700/50 py-2 rounded-lg"><i data-lucide="calendar" class="inline w-4 h-4 mb-0.5 mr-1"></i> ${nextEv.date} @ ${val(nextEv, 'location')}</p>
+                    </div>
+                `;
+            }
+
+            // 2. 最新照片預覽
+            let latestPhotoHtml = '';
+            if(APP_DATA.photos && APP_DATA.photos.length > 0) {
+                const p = APP_DATA.photos[0];
+                latestPhotoHtml = `
+                    <div class="bg-white dark:bg-gray-800 p-1 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 mt-8 group cursor-pointer" onclick="navigate('gallery')">
+                        <div class="relative overflow-hidden rounded-[20px] aspect-video">
+                            <img src="${p.url}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700" loading="lazy">
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                                <span class="text-white font-bold flex items-center gap-2"><i data-lucide="image" class="w-5 h-5"></i> 查看活動花絮</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="bg-gradient-to-br from-theme-500 via-theme-600 to-blue-600 text-white rounded-3xl p-8 sm:p-12 mb-12 shadow-2xl shadow-theme-500/20 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 animate-fade-in">
+                    <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float"></div>
+                    <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-float" style="animation-delay: 1s;"></div>
+                    
+                    <div class="relative z-10 text-center md:text-left max-w-xl">
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 tracking-tight leading-tight drop-shadow-lg">${t('heroTitle')}</h1>
+                        <p class="text-lg sm:text-xl opacity-90 font-medium leading-relaxed max-w-lg">${t('heroSubtitle')}</p>
+                        <button onclick="navigate('mailboxes')" class="mt-8 bg-white text-theme-600 font-black py-3.5 px-8 rounded-full hover:bg-gray-50 transition shadow-lg hover:shadow-2xl transform hover:-translate-y-1 active:scale-95 duration-200 flex items-center gap-2 mx-auto md:mx-0 group text-lg">
+                            ${t('btnComplaint')} <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
+                    <div class="relative z-10 flex-shrink-0 animate-float">
+                        <div class="absolute inset-0 bg-white/20 rounded-full blur-2xl transform scale-110"></div>
+                        <img src="大頭貼.jpg" onerror="this.src='https://ui-avatars.com/api/?name=PKSH&background=0d9488&color=fff&size=200'" class="relative w-40 h-40 md:w-56 md:h-56 rounded-full border-[6px] border-white/30 shadow-2xl object-cover">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <h2 class="text-2xl font-bold dark:text-white flex items-center gap-3"><span class="bg-theme-100 dark:bg-theme-900/30 p-2 rounded-lg text-theme-600 dark:text-theme-400"><i data-lucide="bell" class="w-6 h-6"></i></span> ${t('news')}</h2>
+                        <div class="grid gap-6 md:grid-cols-1">${newsHtml}</div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden hover-lift">
+                            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-theme-400 to-blue-500"></div>
+                            ${nextEventHtml}
+                        </div>
+                        
+                        ${latestPhotoHtml}
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700">
+                            <h3 class="font-bold text-gray-800 dark:text-white mb-5 flex items-center gap-2 text-lg"><i data-lucide="link" class="text-blue-500"></i> 常用連結</h3>
+                            <div class="space-y-3">
+                                <a href="https://www.pksh.ylc.edu.tw/" target="_blank" class="block p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl hover:bg-blue-50 dark:hover:bg-blue-900/20 transition flex items-center justify-between group border border-transparent hover:border-blue-200 dark:hover:border-blue-800">
+                                    <span class="font-bold text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">🏫 學校官網</span>
+                                    <i data-lucide="external-link" class="w-4 h-4 text-gray-400 group-hover:text-blue-500"></i>
+                                </a>
+                                <a href="https://portal.k12.ntut.edu.tw/" target="_blank" class="block p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl hover:bg-green-50 dark:hover:bg-green-900/20 transition flex items-center justify-between group border border-transparent hover:border-green-200 dark:hover:border-green-800">
+                                    <span class="font-bold text-gray-700 dark:text-gray-200 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">📊 成績查詢</span>
+                                    <i data-lucide="external-link" class="w-4 h-4 text-gray-400 group-hover:text-green-500"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // [FIXED] Dedicated function for Back Button
+        window.backToAlbums = () => {
+            APP_STATE.galleryView = 'albums';
+            render();
+        }
+
+        // [MODIFIED] Render Gallery to support Albums
+        function renderGallery() {
+            // Group photos by Album
+            const photos = APP_DATA.photos;
+            
+            // View 1: Albums List
+            if (APP_STATE.galleryView === 'albums') {
+                const albumsMap = {};
+                photos.forEach(p => {
+                    const albumName = p.album || '未分類';
+                    if (!albumsMap[albumName]) albumsMap[albumName] = [];
+                    albumsMap[albumName].push(p);
+                });
+
+                const albumsHtml = Object.keys(albumsMap).map(name => {
+                    const coverPhoto = albumsMap[name][0];
+                    const count = albumsMap[name].length;
+                    return `
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer group hover:shadow-2xl transition-all" onclick="openAlbum('${name}')">
+                            <div class="aspect-video relative overflow-hidden">
+                                <img src="${coverPhoto.url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
+                                <div class="absolute bottom-4 left-4 text-white">
+                                    <h3 class="font-bold text-xl shadow-black drop-shadow-md">${name}</h3>
+                                    <p class="text-xs opacity-80 mt-1 bg-black/30 px-2 py-0.5 rounded-full inline-block">${count} 張照片</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                if (photos.length === 0) return `<div class="text-center py-20 text-gray-400">目前沒有照片</div>`;
+
+                return `
+                    <div class="text-center mb-10 animate-fade-in">
+                        <h1 class="text-4xl font-black mb-2 text-theme-600 dark:text-theme-400 tracking-tight">${t('galleryTitle')}</h1>
+                        <p class="text-gray-500">點擊相簿查看更多精彩瞬間</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+                        ${albumsHtml}
+                    </div>
+                `;
+            } 
+            // View 2: Photos inside Album (Masonry Layout)
+            else {
+                const currentAlbumName = APP_STATE.activeAlbum;
+                const albumPhotos = photos.filter(p => (p.album || '未分類') === currentAlbumName);
+                
+                // [FIXED] onClick now just passes index, openLightbox handles the rest
+                // [IMPROVED] Use CSS columns for masonry layout effect
+                const photoHtml = albumPhotos.map((p, idx) => `
+                    <div class="break-inside-avoid mb-6 cursor-zoom-in group relative overflow-hidden rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700" onclick="openLightbox(${idx})">
+                        <img src="${p.url}" alt="${val(p, 'title')}" class="w-full h-auto object-cover transform group-hover:scale-105 transition duration-700 ease-out" loading="lazy">
+                        <div class="gallery-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-6">
+                            <p class="text-white font-bold text-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300">${val(p, 'title')}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="mb-8 flex items-center animate-fade-in">
+                        <button onclick="backToAlbums()" class="flex items-center gap-2 text-gray-500 hover:text-theme-600 transition-colors font-bold bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i> 返回相簿列表
+                        </button>
+                    </div>
+                    <div class="text-center mb-10 animate-fade-in">
+                        <h1 class="text-3xl font-black mb-2 dark:text-white tracking-tight">${currentAlbumName}</h1>
+                    </div>
+                    <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6 animate-fade-in px-2">
+                        ${photoHtml}
+                    </div>
+                `;
+            }
+        }
+        
+        window.openAlbum = (name) => {
+            APP_STATE.activeAlbum = name;
+            APP_STATE.galleryView = 'photos';
+            render();
+        }
+
+        function renderEvents() {
+            const filter = APP_STATE.eventFilter;
+            const filteredEvents = filter === 'All' 
+                ? APP_DATA.events 
+                : APP_DATA.events.filter(e => e.type === filter);
+            const eventsHtml = filteredEvents.length > 0 ? filteredEvents.map(ev => {
+                const { month, day } = formatDateHelper(ev.date);
+                
+                return `
+                <div class="flex items-center bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md mb-5 border-l-[6px] ${ev.type === 'Holiday' ? 'border-red-500' : ev.type === 'Academic' ? 'border-blue-500' : 'border-theme-500'} hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl text-center min-w-[90px] border border-gray-100 dark:border-gray-600 group-hover:border-theme-200 transition-colors">
+                        <span class="block text-2xl font-black text-gray-800 dark:text-white">${day}</span>
+                        <span class="block text-xs font-bold text-gray-500 uppercase mt-1">${month}${isEn() ? '' : '月'}</span>
+                    </div>
+                    <div class="ml-6 flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold dark:text-white group-hover:text-theme-600 transition-colors">${val(ev, 'title')}</h3>
+                            <span class="text-xs px-2.5 py-1 rounded-full font-bold tracking-wide ${ev.type==='Holiday'?'bg-red-100 text-red-600':ev.type==='Academic'?'bg-blue-100 text-blue-600':'bg-theme-50 text-theme-600 dark:bg-theme-900/30 dark:text-theme-400'}">${isEn() ? ev.type : (ev.type==='Holiday'?'假日':ev.type==='Academic'?'教務':'活動')}</span>
+                        </div>
+                        <p class="text-sm text-gray-500 font-medium flex items-center gap-2 mt-2">
+                            <span class="flex items-center"><i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1"></i> ${val(ev, 'location')}</span>
+                            <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                            <span class="flex items-center"><i data-lucide="clock" class="w-3.5 h-3.5 mr-1"></i> ${ev.time}</span>
+                        </p>
+                        ${ev.link ? `
+                            <a href="${ev.link}" target="_blank" class="inline-flex items-center mt-3 text-sm text-theme-600 dark:text-theme-400 font-bold hover:underline decoration-2 underline-offset-2">
+                                ${isEn() ? 'Link / Sign up' : '相關連結/報名'} <i data-lucide="external-link" class="w-3.5 h-3.5 ml-1"></i>
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `}).join('') : `<div class="text-center text-gray-400 py-20 font-medium bg-gray-50 dark:bg-gray-800/50 rounded-2xl">此分類暫無活動</div>`;
+            const makeBtn = (type, label) => `
+                <button onclick="setEventFilter('${type}')" class="px-6 py-2.5 rounded-full text-sm font-bold transition-all transform active:scale-95 ${APP_STATE.eventFilter === type ? 'bg-theme-600 text-white shadow-lg ring-2 ring-theme-200' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-700'}">
+                    ${label}
+                </button>
+            `;
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-10">
+                        <h1 class="text-4xl font-black text-theme-600 dark:text-theme-400 tracking-tight mb-2">${t('eventTitle')}</h1>
+                        <div class="flex justify-center gap-3 flex-wrap animate-fade-in mt-6">
+                            ${makeBtn('All', t('filter_all'))}
+                            ${makeBtn('Academic', t('filter_academic'))}
+                            ${makeBtn('Holiday', t('filter_holiday'))}
+                            ${makeBtn('Activity', t('filter_event'))}
+                        </div>
+                    </div>
+                    <div class="animate-fade-in space-y-4">
+                        ${eventsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.setEventFilter = (filter) => {
+            APP_STATE.eventFilter = filter;
+            render();
+        }
+
+        function renderOrg() {
+            const leadersHtml = APP_DATA.orgLeaders.map(l => `
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg flex flex-col items-center text-center border-t-[6px] border-theme-500 hover:scale-105 transition-all duration-300 hover:shadow-2xl">
+                    <div class="text-7xl mb-6 animate-float filter drop-shadow-md">${l.icon}</div>
+                    <h3 class="text-2xl font-black text-theme-600 dark:text-theme-400 tracking-tight mb-1">${t(l.roleKey)}</h3>
+                    <div class="w-12 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mb-4"></div>
+                    <p class="text-xl font-bold dark:text-white mb-3 uppercase tracking-wide">${val(l, 'name')}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl w-full text-justify">${val(l, 'desc')}</p>
+                </div>
+            `).join('');
+            const deptsHtml = APP_DATA.orgDepts.map(d => `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:-translate-y-2 transition-all duration-300 h-full border border-gray-100 dark:border-gray-700 group hover:border-theme-300">
+                    <div class="flex items-center gap-4 mb-5 pb-3 border-b border-gray-100 dark:border-gray-700">
+                        <span class="text-4xl filter grayscale-0 transition duration-300">${d.icon}</span> <h3 class="text-xl font-bold text-gray-800 dark:text-white group-hover:text-theme-600 transition-colors">${t(d.roleKey)}</h3>
+                    </div>
+                    <div class="flex justify-between mb-5 bg-gray-50 dark:bg-gray-700/30 p-3 rounded-xl">
+                        <div class="text-center w-1/2 border-r border-gray-200 dark:border-gray-600">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">${t('role_chief')}</span>
+                            <span class="font-bold text-base dark:text-white uppercase">${val(d, 'chief')}</span>
+                        </div>
+                        ${d.deputy_zh ? `<div class="text-center w-1/2"><span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">${t('role_deputy')}</span><span class="font-bold text-base dark:text-white uppercase">${val(d, 'deputy')}</span></div>` : ''}
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed text-justify">${val(d, 'desc')}</p>
+                </div>
+            `).join('');
+            return `
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl font-black mb-4 text-theme-600 dark:text-theme-400 tracking-tight">${t('orgTitle')}</h1>
+                    <p class="text-gray-500 max-w-2xl mx-auto">學生會由會長與副會長領導，下設六大職能部門，各司其職，共同為全校同學服務。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16 animate-fade-in">${leadersHtml}</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr animate-fade-in">${deptsHtml}</div>
+            `;
+        }
+
+        function renderFinance() {
+            const total = APP_DATA.finance.reduce((acc, cur) => acc + Number(cur.amount), 0);
+            const rows = APP_DATA.finance.map(f => `
+                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition last:border-0">
+                    <td class="py-4 px-6 dark:text-gray-300 font-mono text-sm">${f.date}</td>
+                    <td class="py-4 px-6 font-bold dark:text-white text-gray-800">${val(f, 'item')}</td>
+                    <td class="py-4 px-6 text-right font-mono"><span class="${f.amount > 0 ? 'text-green-600 bg-green-50 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-800' : 'text-red-600 bg-red-50 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-800'} font-bold px-3 py-1 rounded-md text-sm">${f.amount > 0 ? '+' : ''}${f.amount.toLocaleString()}</span></td>
+                </tr>
+            `).join('');
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-3xl font-black mb-8 text-theme-600 dark:text-theme-400 text-center tracking-tight">${t('financeTitle')}</h1>
+                    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
+                        <div class="p-8 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-750 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-theme-100 dark:bg-theme-900/30 p-3 rounded-full text-theme-600 dark:text-theme-400"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">CURRENT BALANCE</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-3xl font-black ${total >= 0 ? 'text-theme-600 dark:text-theme-400' : 'text-red-500'} tracking-tight">
+                                        ${total > 0 ? '+' : ''}${total.toLocaleString()}
+                                    </span>
+                                    <span class="text-sm font-bold text-gray-400">TWD</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold tracking-wider">
+                                    <tr>
+                                        <th class="py-4 px-6">${t('col_date')}</th>
+                                        <th class="py-4 px-6">${t('col_item')}</th>
+                                        <th class="py-4 px-6 text-right">${t('col_amount')} (TWD)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">${rows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function renderMailboxes() {
+            return `
+                <div class="max-w-5xl mx-auto">
+                    <h1 class="text-3xl font-black mb-10 text-center text-theme-600 dark:text-theme-400 tracking-tight">${t('mailboxes')}</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all border-t-[8px] border-blue-500 flex flex-col items-center text-center transform hover:-translate-y-2 duration-300 group">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300"><i data-lucide="scale" class="w-12 h-12 text-blue-500"></i></div>
+                            <h2 class="text-2xl font-black mb-3 dark:text-white tracking-tight">${t('rightsMailbox')}</h2>
+                            <p class="text-gray-500 dark:text-gray-400 mb-8 flex-grow leading-relaxed max-w-sm">${t('rightsDesc')}</p>
+                            <a href="https://forms.gle/HAxbZJCiCEFhVkwV6" target="_blank" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition flex justify-center items-center gap-2 shadow-lg shadow-blue-500/30 transform active:scale-95 text-lg">${t('goToForm')} <i data-lucide="arrow-right" class="w-5 h-5"></i></a>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all border-t-[8px] border-pink-500 flex flex-col items-center text-center transform hover:-translate-y-2 duration-300 group">
+                            <div class="bg-pink-50 dark:bg-pink-900/20 p-6 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300"><i data-lucide="ghost" class="w-12 h-12 text-pink-500"></i></div>
+                            <h2 class="text-2xl font-black mb-3 dark:text-white tracking-tight">${t('anonMailbox')}</h2>
+                            <p class="text-gray-500 dark:text-gray-400 mb-8 flex-grow leading-relaxed max-w-sm">${t('anonDesc')}</p>
+                            <a href="https://forms.gle/L8v7cPxDGP8wfYnJ6" target="_blank" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 rounded-xl transition flex justify-center items-center gap-2 shadow-lg shadow-pink-500/30 transform active:scale-95 text-lg">${t('goToForm')} <i data-lucide="arrow-right" class="w-5 h-5"></i></a>
+                        </div>
+                    </div>
+                </div>`;
+        }
+        
+        function renderClubs() {
+            const clubList = APP_DATA.clubs.map(c => `
+                <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-md p-8 flex flex-col items-center text-center hover:shadow-2xl transition-all duration-300 group border border-gray-100 dark:border-gray-700 hover:border-theme-300 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-700/30 opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <div class="w-36 h-36 rounded-full overflow-hidden mb-6 border-8 border-gray-50 dark:border-gray-700 shadow-inner group-hover:border-theme-100 transition-colors duration-300 flex items-center justify-center bg-white dark:bg-gray-800 relative z-10">
+                        <div class="w-full h-full flex items-center justify-center text-7xl select-none group-hover:scale-110 group-hover:rotate-12 transition duration-500">
+                            ${c.emoji}
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-bold bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full text-gray-500 dark:text-gray-300 mb-3 tracking-widest uppercase relative z-10">${c.category}</span>
+                    <h3 class="font-black dark:text-white text-xl mb-6 relative z-10 tracking-tight">${val(c, 'name')}</h3>
+                    <a href="${c.ig}" target="_blank" class="w-full py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all flex items-center justify-center gap-2 font-bold group-hover:shadow-md relative z-10">
+                        <i data-lucide="instagram" class="w-4 h-4"></i> Follow
+                    </a>
+                </div>
+            `).join('');
+            return `<h1 class="text-3xl font-black mb-10 text-theme-600 dark:text-theme-400 text-center tracking-tight">${t('clubTitle')}</h1><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 px-4">${clubList}</div>`;
+        }
+
+        function renderDownloads() {
+            const list = APP_DATA.downloads.map(d => `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100 dark:border-gray-700 hover:border-theme-400 hover:shadow-lg transition-all group gap-4">
+                    <div class="flex items-center gap-5">
+                        <div class="bg-theme-50 dark:bg-theme-900/30 p-4 rounded-2xl text-theme-600 dark:text-theme-400 group-hover:bg-theme-500 group-hover:text-white transition duration-300"><i data-lucide="file-text" class="w-6 h-6"></i></div>
+                        <div>
+                            <h3 class="font-bold text-lg dark:text-white group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors">${val(d, 'title')}</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs font-mono text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">${d.date}</span>
+                                <span class="text-xs text-gray-400 font-medium">• ${isEn() ? d.type : (d.type==='Academic'?'教務':d.type==='Event'?'活動':'其他')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="${d.file}" target="_blank" class="w-full sm:w-auto bg-gray-50 dark:bg-gray-700 hover:bg-theme-500 hover:text-white text-gray-600 dark:text-gray-300 px-6 py-3 rounded-xl transition font-bold flex items-center justify-center gap-2 group-hover:shadow-md">
+                        <span class="hidden sm:inline">${t('download_btn')}</span> <i data-lucide="download" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            `).join('');
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-3xl font-black mb-8 text-center text-theme-600 dark:text-theme-400 tracking-tight">${t('downloadTitle')}</h1>
+                    <div class="space-y-4 animate-fade-in">${list}</div>
+                </div>`;
+        }
+
+        function renderContact() {
+            return `
+                <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-theme-100 dark:bg-theme-900/30 rounded-full blur-2xl"></div>
+                    
+                    <h1 class="text-3xl font-black mb-8 text-center text-theme-600 dark:text-theme-400 tracking-tight relative z-10">${t('contact')}</h1>
+                    <div class="space-y-4 relative z-10">
+                        <a href="https://www.instagram.com/pksh.su/" target="_blank" class="flex items-center p-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 border border-gray-100 dark:border-gray-600 rounded-2xl hover:border-pink-300 transition-all group shadow-sm hover:shadow-md">
+                            <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform mr-5">
+                                <i data-lucide="instagram" class="w-8 h-8 text-pink-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl dark:text-white group-hover:text-pink-500 transition-colors">Instagram</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 font-mono mt-0.5">@pksh.su</p>
+                            </div>
+                            <i data-lucide="arrow-right" class="ml-auto w-5 h-5 text-gray-300 group-hover:text-pink-500 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                        
+                        <a href="mailto:pkshsu@pksh.ylc.edu.tw" class="flex items-center p-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 border border-gray-100 dark:border-gray-600 rounded-2xl hover:border-theme-300 transition-all group shadow-sm hover:shadow-md">
+                            <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform mr-5">
+                                <i data-lucide="mail" class="w-8 h-8 text-theme-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl dark:text-white group-hover:text-theme-600 transition-colors">Email</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 font-mono mt-0.5">pkshsu@pksh.ylc.edu.tw</p>
+                            </div>
+                            <i data-lucide="arrow-right" class="ml-auto w-5 h-5 text-gray-300 group-hover:text-theme-500 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="pt-8 mt-8 border-t border-gray-100 dark:border-gray-700 text-center">
+                        <button onclick="navigate('admin')" class="text-xs font-bold text-gray-400 hover:text-theme-500 flex items-center justify-center transition mx-auto gap-1 py-2 px-4 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <i data-lucide="shield" class="w-3 h-3"></i> ${t('admin')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMeetings() {
+            const list = APP_DATA.meetings.length ? APP_DATA.meetings.map(m => `
+                <div class="flex items-center justify-between bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all cursor-pointer border border-gray-100 dark:border-gray-700 hover:border-theme-300 group">
+                    <div class="flex items-center gap-5">
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl text-gray-500 dark:text-gray-300 group-hover:bg-theme-500 group-hover:text-white transition-colors">
+                            <i data-lucide="file-text" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold dark:text-white text-lg group-hover:text-theme-600 transition-colors">${val(m, 'title')}</h3>
+                            <p class="text-xs text-gray-400 font-mono mt-1">${m.date}</p>
+                        </div>
+                    </div>
+                    <a href="${m.file}" target="_blank" class="text-theme-600 hover:bg-theme-500 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition-all border border-theme-200">
+                        Open PDF
+                    </a>
+                </div>
+            `).join('') : `<div class="text-center py-20 bg-gray-50 dark:bg-gray-800/50 rounded-3xl"><p class="text-gray-400 font-medium">暫無公開的會議記錄。</p></div>`;
+            return `
+                <div class="max-w-3xl mx-auto">
+                    <h1 class="text-3xl font-black mb-8 text-theme-600 dark:text-theme-400 text-center tracking-tight">${t('meetingTitle')}</h1>
+                    <div class="space-y-4 animate-fade-in">${list}</div>
+                </div>`;
+        }
+
+        // --- Admin System ---
+        function renderAdmin() {
+            if (!APP_STATE.user) {
+                // Login Form
+                return `
+                    <div class="max-w-sm mx-auto bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 mt-20 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-theme-400 to-blue-500"></div>
+                        <h1 class="text-3xl font-black mb-8 dark:text-white text-center tracking-tight">${t('login_title')}</h1>
+                        <form onsubmit="handleLogin(event)" class="space-y-6">
+                            <div>
+                                <label class="block text-xs font-bold mb-2 dark:text-gray-300 uppercase tracking-widest text-gray-500">${t('login_email')}</label>
+                                <input type="email" id="admin-email" required class="w-full p-3.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-theme-500 focus:border-transparent transition-all shadow-inner" placeholder="admin@pksh.su">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-2 dark:text-gray-300 uppercase tracking-widest text-gray-500">${t('login_pwd')}</label>
+                                <input type="password" id="admin-pwd" required class="w-full p-3.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl dark:text-white focus:outline-none focus:ring-2 focus:ring-theme-500 focus:border-transparent transition-all shadow-inner" placeholder="••••••••">
+                            </div>
+                            <button type="submit" class="w-full bg-gradient-to-r from-theme-500 to-theme-700 text-white py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all font-bold text-lg shadow-theme-500/30">${t('login_btn')}</button>
+                        </form>
+                    </div>
+                `;
+            } else {
+                const tab = APP_STATE.adminTab;
+                let contentHtml = '';
+
+                const inputStyle = "w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:ring-2 focus:ring-theme-500 focus:outline-none transition-shadow";
+                const labelStyle = "block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 ml-1";
+                const btnStyle = "bg-theme-500 hover:bg-theme-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all active:scale-95 w-full md:w-auto";
+                
+                if (tab === 'news') {
+                    const list = APP_DATA.announcements.filter(a => a.id && !a.id.startsWith('static_')).map(a => `
+                         <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700 group hover:border-theme-200 transition mb-3">
+                            <div><p class="font-bold dark:text-white">${a.title_zh}</p><span class="text-xs text-gray-400 font-mono">${a.date}</span></div>
+                            <button onclick="deleteItem('announcements', '${a.id}')" class="text-gray-400 hover:text-red-500 p-2 hover:bg-red-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                         </div>
+                    `).join('');
+                    contentHtml = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                                <h3 class="font-bold mb-6 text-xl dark:text-white flex items-center gap-2"><i data-lucide="plus-circle" class="text-theme-500"></i> 新增公告</h3>
+                                <div class="space-y-4">
+                                    <div><label class="${labelStyle}">日期</label><input id="news-date" type="date" class="${inputStyle}"></div>
+                                    <div><label class="${labelStyle}">中文標題</label><input id="news-title-zh" class="${inputStyle}" placeholder="輸入標題..."></div>
+                                    <div class="flex gap-2 items-end">
+                                        <div class="flex-grow"><label class="${labelStyle}">English Title</label><input id="news-title-en" class="${inputStyle}" placeholder="Auto translate..."></div>
+                                        <button onclick="autoTranslate('news-title-zh', 'news-title-en')" class="h-[50px] px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition"><i data-lucide="languages"></i></button>
+                                    </div>
+                                    <div><label class="${labelStyle}">中文內容</label><textarea id="news-content-zh" class="${inputStyle} h-24" placeholder="支援 HTML..."></textarea></div>
+                                    <div class="flex gap-2 items-start">
+                                        <div class="flex-grow"><label class="${labelStyle}">English Content</label><textarea id="news-content-en" class="${inputStyle} h-24"></textarea></div>
+                                        <button onclick="autoTranslate('news-content-zh', 'news-content-en')" class="mt-8 h-[50px] px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition"><i data-lucide="languages"></i></button>
+                                    </div>
+                                    <button onclick="addNews()" class="${btnStyle} mt-2 w-full"><i data-lucide="save" class="inline w-4 h-4 mr-2"></i> 發布公告</button>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-[600px]">
+                                <h3 class="font-bold mb-4 text-xl dark:text-white">已發布列表</h3>
+                                <div class="overflow-y-auto flex-grow pr-2 space-y-1 custom-scrollbar">${list || `<div class="h-full flex items-center justify-center text-gray-400">暫無資料</div>`}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                else if (tab === 'events') {
+                     const list = APP_DATA.events.filter(e => e.id && !e.id.startsWith('e')).map(e => `
+                         <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700 group hover:border-theme-200 transition mb-3">
+                            <div><p class="font-bold dark:text-white">${e.title_zh}</p><span class="text-xs text-gray-400">${e.date} | ${e.type}</span></div>
+                            <button onclick="deleteItem('events', '${e.id}')" class="text-gray-400 hover:text-red-500 p-2 hover:bg-red-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                         </div>
+                    `).join('');
+                    contentHtml = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                             <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                                <h3 class="font-bold mb-6 text-xl dark:text-white flex items-center gap-2"><i data-lucide="calendar-plus" class="text-theme-500"></i> 新增活動</h3>
+                                <div class="space-y-4">
+                                    <div><label class="${labelStyle}">中文名稱</label><input id="event-title-zh" class="${inputStyle}"></div>
+                                    <div class="flex gap-2 items-end"><div class="flex-grow"><label class="${labelStyle}">English Title</label><input id="event-title-en" class="${inputStyle}"></div><button onclick="autoTranslate('event-title-zh', 'event-title-en')" class="h-[50px] px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition"><i data-lucide="languages"></i></button></div>
+                                    <div class="flex gap-4">
+                                        <div class="w-1/2"><label class="${labelStyle}">日期</label><input id="event-date" type="date" class="${inputStyle}"></div>
+                                        <div class="w-1/2"><label class="${labelStyle}">時間</label><input id="event-time" class="${inputStyle}" placeholder="ex: 08:00"></div>
+                                    </div>
+                                    <div><label class="${labelStyle}">地點</label><input id="event-loc-zh" class="${inputStyle}"></div>
+                                    <div class="flex gap-2 items-end">
+                                         <div class="flex-grow"><label class="${labelStyle}">English Location</label><input id="event-loc-en" class="${inputStyle}"></div>
+                                         <button onclick="autoTranslate('event-loc-zh', 'event-loc-en')" class="h-[50px] px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition"><i data-lucide="languages"></i></button>
+                                    </div>
+
+                                    <div><label class="${labelStyle}">連結 (選填)</label><input id="event-link" class="${inputStyle}" placeholder="https://..."></div>
+                                    <div><label class="${labelStyle}">類型</label><select id="event-type" class="${inputStyle}"><option value="Activity">Activity (活動)</option><option value="Academic">Academic (教務)</option><option value="Holiday">Holiday (假日)</option></select></div>
+                                    <button onclick="addEvent()" class="${btnStyle} mt-2 w-full">發布活動</button>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-[600px]">
+                                <h3 class="font-bold mb-4 text-xl dark:text-white">活動列表</h3>
+                                <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">${list || `<div class="h-full flex items-center justify-center text-gray-400">暫無資料</div>`}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                else if (tab === 'photos') {
+                    const list = APP_DATA.photos ? APP_DATA.photos.map(p => `
+                        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-100 dark:border-gray-700 mb-3">
+                            <div class="flex items-center gap-4">
+                                <img src="${p.url}" class="w-12 h-12 object-cover rounded-lg">
+                                <div>
+                                    <p class="font-bold dark:text-white text-sm truncate w-32">${p.title_zh}</p>
+                                    <p class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-800 px-1 rounded inline-block">${p.album || '未分類'}</p>
+                                </div>
+                            </div>
+                            <button onclick="deleteItem('photos', '${p.id}')" class="text-gray-400 hover:text-red-500 p-2 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    `).join('') : '';
+                    contentHtml = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                                <h3 class="font-bold mb-6 text-xl dark:text-white flex items-center gap-2"><i data-lucide="image-plus" class="text-theme-500"></i> 新增照片</h3>
+                                <div class="space-y-4">
+                                    <div><label class="${labelStyle}">圖片網址 (URL)</label><input id="photo-url" class="${inputStyle}" placeholder="https://..."></div>
+                                    <div><label class="${labelStyle}">中文標題</label><input id="photo-title-zh" class="${inputStyle}"></div>
+                                    <div class="flex gap-2 items-end">
+                                        <div class="flex-grow"><label class="${labelStyle}">English Title</label><input id="photo-title-en" class="${inputStyle}"></div>
+                                        <button onclick="autoTranslate('photo-title-zh', 'photo-title-en')" class="h-[50px] px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition"><i data-lucide="languages"></i></button>
+                                    </div>
+                                    <div><label class="${labelStyle}">相簿名稱 (Album)</label><input id="photo-album" class="${inputStyle}" placeholder="ex: 校慶運動會"></div>
+                                    <button onclick="addPhoto()" class="${btnStyle} mt-2 w-full">新增照片</button>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-[600px]">
+                                <h3 class="font-bold mb-4 text-xl dark:text-white">照片列表</h3>
+                                <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">${list || `<div class="h-full flex items-center justify-center text-gray-400">暫無資料</div>`}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                else if (tab === 'finance') {
+                    const list = APP_DATA.finance.map(f => `
+                        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-3">
+                            <div><p class="font-bold dark:text-white">${f.item_zh}</p><span class="text-xs text-gray-400">${f.date} | $${f.amount}</span></div>
+                            <button onclick="deleteItem('finance', '${f.id}')" class="text-gray-400 hover:text-red-500 p-2 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    `).join('');
+                    contentHtml = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                                <h3 class="font-bold mb-6 text-xl dark:text-white flex items-center gap-2"><i data-lucide="dollar-sign" class="text-theme-500"></i> 新增收支</h3>
+                                <div class="space-y-4">
+                                    <div><label class="${labelStyle}">日期</label><input id="fin-date" type="date" class="${inputStyle}"></div>
+                                    <div><label class="${labelStyle}">中文項目名稱</label><input id="fin-item-zh" class="${inputStyle}"></div>
+                                    <div class="flex gap-2 items-end">
+                                        <div class="flex-grow"><label class="${labelStyle}">English Item</label><input id="fin-item-en" class="${inputStyle}"></div>
+                                        <button onclick="autoTranslate('fin-item-zh', 'fin-item-en')" class="h-[50px] px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition"><i data-lucide="languages"></i></button>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="w-2/3"><label class="${labelStyle}">金額</label><input id="fin-amount" type="number" class="${inputStyle}" placeholder="1000"></div>
+                                        <div class="w-1/3"><label class="${labelStyle}">類型</label><select id="fin-type" class="${inputStyle}"><option value="In">收入 (+)</option><option value="Out">支出 (-)</option></select></div>
+                                    </div>
+                                    <button onclick="addFinance()" class="${btnStyle} mt-2 w-full">新增紀錄</button>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-[600px]">
+                                <h3 class="font-bold mb-4 text-xl dark:text-white">財務列表</h3>
+                                <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">${list}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                else if (tab === 'meetings') {
+                     const list = APP_DATA.meetings.map(m => `
+                        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-3">
+                            <div><p class="font-bold dark:text-white">${m.title_zh}</p><span class="text-xs text-gray-400">${m.date}</span></div>
+                            <button onclick="deleteItem('meetings', '${m.id}')" class="text-gray-400 hover:text-red-500 p-2 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    `).join('');
+                    contentHtml = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                                <h3 class="font-bold mb-6 text-xl dark:text-white flex items-center gap-2"><i data-lucide="file-plus" class="text-theme-500"></i> 上傳會議記錄</h3>
+                                <div class="space-y-4">
+                                    <div><label class="${labelStyle}">日期</label><input id="mt-date" type="date" class="${inputStyle}"></div>
+                                    <div><label class="${labelStyle}">中文標題</label><input id="mt-title-zh" class="${inputStyle}"></div>
+                                    <div class="flex gap-2 items-end">
+                                        <div class="flex-grow"><label class="${labelStyle}">English Title</label><input id="mt-title-en" class="${inputStyle}"></div>
+                                        <button onclick="autoTranslate('mt-title-zh', 'mt-title-en')" class="h-[50px] px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition"><i data-lucide="languages"></i></button>
+                                    </div>
+                                    <div><label class="${labelStyle}">檔案連結 (Google Drive)</label><input id="mt-link" class="${inputStyle}" placeholder="https://..."></div>
+                                    <button onclick="addMeeting()" class="${btnStyle} mt-2 w-full">發布紀錄</button>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-[600px]">
+                                <h3 class="font-bold mb-4 text-xl dark:text-white">記錄列表</h3>
+                                <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">${list}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                else if (tab === 'downloads') {
+                     const list = APP_DATA.downloads.map(d => `
+                        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-3">
+                            <div><p class="font-bold dark:text-white">${d.title_zh}</p><span class="text-xs text-gray-400">${d.type}</span></div>
+                            <button onclick="deleteItem('downloads', '${d.id}')" class="text-gray-400 hover:text-red-500 p-2 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    `).join('');
+                    contentHtml = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                                <h3 class="font-bold mb-6 text-xl dark:text-white flex items-center gap-2"><i data-lucide="folder-plus" class="text-theme-500"></i> 新增下載資源</h3>
+                                <div class="space-y-4">
+                                    <div><label class="${labelStyle}">日期</label><input id="dl-date" type="date" class="${inputStyle}"></div>
+                                    <div><label class="${labelStyle}">中文標題</label><input id="dl-title-zh" class="${inputStyle}"></div>
+                                    <div class="flex gap-2 items-end">
+                                        <div class="flex-grow"><label class="${labelStyle}">English Title</label><input id="dl-title-en" class="${inputStyle}"></div>
+                                        <button onclick="autoTranslate('dl-title-zh', 'dl-title-en')" class="h-[50px] px-4 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition"><i data-lucide="languages"></i></button>
+                                    </div>
+                                    <div><label class="${labelStyle}">檔案連結</label><input id="dl-link" class="${inputStyle}" placeholder="https://..."></div>
+                                    <div><label class="${labelStyle}">類型</label><select id="dl-type" class="${inputStyle}"><option value="Event">Event (活動)</option><option value="Academic">Academic (教務)</option><option value="Other">Other (其他)</option></select></div>
+                                    <button onclick="addDownload()" class="${btnStyle} mt-2 w-full">發布資源</button>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-[600px]">
+                                <h3 class="font-bold mb-4 text-xl dark:text-white">資源列表</h3>
+                                <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">${list}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                else if (tab === 'system') {
+                    let marqueeVal = '';
+                    if(Array.isArray(SYSTEM_SETTINGS.marquee)) marqueeVal = SYSTEM_SETTINGS.marquee.join(' | ');
+                    else marqueeVal = SYSTEM_SETTINGS.marquee;
+                    
+                    const currentSize = SYSTEM_SETTINGS.marqueeSize || 'text-xs';
+
+                    contentHtml = `
+                        <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 max-w-2xl mx-auto">
+                            <h3 class="font-bold mb-6 dark:text-white text-xl flex items-center gap-2"><i data-lucide="settings" class="text-theme-500"></i> 系統全域設定</h3>
+                            
+                            <div class="mb-8">
+                                <label class="${labelStyle}">首頁跑馬燈內容</label>
+                                <textarea id="system-marquee" rows="4" class="${inputStyle}" placeholder="輸入文字... 若要分段顯示，請使用 | 符號分隔">${marqueeVal}</textarea>
+                                <p class="text-xs text-gray-400 mt-2 ml-1"><i data-lucide="info" class="inline w-3 h-3"></i> 提示：使用 " | " 符號來分隔多段跑馬燈訊息。</p>
+                            </div>
+                            
+                            <div class="mb-8">
+                                <label class="${labelStyle}">跑馬燈字體大小</label>
+                                <div class="flex items-center gap-4">
+                                    <select id="system-marquee-size" class="${inputStyle}">
+                                        <option value="text-xs" ${currentSize === 'text-xs' ? 'selected' : ''}>最小 (Default)</option>
+                                        <option value="text-sm" ${currentSize === 'text-sm' ? 'selected' : ''}>小</option>
+                                        <option value="text-base" ${currentSize === 'text-base' ? 'selected' : ''}>中</option>
+                                        <option value="text-lg" ${currentSize === 'text-lg' ? 'selected' : ''}>大</option>
+                                        <option value="text-xl" ${currentSize === 'text-xl' ? 'selected' : ''}>特大</option>
+                                        <option value="text-2xl" ${currentSize === 'text-2xl' ? 'selected' : ''}>超大</option>
+                                    </select>
+                                    <span class="text-gray-500 text-sm">預覽: A+</span>
+                                </div>
+                            </div>
+
+                            <button onclick="saveSystemSettings()" class="${btnStyle} w-full"><i data-lucide="save" class="inline w-4 h-4 mr-1"></i> 儲存設定</button>
+                        </div>
+                    `;
+                }
+
+                const navBtn = (key, icon, label) => `
+                    <button onclick="switchAdminTab('${key}')" class="text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 font-bold ${tab===key ? 'bg-theme-500 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}">
+                        <i data-lucide="${icon}" class="w-5 h-5"></i> ${label}
+                    </button>
+                `;
+                return `
+                    <div class="bg-white dark:bg-gray-900 rounded-[2rem] shadow-2xl flex flex-col md:flex-row overflow-hidden border border-gray-100 dark:border-gray-800 min-h-[80vh]">
+                        <div class="w-full md:w-64 bg-gray-50 dark:bg-gray-950 p-6 flex flex-col gap-1 border-r border-gray-100 dark:border-gray-800">
+                            <div class="mb-8 px-2">
+                                <h2 class="text-2xl font-black text-theme-600 dark:text-theme-400 tracking-tight">${t('admin_dashboard')}</h2>
+                                <p class="text-xs text-gray-400 mt-1 truncate font-mono">${APP_STATE.user.email}</p>
+                            </div>
+                            ${navBtn('news', 'bell', t('admin_news'))}
+                            ${navBtn('events', 'calendar', t('admin_events'))}
+                            ${navBtn('photos', 'image', t('admin_photos'))}
+                            ${navBtn('finance', 'dollar-sign', t('admin_finance'))}
+                            ${navBtn('meetings', 'file-text', t('admin_meetings'))}
+                            ${navBtn('downloads', 'download', t('admin_downloads'))}
+                            ${navBtn('system', 'settings', t('admin_system'))}
+                            
+                            <div class="mt-auto pt-6 border-t border-gray-200 dark:border-gray-800">
+                                <button onclick="handleLogout()" class="w-full text-left px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold transition flex items-center gap-3">
+                                    <i data-lucide="log-out" class="w-5 h-5"></i> ${t('admin_logout')}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-grow p-8 bg-white dark:bg-gray-900 overflow-y-auto">
+                            ${contentHtml}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // --- Core Render ---
+        function render() {
+            const container = document.getElementById('app-container');
+            const view = APP_STATE.view;
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const isActive = btn.dataset.key === view;
+                if(isActive) btn.classList.add('bg-theme-50', 'dark:bg-theme-900/30', 'text-theme-600', 'dark:text-theme-400');
+                else btn.classList.remove('bg-theme-50', 'dark:bg-theme-900/30', 'text-theme-600', 'dark:text-theme-400');
+            });
+            updateMarquee();
+            
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                 if(I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
+            });
+            document.querySelectorAll('#mobile-menu button').forEach(el => {
+                if(el.dataset.key && I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
+            });
+            const routes = {
+                'home': renderHome, 'events': renderEvents, 'mailboxes': renderMailboxes,
+                'gallery': renderGallery,
+                'org': renderOrg, 'finance': renderFinance, 'clubs': renderClubs, 'downloads': renderDownloads,
+                'contact': renderContact, 'meetings': renderMeetings, 'admin': renderAdmin
+            };
+            // 安全渲染
+            try {
+                container.innerHTML = routes[view] ? routes[view]() : renderHome();
+            } catch (e) {
+                console.error("Render Error:", e);
+                container.innerHTML = `<div class="p-10 text-center text-red-500">頁面載入錯誤，請稍後再試。<br><small>${e.message}</small></div>`;
+            }
+            
+            lucide.createIcons();
+            window.scrollTo(0,0);
+        }
+
+        window.navigate = (view) => {
+            APP_STATE.view = view;
+            APP_STATE.eventFilter = 'All'; 
+            APP_STATE.galleryView = 'albums'; // Reset gallery view
+            document.getElementById('mobile-menu').classList.add('hidden');
+            render();
+        };
+
+        window.toggleLang = () => {
+            APP_STATE.lang = APP_STATE.lang === 'zh' ? 'en' : 'zh';
+            document.getElementById('lang-display').innerText = APP_STATE.lang.toUpperCase();
+            const searchInput = document.getElementById('search-input');
+            if(searchInput) searchInput.placeholder = t('searchPlaceholder');
+            render();
+        };
+        window.toggleDarkMode = () => {
+            APP_STATE.darkMode = !APP_STATE.darkMode;
+            document.documentElement.classList.toggle('dark');
+            document.getElementById('dark-icon').classList.toggle('hidden');
+            document.getElementById('light-icon').classList.toggle('hidden');
+        };
+
+        document.getElementById('menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+        // Init
+        (async () => {
+            await loadDataFromFirebase();
+            render();
+        })();
+    </script>
+</body>
+</html>
 
