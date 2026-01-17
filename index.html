@@ -10,10 +10,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 
+    <meta property="og:title" content="北港高中學生會 | PKSH Student Council" />
+    <meta property="og:description" content="你的聲音，我們的行動。共創更美好的校園生活。" />
+    <meta property="og:image" content="https://hxkzl.github.io/pksh-student-council/大頭貼.jpg" />
+    <meta property="og:url" content="https://hxkzl.github.io/pksh-student-council/" />
+    <meta property="og:type" content="website" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class', // [已恢復] 啟用深色模式切換
+            darkMode: 'class',
             theme: {
                 fontFamily: {
                     sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'],
@@ -36,7 +44,6 @@
                     animation: {
                         'fade-up': 'fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'float': 'float 6s ease-in-out infinite',
-                        'blob': 'blob 7s infinite', // [新增] 背景動畫
                     },
                     keyframes: {
                         fadeUp: {
@@ -46,13 +53,6 @@
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-10px)' },
-                        },
-                        // [新增] 背景光暈動畫
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         }
                     },
                     boxShadow: {
@@ -64,6 +64,7 @@
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
     
     <style>
         /* 隱藏捲軸但保留功能 */
@@ -167,10 +168,6 @@
             background: rgba(255,255,255,0.3);
             transform: scale(1.05);
         }
-
-        /* 背景光暈延遲 */
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
     </style>
 </head>
 <body class="bg-gray-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 flex flex-col min-h-screen relative font-sans selection:bg-theme-100 selection:text-theme-800">
@@ -201,8 +198,8 @@
             <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
                 <a href="#" class="flex-shrink-0 flex items-center gap-3 group" onclick="navigate('home')">
                     <img src="大頭貼.jpg" onerror="this.src='https://ui-avatars.com/api/?name=PKSH&background=0d9488&color=fff'" alt="Logo" class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-700 group-hover:ring-theme-400 transition-all">
-                    <div class="hidden sm:flex flex-col">
-                        <span class="text-lg font-bold tracking-tight leading-none text-slate-900 dark:text-white">北港高中<span class="text-theme-500">學生會</span></span>
+                    <div class="flex flex-col">
+                        <span class="text-base sm:text-lg font-bold tracking-tight leading-none text-slate-900 dark:text-white">北港高中<span class="text-theme-500">學生會</span></span>
                         <span class="text-[10px] font-semibold text-slate-400 tracking-widest mt-0.5 uppercase">PKSH SU</span>
                     </div>
                 </a>
@@ -326,6 +323,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
 
         // ============================================
         // ⚠️ Config (請確保這裡填入你的 Firebase Config)
@@ -344,6 +342,18 @@
         try {
             if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
                 const app = initializeApp(firebaseConfig);
+                
+                // 判斷：如果是本機測試 (localhost)，才開啟 Debug Token
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+}
+
+// 正常啟動 App Check
+initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider('6LcZA0gsAAAAAEHxUZAjATy05QzBQKkOG1wPfEtk'),
+    isTokenAutoRefreshEnabled: true
+});
+
                 db = getFirestore(app);
                 auth = getAuth(app);
                 console.log("✅ Firebase 連線成功！");
@@ -383,9 +393,9 @@
                 { roleKey: 'role_vp', icon: '⭐', name_zh: '王雅琝', name_en: 'WANG, YA-WEN', desc_zh: '協助會長執行本會事宜，會長因故缺席時代理之。', desc_en: 'Assists the President.'}
             ],
             orgDepts: [
-                { roleKey: 'role_act', icon: '🎉', chief_zh: '鄭雨涵', chief_en: 'CHENG, YU-HAN', desc_zh: '負責策劃及推行本會所舉辦之各類活動。', desc_en: 'Activities planning.'},
+                { roleKey: 'role_act', icon: '🎉', chief_zh: '鄭雨涵', chief_en: 'CHENG, YU-HAN', deputy_zh: '余采璇', deputy_en: 'YU, TSAI-HSUAN', desc_zh: '負責策劃及推行本會所舉辦之各類活動。', desc_en: 'Activities planning.'},
                 { roleKey: 'role_art', icon: '🎨', chief_zh: '朱守晴', chief_en: 'CHU, SHOU-CHING', deputy_zh: '黃瓊美', deputy_en: 'HUANG, CHIUNG-MEI', desc_zh: '負責本會學藝活動、海報、壁報設計。', desc_en: 'Art and Design.'},
-                { roleKey: 'role_admin', icon: '📝', chief_zh: '蔡秉宏', chief_en: 'TSAI, PING-HUNG', deputy_zh: '顏子䒟', deputy_en: 'YEN, TZU-TAN', desc_zh: '負責本會開會通告、會議記錄。', desc_en: 'Administration.'},
+                { roleKey: 'role_admin', icon: '📝', chief_zh: '蔡秉宏', chief_en: 'TSAI, PING-HUNG', desc_zh: '負責本會開會通告、會議記錄。', desc_en: 'Administration.'},
                 { roleKey: 'role_ga', icon: '💰', chief_zh: '趙芝翊', chief_en: 'CHAO, CHIH-YI', desc_zh: '負責本會經費收支，財產保管。', desc_en: 'General Affairs.'},
                 { roleKey: 'role_pr', icon: '📢', chief_zh: '許雅琳', chief_en: 'HSU, YA-LIN', desc_zh: '負責本會會議之聯絡及舉辦活動之聯繫。', desc_en: 'Public Relations.'},
                 { roleKey: 'role_mobile', icon: '🛠️', chief_zh: '劉乙葭', chief_en: 'LIU, YI-CHIA', desc_zh: '負責本會舉辦之場地佈置。', desc_en: 'Logistics.'}
@@ -497,22 +507,41 @@
 
         function formatContent(text) {
             if (!text) return '';
-            if (/<[a-z][\s\S]*>/i.test(text) && !text.startsWith('http')) return text;
+
+            // [修改重點 1] 安全過濾
+            // 原本的寫法是：如果看起來像 HTML 標籤，就直接回傳 (很危險)
+            // 新的寫法是：如果看起來像 HTML，先用 DOMPurify "洗乾淨" 再回傳
+            // 這樣可以保留粗體 <b> 或換行 <br>，但會刪除惡意的 <script>
+            if (/<[a-z][\s\S]*>/i.test(text) && !text.startsWith('http')) {
+                return DOMPurify.sanitize(text);
+            }
+
+            // 下面是原本的網址自動轉換邏輯 (YouTube, PDF, 圖片)，這裡大致保持不變
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return text.replace(urlRegex, (url) => {
+                
+                // 1. YouTube 處理
                 const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
                 if (ytMatch && ytMatch[1]) {
                     return `<div class="my-4 w-full aspect-video"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" class="w-full h-full rounded-2xl shadow-lg border-2 border-white dark:border-gray-700" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
                 }
+ 
+                // 2. PDF 下載按鈕處理
                 if (url.toLowerCase().endsWith('.pdf')) {
                     let filename = '下載 PDF 文件';
                     try { filename = decodeURIComponent(new URL(url).pathname.split('/').pop()); } catch(e){}
                     return `<a href="${url}" target="_blank" class="btn-link group block mt-3 w-full text-center bg-gradient-to-r from-red-50 to-white border border-red-200 text-red-600 rounded-xl py-3.5 hover:from-red-100 hover:to-red-50 hover:shadow-md transition-all font-bold"><i data-lucide="file-down" class="inline-block mr-2 w-5 h-5 group-hover:scale-110 transition-transform"></i>${filename}</a>`;
                 }
+
+                // 3. 圖片預覽處理
                 if (/\.(jpeg|jpg|gif|png)$/i.test(url)) {
                      return `<img src="${url}" class="mt-3 rounded-2xl shadow-lg max-h-80 mx-auto border-4 border-white dark:border-gray-700 hover:scale-[1.02] transition-transform" alt="Image">`;
                 }
-                return `<a href="${url}" target="_blank" class="text-theme-600 font-bold hover:text-theme-700 transition-colors inline-flex items-center gap-1 border-b-2 border-theme-200 hover:border-theme-500 pb-0.5">🔗 開啟連結 <i data-lucide="external-link" class="w-3 h-3"></i></a>`;
+
+                // [修改重點 2] 一般連結處理
+                // 為了保險起見，我們把網址也用 DOMPurify 洗一次 (雖然這步不是最致命的，但多一層保護更好)
+                const safeUrl = DOMPurify.sanitize(url);
+                return `<a href="${safeUrl}" target="_blank" class="text-theme-600 font-bold hover:text-theme-700 transition-colors inline-flex items-center gap-1 border-b-2 border-theme-200 hover:border-theme-500 pb-0.5">🔗 開啟連結 <i data-lucide="external-link" class="w-3 h-3"></i></a>`;
             });
         }
 
@@ -852,32 +881,73 @@
             }
         };
         window.performSearch = () => {
-            const queryText = document.getElementById('search-input').value.toLowerCase();
+            const queryText = document.getElementById('search-input').value.toLowerCase().trim();
             const resultsDiv = document.getElementById('search-results');
-            if (queryText.length < 2) {
+            
+            if (queryText.length < 1) {
                 resultsDiv.innerHTML = '';
                 return;
             }
+
             const hits = [];
+            const check = (text) => text && text.toLowerCase().includes(queryText);
+
+            // 1. 公告
             APP_DATA.announcements.forEach(a => {
-                const title = val(a, 'title');
-                if (title.toLowerCase().includes(queryText)) hits.push({ type: isEn()?'News':'公告', title: title, date: a.date, icon: 'bell' });
+                if (check(a.title_zh) || check(a.title_en) || check(a.content_zh) || check(a.content_en)) {
+                    hits.push({ 
+                        type: isEn() ? 'News' : '公告', 
+                        title: val(a, 'title'), 
+                        date: a.date, 
+                        icon: 'bell',
+                        key: 'home',
+                        id: a.id // [新增] 傳送 ID
+                    });
+                }
             });
+
+            // 2. 活動
             APP_DATA.events.forEach(e => {
-                const title = val(e, 'title');
-                if (title.toLowerCase().includes(queryText)) hits.push({ type: isEn()?'Event':'活動', title: title, date: e.date, icon: 'calendar' });
+                if (check(e.title_zh) || check(e.title_en) || check(e.location_zh) || check(e.location_en)) {
+                    hits.push({ 
+                        type: isEn() ? 'Event' : '活動', 
+                        title: val(e, 'title'), 
+                        date: e.date, 
+                        icon: 'calendar',
+                        key: 'events',
+                        id: e.id // [新增] 傳送 ID
+                    });
+                }
             });
+            
+            // 3. 下載
+            APP_DATA.downloads.forEach(d => {
+                if (check(d.title_zh) || check(d.title_en)) {
+                    hits.push({ 
+                        type: isEn() ? 'Download' : '下載', 
+                        title: val(d, 'title'), 
+                        date: d.date, 
+                        icon: 'download',
+                        key: 'downloads',
+                        id: d.id // [新增] 傳送 ID
+                    });
+                }
+            });
+
+            // 渲染結果 (注意 onclick 多了第二個參數)
             if (hits.length === 0) {
                 resultsDiv.innerHTML = `<div class="text-center text-white/80 text-lg mt-10 font-medium">${t('noResults')}</div>`;
             } else {
                 resultsDiv.innerHTML = hits.map(h => `
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-md hover:scale-[1.02]">
-                        <div class="bg-theme-50 dark:bg-theme-900/30 p-2.5 rounded-full text-theme-600 dark:text-theme-400"><i data-lucide="${h.icon}"></i></div>
-                        <div>
-                            <p class="font-bold dark:text-white text-lg">${h.title}</p>
+                    <div onclick="navigate('${h.key}', '${h.id}'); toggleSearch();" class="bg-white dark:bg-gray-800 p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-md hover:scale-[1.02]">
+                        <div class="bg-theme-50 dark:bg-theme-900/30 p-2.5 rounded-full text-theme-600 dark:text-theme-400 shrink-0">
+                            <i data-lucide="${h.icon}"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="font-bold dark:text-white text-lg truncate">${h.title}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500 dark:text-gray-300 font-bold">${h.type}</span>
-                                <span class="text-xs text-gray-400">${h.date}</span>
+                                <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-500 dark:text-gray-300 font-bold shrink-0">${h.type}</span>
+                                <span class="text-xs text-gray-400 truncate">${h.date}</span>
                             </div>
                         </div>
                     </div>
@@ -990,10 +1060,33 @@
         });
 
         // --- Render Functions ---
+        // [新增] 產生 Google Calendar 連結的輔助函式
+        function createGoogleCalUrl(ev) {
+            const title = encodeURIComponent(val(ev, 'title'));
+            const loc = encodeURIComponent(val(ev, 'location'));
+            const details = encodeURIComponent('更多資訊請見北港高中學生會網站');
+            
+            // 簡單處理日期格式 (移除橫線)
+            const dateStr = ev.date.replace(/-/g, '');
+            let start = dateStr;
+            let end = dateStr;
+            
+            // 如果有填時間 (例如 08:00)，就加上時間
+            if (ev.time && ev.time.includes(':')) {
+                const timeStr = ev.time.replace(':', '') + '00';
+                start += 'T' + timeStr;
+                end += 'T' + timeStr; 
+            }
+
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&location=${loc}&details=${details}`;
+        }
+
+        // 下面接著原本的 renderHome...
         function renderHome() {
             const announcements = APP_DATA.announcements;
+            // [修正] 這裡加上了 id="${item.id}"
             const newsHtml = announcements.map(item => `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-l-[6px] border-theme-500 hover-lift relative overflow-hidden">
+                <div id="${item.id}" class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-l-[6px] border-theme-500 hover-lift relative overflow-hidden">
                     <div class="flex justify-between items-start mb-2 relative z-10">
                         <span class="text-xs font-bold text-theme-600 dark:text-theme-400 uppercase tracking-wider bg-theme-50 dark:bg-theme-900/30 px-2 py-1 rounded">${val(item, 'tag')}</span>
                         <span class="text-xs text-gray-400 font-mono">${item.date}</span>
@@ -1002,23 +1095,36 @@
                     ${item.content_zh ? `<div class="text-gray-600 dark:text-gray-300 overflow-x-auto news-content leading-relaxed relative z-10">${formatContent(val(item, 'content'))}</div>` : ''}
                 </div>
             `).join('');
+
             // 右側功能：活動倒數 + 最新照片預覽
             let rightSideHtml = '';
             // 1. 活動倒數
+            // 1. 活動倒數 (升級版)
             let nextEventHtml = `<div class="p-8 text-center text-gray-400 dark:text-gray-500 font-medium">暫無即將到來的活動</div>`;
             const futureEvents = APP_DATA.events.filter(e => new Date(e.date) >= new Date());
+            
             if (futureEvents.length > 0) {
                 const nextEv = futureEvents[0];
                 const daysLeft = Math.ceil((new Date(nextEv.date) - new Date()) / (1000 * 60 * 60 * 24));
+                
+                // [新增] 產生連結
+                const calLink = createGoogleCalUrl(nextEv);
+
                 nextEventHtml = `
                     <div class="text-center relative z-10">
                         <span class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">NEXT EVENT</span>
                         <h3 class="text-2xl font-black mt-3 dark:text-white bg-clip-text text-transparent bg-gradient-to-r from-theme-500 to-blue-500">${val(nextEv, 'title')}</h3>
-                        <div class="my-6 relative inline-block">
-                            <span class="text-6xl font-black text-theme-500 drop-shadow-sm">${daysLeft}</span>
+                        
+                        <div class="my-6 relative inline-block group cursor-default">
+                            <span class="text-6xl font-black text-theme-500 drop-shadow-sm group-hover:scale-110 transition-transform duration-300 inline-block">${daysLeft}</span>
                             <span class="text-gray-400 font-bold block mt-1 text-sm tracking-widest">DAYS LEFT</span>
                         </div>
-                        <p class="text-sm text-gray-500 font-medium bg-gray-100 dark:bg-gray-700/50 py-2 rounded-lg"><i data-lucide="calendar" class="inline w-4 h-4 mb-0.5 mr-1"></i> ${nextEv.date} @ ${val(nextEv, 'location')}</p>
+                        
+                        <p class="text-sm text-gray-500 font-medium bg-gray-100 dark:bg-gray-700/50 py-2 rounded-lg mb-4"><i data-lucide="calendar" class="inline w-4 h-4 mb-0.5 mr-1"></i> ${nextEv.date} @ ${val(nextEv, 'location')}</p>
+                        
+                        <a href="${calLink}" target="_blank" class="inline-flex items-center justify-center gap-2 bg-theme-500 hover:bg-theme-600 text-white font-bold py-2.5 px-6 rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm w-full">
+                            <i data-lucide="calendar-plus" class="w-4 h-4"></i> ${isEn() ? 'Add to Calendar' : '加入行事曆'}
+                        </a>
                     </div>
                 `;
             }
@@ -1078,7 +1184,7 @@
                                     <span class="font-bold text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">🏫 學校官網</span>
                                     <i data-lucide="external-link" class="w-4 h-4 text-gray-400 group-hover:text-blue-500"></i>
                                 </a>
-                                <a href="https://school.ylc.edu.tw/" target="_blank" class="block p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl hover:bg-green-50 dark:hover:bg-green-900/20 transition flex items-center justify-between group border border-transparent hover:border-green-200 dark:hover:border-green-800">
+                                <a href="https://portal.k12.ntut.edu.tw/" target="_blank" class="block p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl hover:bg-green-50 dark:hover:bg-green-900/20 transition flex items-center justify-between group border border-transparent hover:border-green-200 dark:hover:border-green-800">
                                     <span class="font-bold text-gray-700 dark:text-gray-200 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">📊 成績查詢</span>
                                     <i data-lucide="external-link" class="w-4 h-4 text-gray-400 group-hover:text-green-500"></i>
                                 </a>
@@ -1181,11 +1287,13 @@
             const filteredEvents = filter === 'All' 
                 ? APP_DATA.events 
                 : APP_DATA.events.filter(e => e.type === filter);
+
             const eventsHtml = filteredEvents.length > 0 ? filteredEvents.map(ev => {
                 const { month, day } = formatDateHelper(ev.date);
                 
+                // [修正] 這裡加上了 id="${ev.id}"
                 return `
-                <div class="flex items-center bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md mb-5 border-l-[6px] ${ev.type === 'Holiday' ? 'border-red-500' : ev.type === 'Academic' ? 'border-blue-500' : 'border-theme-500'} hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div id="${ev.id}" class="flex items-center bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md mb-5 border-l-[6px] ${ev.type === 'Holiday' ? 'border-red-500' : ev.type === 'Academic' ? 'border-blue-500' : 'border-theme-500'} hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                     <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl text-center min-w-[90px] border border-gray-100 dark:border-gray-600 group-hover:border-theme-200 transition-colors">
                         <span class="block text-2xl font-black text-gray-800 dark:text-white">${day}</span>
                         <span class="block text-xs font-bold text-gray-500 uppercase mt-1">${month}${isEn() ? '' : '月'}</span>
@@ -1208,11 +1316,13 @@
                     </div>
                 </div>
             `}).join('') : `<div class="text-center text-gray-400 py-20 font-medium bg-gray-50 dark:bg-gray-800/50 rounded-2xl">此分類暫無活動</div>`;
+
             const makeBtn = (type, label) => `
                 <button onclick="setEventFilter('${type}')" class="px-6 py-2.5 rounded-full text-sm font-bold transition-all transform active:scale-95 ${APP_STATE.eventFilter === type ? 'bg-theme-600 text-white shadow-lg ring-2 ring-theme-200' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm border border-gray-200 dark:border-gray-700'}">
                     ${label}
                 </button>
             `;
+
             return `
                 <div class="max-w-4xl mx-auto">
                     <div class="text-center mb-10">
@@ -1271,45 +1381,134 @@
             `;
         }
 
+        // 變數放在外面 (這行不要動，確認有在 function 外面即可)
+        let financeChartInstance = null;
+
         function renderFinance() {
+            // 1. 計算數據
             const total = APP_DATA.finance.reduce((acc, cur) => acc + Number(cur.amount), 0);
-            const rows = APP_DATA.finance.map(f => `
-                <tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition last:border-0">
-                    <td class="py-4 px-6 dark:text-gray-300 font-mono text-sm">${f.date}</td>
-                    <td class="py-4 px-6 font-bold dark:text-white text-gray-800">${val(f, 'item')}</td>
-                    <td class="py-4 px-6 text-right font-mono"><span class="${f.amount > 0 ? 'text-green-600 bg-green-50 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-800' : 'text-red-600 bg-red-50 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-800'} font-bold px-3 py-1 rounded-md text-sm">${f.amount > 0 ? '+' : ''}${f.amount.toLocaleString()}</span></td>
-                </tr>
-            `).join('');
+            const totalIncome = APP_DATA.finance.filter(f => f.amount > 0).reduce((acc, cur) => acc + cur.amount, 0);
+            const totalExpense = APP_DATA.finance.filter(f => f.amount < 0).reduce((acc, cur) => acc + Math.abs(cur.amount), 0);
+
+            // 2. 生成列表 HTML (升級版)
+            const rows = APP_DATA.finance.map(f => {
+                const isIncome = f.amount > 0;
+                return `
+                <div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-800 last:border-0 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center ${isIncome ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'}">
+                            <i data-lucide="${isIncome ? 'arrow-down-left' : 'arrow-up-right'}" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800 dark:text-gray-100 text-base mb-0.5 group-hover:text-theme-600 transition-colors">${val(f, 'item')}</p>
+                            <p class="text-xs text-gray-400 font-mono">${f.date}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="block font-bold font-mono text-lg ${isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}">
+                            ${isIncome ? '+' : ''}${f.amount.toLocaleString()}
+                        </span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${isIncome ? (isEn()?'IN':'收入') : (isEn()?'OUT':'支出')}</span>
+                    </div>
+                </div>
+            `}).join('');
+
+            // 3. 繪製圖表 (保持不變，調整配色)
+            setTimeout(() => {
+                const ctx = document.getElementById('financeChart');
+                if (ctx) {
+                    if (financeChartInstance) financeChartInstance.destroy();
+                    financeChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: [isEn() ? 'Income' : '總收入', isEn() ? 'Expense' : '總支出'],
+                            datasets: [{
+                                label: 'Amount (TWD)',
+                                data: [totalIncome, totalExpense],
+                                backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)'], // Green, Red
+                                borderColor: ['#10b981', '#ef4444'],
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                barThickness: 50 // 讓柱子細一點，比較精緻
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(200, 200, 200, 0.1)' },
+                                    ticks: { color: '#9ca3af', font: {family: "'Inter', sans-serif"} }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { color: document.documentElement.classList.contains('dark') ? '#fff' : '#4b5563', font: { size: 14, weight: 'bold' } }
+                                }
+                            }
+                        }
+                    });
+                }
+            }, 100);
+
+            // 4. 回傳全新佈局 HTML
             return `
-                <div class="max-w-4xl mx-auto">
-                    <h1 class="text-3xl font-black mb-8 text-theme-600 dark:text-theme-400 text-center tracking-tight">${t('financeTitle')}</h1>
-                    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
-                        <div class="p-8 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-750 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-6">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-theme-100 dark:bg-theme-900/30 p-3 rounded-full text-theme-600 dark:text-theme-400"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">本表僅列出近期收支概況，詳細報表請至學生會辦公室查閱。</p>
-                            </div>
-                            <div class="flex flex-col items-end">
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">CURRENT BALANCE</span>
-                                <div class="flex items-baseline gap-2">
-                                    <span class="text-3xl font-black ${total >= 0 ? 'text-theme-600 dark:text-theme-400' : 'text-red-500'} tracking-tight">
-                                        ${total > 0 ? '+' : ''}${total.toLocaleString()}
-                                    </span>
-                                    <span class="text-sm font-bold text-gray-400">TWD</span>
-                                </div>
+                <div class="max-w-5xl mx-auto animate-fade-in space-y-8">
+                    
+                    <div class="text-center">
+                        <h1 class="text-3xl font-black text-theme-600 dark:text-theme-400 tracking-tight">${t('financeTitle')}</h1>
+                        <p class="text-gray-500 mt-2 text-sm">公開透明的學生會財務流向</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-lg transition-all">
+                            <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-lucide="trending-up" class="w-24 h-24 text-green-500"></i></div>
+                            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Total Income</p>
+                            <h3 class="text-3xl font-black text-green-500 dark:text-green-400 font-mono tracking-tight">+${totalIncome.toLocaleString()}</h3>
+                            <div class="mt-4 flex items-center gap-2 text-xs font-bold text-green-600 bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-full w-fit">
+                                <i data-lucide="arrow-up-right" class="w-3 h-3"></i> 累計收入
                             </div>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold tracking-wider">
-                                    <tr>
-                                        <th class="py-4 px-6">${t('col_date')}</th>
-                                        <th class="py-4 px-6">${t('col_item')}</th>
-                                        <th class="py-4 px-6 text-right">${t('col_amount')} (TWD)</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">${rows}</tbody>
-                            </table>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-lg transition-all">
+                            <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><i data-lucide="trending-down" class="w-24 h-24 text-red-500"></i></div>
+                            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Total Expense</p>
+                            <h3 class="text-3xl font-black text-red-500 dark:text-red-400 font-mono tracking-tight">-${totalExpense.toLocaleString()}</h3>
+                            <div class="mt-4 flex items-center gap-2 text-xs font-bold text-red-600 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-full w-fit">
+                                <i data-lucide="arrow-down-right" class="w-3 h-3"></i> 累計支出
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-theme-500 to-blue-600 p-6 rounded-3xl shadow-xl shadow-theme-500/20 text-white relative overflow-hidden transform hover:-translate-y-1 transition-all">
+                            <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
+                            <p class="text-sm font-bold text-white/80 uppercase tracking-widest mb-1">Current Balance</p>
+                            <h3 class="text-4xl font-black font-mono tracking-tight mt-2">$${total.toLocaleString()}</h3>
+                            <p class="mt-4 text-xs font-medium text-white/90 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-lg inline-block">
+                                <i data-lucide="wallet" class="inline w-3 h-3 mr-1"></i> 目前可用資金
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        
+                        <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 flex flex-col">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="font-bold dark:text-white flex items-center gap-2"><i data-lucide="bar-chart-2" class="text-theme-500"></i> 收支分析</h3>
+                            </div>
+                            <div class="flex-grow min-h-[250px] relative">
+                                <canvas id="financeChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 flex flex-col overflow-hidden">
+                            <div class="p-6 bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                                <h3 class="font-bold dark:text-white flex items-center gap-2"><i data-lucide="list" class="text-theme-500"></i> 近期明細</h3>
+                                <span class="text-xs font-bold text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Latest Transactions</span>
+                            </div>
+                            <div class="overflow-y-auto max-h-[400px] custom-scrollbar">
+                                ${rows}
+                            </div>
                         </div>
                     </div>
                 </div>`;
@@ -1356,8 +1555,9 @@
         }
 
         function renderDownloads() {
+            // [修正] 這裡加上了 id="${d.id}"
             const list = APP_DATA.downloads.map(d => `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100 dark:border-gray-700 hover:border-theme-400 hover:shadow-lg transition-all group gap-4">
+                <div id="${d.id}" class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100 dark:border-gray-700 hover:border-theme-400 hover:shadow-lg transition-all group gap-4">
                     <div class="flex items-center gap-5">
                         <div class="bg-theme-50 dark:bg-theme-900/30 p-4 rounded-2xl text-theme-600 dark:text-theme-400 group-hover:bg-theme-500 group-hover:text-white transition duration-300"><i data-lucide="file-text" class="w-6 h-6"></i></div>
                         <div>
@@ -1373,6 +1573,7 @@
                     </a>
                 </div>
             `).join('');
+
             return `
                 <div class="max-w-4xl mx-auto">
                     <h1 class="text-3xl font-black mb-8 text-center text-theme-600 dark:text-theme-400 tracking-tight">${t('downloadTitle')}</h1>
@@ -1382,48 +1583,38 @@
 
         function renderContact() {
             return `
-                <div class="max-w-4xl mx-auto relative z-10 px-4">
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-theme-200/40 via-purple-200/40 to-blue-200/40 rounded-full blur-3xl -z-10 dark:from-theme-900/20 dark:to-blue-900/20"></div>
-
-                    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-2xl p-8 sm:p-12 rounded-[2.5rem] shadow-2xl border border-white/50 dark:border-slate-700 text-center relative overflow-hidden">
+                <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-10 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-theme-100 dark:bg-theme-900/30 rounded-full blur-2xl"></div>
+                    
+                    <h1 class="text-3xl font-black mb-8 text-center text-theme-600 dark:text-theme-400 tracking-tight relative z-10">${t('contact')}</h1>
+                    <div class="space-y-4 relative z-10">
+                        <a href="https://www.instagram.com/pksh.su/" target="_blank" class="flex items-center p-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 border border-gray-100 dark:border-gray-600 rounded-2xl hover:border-pink-300 transition-all group shadow-sm hover:shadow-md">
+                            <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform mr-5">
+                                <i data-lucide="instagram" class="w-8 h-8 text-pink-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl dark:text-white group-hover:text-pink-500 transition-colors">Instagram</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 font-mono mt-0.5">@pksh.su</p>
+                            </div>
+                            <i data-lucide="arrow-right" class="ml-auto w-5 h-5 text-gray-300 group-hover:text-pink-500 group-hover:translate-x-1 transition-all"></i>
+                        </a>
                         
-                        <div class="mb-12">
-                            <span class="inline-block py-1 px-3 rounded-full bg-theme-100 dark:bg-theme-900/50 text-theme-600 dark:text-theme-400 text-xs font-bold tracking-widest uppercase mb-4">Get in Touch</span>
-                            <h1 class="text-4xl sm:text-5xl font-black text-slate-800 dark:text-white tracking-tight mb-4">聯絡我們</h1>
-                            <p class="text-slate-500 dark:text-slate-400 text-lg max-w-xl mx-auto">無論是對學生會的建議、活動諮詢，或是單純想聊聊，我們都隨時歡迎您的來訊！</p>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                            <a href="https://www.instagram.com/pksh.su/" target="_blank" class="group relative flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:shadow-pink-500/10 transition-all duration-300 hover:-translate-y-1">
-                                <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 text-white flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                    <i data-lucide="instagram" class="w-10 h-10 stroke-white"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-1 group-hover:text-pink-600 transition-colors">Instagram</h3>
-                                <p class="text-slate-400 font-mono text-sm">@pksh.su</p>
-                                <div class="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                                    <i data-lucide="arrow-right" class="w-6 h-6 text-pink-500"></i>
-                                </div>
-                            </a>
-
-                            <a href="mailto:pkshsu@pksh.ylc.edu.tw" class="group relative flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:shadow-theme-500/10 transition-all duration-300 hover:-translate-y-1">
-                                <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-theme-400 to-cyan-600 text-white flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                    <i data-lucide="mail" class="w-10 h-10 stroke-white"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-1 group-hover:text-theme-600 transition-colors">Email</h3>
-                                <p class="text-slate-400 font-mono text-sm">pkshsu@pksh.ylc.edu.tw</p>
-                                <div class="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                                    <i data-lucide="arrow-right" class="w-6 h-6 text-theme-500"></i>
-                                </div>
-                            </a>
-                        </div>
-                        
-                        <div class="border-t border-slate-100 dark:border-slate-700 pt-8">
-                            <button onclick="navigate('admin')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all text-sm font-bold">
-                                <i data-lucide="shield" class="w-4 h-4"></i>
-                                <span>後台管理登入</span>
-                            </button>
-                        </div>
-
+                        <a href="mailto:pkshsu@pksh.ylc.edu.tw" class="flex items-center p-5 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 border border-gray-100 dark:border-gray-600 rounded-2xl hover:border-theme-300 transition-all group shadow-sm hover:shadow-md">
+                            <div class="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform mr-5">
+                                <i data-lucide="mail" class="w-8 h-8 text-theme-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xl dark:text-white group-hover:text-theme-600 transition-colors">Email</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 font-mono mt-0.5">pkshsu@pksh.ylc.edu.tw</p>
+                            </div>
+                            <i data-lucide="arrow-right" class="ml-auto w-5 h-5 text-gray-300 group-hover:text-theme-500 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="pt-8 mt-8 border-t border-gray-100 dark:border-gray-700 text-center">
+                        <button onclick="navigate('admin')" class="text-xs font-bold text-gray-400 hover:text-theme-500 flex items-center justify-center transition mx-auto gap-1 py-2 px-4 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <i data-lucide="shield" class="w-3 h-3"></i> ${t('admin')}
+                        </button>
                     </div>
                 </div>
             `;
@@ -1755,10 +1946,12 @@
         }
 
         // --- Core Render ---
+        // --- Core Render (修正版) ---
         function render() {
             const container = document.getElementById('app-container');
             const view = APP_STATE.view;
             
+            // 1. 更新導覽列狀態
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 const isActive = btn.dataset.key === view;
                 if(isActive) btn.classList.add('bg-theme-50', 'dark:bg-theme-900/30', 'text-theme-600', 'dark:text-theme-400');
@@ -1766,19 +1959,30 @@
             });
             updateMarquee();
             
+            // 2. 更新語言
             document.querySelectorAll('.nav-btn').forEach(el => {
                  if(I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
             });
             document.querySelectorAll('#mobile-menu button').forEach(el => {
                 if(el.dataset.key && I18N[APP_STATE.lang][el.dataset.key]) el.innerText = I18N[APP_STATE.lang][el.dataset.key];
             });
+
+            // 3. 定義路由
             const routes = {
-                'home': renderHome, 'events': renderEvents, 'mailboxes': renderMailboxes,
+                'home': renderHome,
+                'events': renderEvents,
+                'mailboxes': renderMailboxes,
                 'gallery': renderGallery,
-                'org': renderOrg, 'finance': renderFinance, 'clubs': renderClubs, 'downloads': renderDownloads,
-                'contact': renderContact, 'meetings': renderMeetings, 'admin': renderAdmin
+                'clubs': renderClubs,
+                'downloads': renderDownloads,
+                'finance': renderFinance,
+                'meetings': renderMeetings,
+                'org': renderOrg,
+                'contact': renderContact,
+                'admin': renderAdmin
             };
-            // 安全渲染
+
+            // 4. 安全渲染
             try {
                 container.innerHTML = routes[view] ? routes[view]() : renderHome();
             } catch (e) {
@@ -1787,34 +1991,90 @@
             }
             
             lucide.createIcons();
-            window.scrollTo(0,0);
+
+            // 5. [修正關鍵] 自動滑動定位邏輯
+            if (APP_STATE.targetId) {
+                // 🔥 關鍵修正：先把 ID 複製一份存起來！
+                const targetId = APP_STATE.targetId;
+                
+                // 然後再清空全域變數，避免重複觸發
+                APP_STATE.targetId = null;
+
+                setTimeout(() => {
+                    // 這裡使用剛剛存起來的 targetId，而不是 APP_STATE.targetId
+                    const el = document.getElementById(targetId);
+                    
+                    if (el) {
+                        // (1) 滑動到該元素
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        // (2) 加上強力高亮效果
+                        el.classList.add(
+                            'ring-8', 'ring-yellow-400', 
+                            'bg-yellow-100', 'dark:bg-yellow-900', 
+                            'scale-110', 'z-10', 
+                            'transition-all', 'duration-500'
+                        );
+                        
+                        // (3) 1.8 秒後移除效果
+                        setTimeout(() => {
+                            el.classList.remove(
+                                'ring-8', 'ring-yellow-400', 
+                                'bg-yellow-100', 'dark:bg-yellow-900', 
+                                'scale-110', 'z-10'
+                            );
+                        }, 1800);
+                    } else {
+                        console.warn("找不到目標元素 ID:", targetId);
+                    }
+                }, 500); // 等待 0.5 秒讓畫面渲染完成
+            } else {
+                // 如果沒有指定目標，就回到最頂端
+                window.scrollTo(0,0);
+            }
         }
 
-        window.navigate = (view) => {
+        // 修改後的 navigate，多了一個 targetId 參數
+        window.navigate = (view, targetId = null) => {
             APP_STATE.view = view;
-            APP_STATE.eventFilter = 'All'; 
-            APP_STATE.galleryView = 'albums'; // Reset gallery view
-            document.getElementById('mobile-menu').classList.add('hidden');
+            APP_STATE.eventFilter = 'All'; // 重置篩選，確保活動看得到
+            APP_STATE.galleryView = 'albums';
+            
+            // 1. 儲存目標 ID 到全域變數
+            APP_STATE.targetId = targetId; 
+
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(mobileMenu) mobileMenu.classList.add('hidden');
             render();
         };
 
         window.toggleLang = () => {
             APP_STATE.lang = APP_STATE.lang === 'zh' ? 'en' : 'zh';
-            document.getElementById('lang-display').innerText = APP_STATE.lang.toUpperCase();
+            const langDisplay = document.getElementById('lang-display');
+            if(langDisplay) langDisplay.innerText = APP_STATE.lang.toUpperCase();
+            
             const searchInput = document.getElementById('search-input');
             if(searchInput) searchInput.placeholder = t('searchPlaceholder');
             render();
         };
+
         window.toggleDarkMode = () => {
             APP_STATE.darkMode = !APP_STATE.darkMode;
             document.documentElement.classList.toggle('dark');
-            document.getElementById('dark-icon').classList.toggle('hidden');
-            document.getElementById('light-icon').classList.toggle('hidden');
+            const darkIcon = document.getElementById('dark-icon');
+            const lightIcon = document.getElementById('light-icon');
+            if(darkIcon) darkIcon.classList.toggle('hidden');
+            if(lightIcon) lightIcon.classList.toggle('hidden');
         };
 
-        document.getElementById('menu-button').addEventListener('click', () => {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
+        const menuBtn = document.getElementById('menu-button');
+        if(menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                if(mobileMenu) mobileMenu.classList.toggle('hidden');
+            });
+        }
+
         // Init
         (async () => {
             await loadDataFromFirebase();
